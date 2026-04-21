@@ -170,6 +170,14 @@ class KDNA_Events_Templates {
 			true
 		);
 
+		wp_register_script(
+			'kdna-events-maps',
+			KDNA_EVENTS_URL . 'assets/js/kdna-events-maps.js',
+			array( 'jquery', 'kdna-events-frontend' ),
+			KDNA_EVENTS_VERSION,
+			true
+		);
+
 		$data = array(
 			'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
 			'nonce'              => wp_create_nonce( 'kdna_events_frontend' ),

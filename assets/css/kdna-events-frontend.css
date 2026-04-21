@@ -267,3 +267,103 @@ a.kdna-events-event-organiser__name:hover {
 	color: #1e40af;
 	text-decoration: underline;
 }
+
+/* Event Location. */
+.kdna-events-event-location {
+	display: block;
+}
+.kdna-events-event-location__name {
+	font-weight: 600;
+	margin: 0 0 0.25em;
+}
+.kdna-events-event-location__address {
+	margin: 0 0 0.75em;
+	color: #4b5563;
+	line-height: 1.45;
+}
+.kdna-events-event-location__address-link {
+	color: inherit;
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.15em;
+	transition: color 0.2s ease;
+}
+.kdna-events-event-location__map {
+	width: 100%;
+	height: 400px;
+	min-height: 180px;
+	background-color: #e5e7eb;
+	position: relative;
+	overflow: hidden;
+}
+.kdna-events-event-location__map--placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1em;
+	background: repeating-linear-gradient(
+		45deg,
+		#f9fafb,
+		#f9fafb 10px,
+		#f3f4f6 10px,
+		#f3f4f6 20px
+	);
+	color: #4b5563;
+	border: 1px dashed #c4c7ca;
+	text-align: center;
+}
+.kdna-events-event-location__map-placeholder-content {
+	max-width: 30em;
+}
+.kdna-events-event-location__map-placeholder-content strong {
+	display: block;
+	margin-bottom: 0.35em;
+	color: #1f2937;
+	font-size: 1.05em;
+}
+.kdna-events-event-location__map-placeholder-content a {
+	color: #1d4ed8;
+}
+.kdna-events-event-location__virtual-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	margin-top: 0.75em;
+	line-height: 1.25;
+	text-decoration: none;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.kdna-events-event-location__virtual-link--button {
+	padding: 0.6em 1.1em;
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border: 1px solid #1d4ed8;
+	border-radius: 0.4em;
+}
+.kdna-events-event-location__virtual-link--button:hover {
+	background-color: #1e40af;
+	border-color: #1e40af;
+	color: #ffffff;
+}
+.kdna-events-event-location__virtual-link--plain {
+	color: #1d4ed8;
+	padding: 0;
+	background: transparent;
+	border: none;
+}
+.kdna-events-event-location__virtual-link--plain:hover {
+	color: #1e40af;
+	text-decoration: underline;
+}
+.kdna-events-event-location__virtual-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+.kdna-events-event-location__virtual-icon svg,
+.kdna-events-event-location__virtual-icon i {
+	width: 1em;
+	height: 1em;
+	font-size: 1em;
+}
