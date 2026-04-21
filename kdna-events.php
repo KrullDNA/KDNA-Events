@@ -112,6 +112,7 @@ function kdna_events_bootstrap() {
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-admin.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-settings.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-templates.php';
+	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-grid.php';
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-base.php';
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-title.php';
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-subtitle.php';
@@ -122,9 +123,12 @@ function kdna_events_bootstrap() {
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-image.php';
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-organiser.php';
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-location.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-grid.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-filter.php';
 
 	KDNA_Events_CPT::init();
 	KDNA_Events_Templates::init();
+	KDNA_Events_Grid::init();
 
 	if ( is_admin() ) {
 		KDNA_Events_Admin::init();
@@ -157,6 +161,8 @@ function kdna_events_register_stage3_widgets( $widgets_manager ) {
 		'KDNA_Events_Widget_Event_Image',
 		'KDNA_Events_Widget_Event_Organiser',
 		'KDNA_Events_Widget_Event_Location',
+		'KDNA_Events_Widget_Event_Grid',
+		'KDNA_Events_Widget_Event_Filter',
 	);
 
 	foreach ( $classes as $class ) {

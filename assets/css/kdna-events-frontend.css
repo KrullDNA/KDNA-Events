@@ -367,3 +367,281 @@ a.kdna-events-event-organiser__name:hover {
 	height: 1em;
 	font-size: 1em;
 }
+
+/* Event Grid. */
+.kdna-events-grid {
+	position: relative;
+	display: block;
+}
+.kdna-events-grid.is-loading {
+	opacity: 0.6;
+	pointer-events: none;
+}
+.kdna-events-grid__wrapper {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 24px;
+}
+@media (max-width: 900px) {
+	.kdna-events-grid__wrapper {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+@media (max-width: 600px) {
+	.kdna-events-grid__wrapper {
+		grid-template-columns: 1fr;
+	}
+}
+.kdna-events-grid__card {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background-color: #ffffff;
+	border-radius: 12px;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.kdna-events-grid__card-image {
+	position: relative;
+	display: block;
+	width: 100%;
+	overflow: hidden;
+	line-height: 0;
+	background-color: #f3f4f6;
+}
+.kdna-events-grid--aspect-1-1 .kdna-events-grid__card-image { aspect-ratio: 1 / 1; }
+.kdna-events-grid--aspect-4-3 .kdna-events-grid__card-image { aspect-ratio: 4 / 3; }
+.kdna-events-grid--aspect-16-9 .kdna-events-grid__card-image { aspect-ratio: 16 / 9; }
+.kdna-events-grid--aspect-3-4 .kdna-events-grid__card-image { aspect-ratio: 3 / 4; }
+.kdna-events-grid__card-image-img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.3s ease;
+}
+.kdna-events-grid__card-body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4em;
+	padding: 16px;
+}
+.kdna-events-grid__card-type {
+	align-self: flex-start;
+}
+.kdna-events-grid__card-date {
+	font-size: 0.85em;
+	color: #4b5563;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+}
+.kdna-events-grid__card-title {
+	margin: 0;
+	font-size: 1.2em;
+	line-height: 1.3;
+}
+.kdna-events-grid__card-title-link {
+	color: inherit;
+	text-decoration: none;
+}
+.kdna-events-grid__card-title-link:hover {
+	text-decoration: underline;
+}
+.kdna-events-grid__card-location {
+	color: #4b5563;
+	font-size: 0.9em;
+}
+.kdna-events-grid__card-price {
+	font-weight: 600;
+}
+.kdna-events-grid__card-price-free {
+	color: #059669;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	font-size: 0.9em;
+}
+.kdna-events-grid__card-excerpt {
+	margin: 0;
+	color: #374151;
+	font-size: 0.95em;
+	line-height: 1.5;
+}
+.kdna-events-grid__card-button {
+	align-self: flex-start;
+	display: inline-flex;
+	align-items: center;
+	margin-top: 0.25em;
+	padding: 0.55em 1em;
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border: 1px solid #1d4ed8;
+	border-radius: 6px;
+	text-decoration: none;
+	font-weight: 600;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.kdna-events-grid__card-button:hover {
+	background-color: #1e40af;
+	border-color: #1e40af;
+	color: #ffffff;
+}
+.kdna-events-grid__empty {
+	grid-column: 1 / -1;
+	padding: 2em;
+	text-align: center;
+	color: #4b5563;
+	border: 1px dashed #e5e7eb;
+	border-radius: 8px;
+	background: #f9fafb;
+}
+.kdna-events-grid__pagination {
+	display: flex;
+	justify-content: center;
+	margin-top: 1.5em;
+}
+.kdna-events-grid__pagination ul {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35em;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.kdna-events-grid__page,
+.kdna-events-grid__load-more {
+	appearance: none;
+	padding: 0.4em 0.75em;
+	min-width: 2.5em;
+	border: 1px solid #e5e7eb;
+	border-radius: 6px;
+	background-color: #ffffff;
+	color: #1f2937;
+	font: inherit;
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.kdna-events-grid__page:hover,
+.kdna-events-grid__load-more:hover {
+	background-color: #f3f4f6;
+	border-color: #d1d5db;
+}
+.kdna-events-grid__page.is-current {
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border-color: #1d4ed8;
+	cursor: default;
+}
+.kdna-events-grid__page:disabled,
+.kdna-events-grid__load-more:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+/* Event Filter. */
+.kdna-events-filter {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	align-items: flex-end;
+	margin-bottom: 1.25em;
+}
+.kdna-events-filter--vertical {
+	flex-direction: column;
+	align-items: stretch;
+}
+.kdna-events-filter__group {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35em;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+.kdna-events-filter__group--pills .kdna-events-filter__pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35em;
+}
+.kdna-events-filter__group--dates {
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 0.5em;
+}
+.kdna-events-filter__group--dates .kdna-events-filter__label {
+	margin-right: 0.25em;
+}
+.kdna-events-filter__label {
+	font-size: 0.85em;
+	font-weight: 600;
+	color: #374151;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+}
+.kdna-events-filter__input,
+.kdna-events-filter__select,
+.kdna-events-filter__date {
+	appearance: none;
+	font: inherit;
+	padding: 0.5em 0.75em;
+	background-color: #ffffff;
+	color: #1f2937;
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.kdna-events-filter__input:focus,
+.kdna-events-filter__select:focus,
+.kdna-events-filter__date:focus {
+	border-color: #1d4ed8;
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.2);
+}
+.kdna-events-filter__pill {
+	appearance: none;
+	padding: 0.4em 0.9em;
+	border: 1px solid transparent;
+	border-radius: 999px;
+	background-color: #f3f4f6;
+	color: #1f2937;
+	font: inherit;
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.kdna-events-filter__pill:hover {
+	background-color: #e5e7eb;
+}
+.kdna-events-filter__pill.is-active {
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border-color: #1d4ed8;
+}
+.kdna-events-filter__actions {
+	display: flex;
+	gap: 0.5em;
+}
+.kdna-events-filter__submit,
+.kdna-events-filter__reset {
+	appearance: none;
+	padding: 0.5em 1em;
+	border-radius: 6px;
+	font: inherit;
+	cursor: pointer;
+	border: 1px solid transparent;
+}
+.kdna-events-filter__submit {
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border-color: #1d4ed8;
+}
+.kdna-events-filter__submit:hover {
+	background-color: #1e40af;
+	border-color: #1e40af;
+}
+.kdna-events-filter__reset {
+	background-color: transparent;
+	color: #4b5563;
+	border-color: #d1d5db;
+}
+.kdna-events-filter__reset:hover {
+	background-color: #f3f4f6;
+}
