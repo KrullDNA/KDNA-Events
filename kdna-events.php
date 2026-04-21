@@ -113,6 +113,14 @@ function kdna_events_bootstrap() {
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-settings.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-templates.php';
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-base.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-title.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-subtitle.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-datetime.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-price.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-type-badge.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-description.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-image.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-organiser.php';
 
 	KDNA_Events_CPT::init();
 	KDNA_Events_Templates::init();
@@ -123,4 +131,37 @@ function kdna_events_bootstrap() {
 		add_action( 'admin_init', array( 'KDNA_Events_DB', 'maybe_upgrade' ) );
 	}
 }
+
+/**
+ * Register every concrete KDNA Events widget with Elementor.
+ *
+ * Hooked into kdna_events_register_widgets which fires inside the
+ * file-load-registered elementor/widgets/register action.
+ *
+ * @param \Elementor\Widgets_Manager $widgets_manager Widgets manager.
+ * @return void
+ */
+function kdna_events_register_stage3_widgets( $widgets_manager ) {
+	if ( ! is_object( $widgets_manager ) || ! method_exists( $widgets_manager, 'register' ) ) {
+		return;
+	}
+
+	$classes = array(
+		'KDNA_Events_Widget_Event_Title',
+		'KDNA_Events_Widget_Event_Subtitle',
+		'KDNA_Events_Widget_Event_Datetime',
+		'KDNA_Events_Widget_Event_Price',
+		'KDNA_Events_Widget_Event_Type_Badge',
+		'KDNA_Events_Widget_Event_Description',
+		'KDNA_Events_Widget_Event_Image',
+		'KDNA_Events_Widget_Event_Organiser',
+	);
+
+	foreach ( $classes as $class ) {
+		if ( class_exists( $class ) ) {
+			$widgets_manager->register( new $class() );
+		}
+	}
+}
+add_action( 'kdna_events_register_widgets', 'kdna_events_register_stage3_widgets' );
 add_action( 'plugins_loaded', 'kdna_events_bootstrap', 15 );

@@ -1,6 +1,269 @@
 /**
  * KDNA Events front-end styles.
  *
- * Stage 2 stub. Per-widget styles are added in later stages scoped to
- * each widget's wrapper class to avoid bleed into the host theme.
+ * Every rule is scoped to a widget-specific BEM wrapper so it will
+ * not bleed into the host theme. Elementor style controls override
+ * these defaults via inline selectors in the widget controls.
  */
+
+/* Editor placeholder. */
+.kdna-events-widget-placeholder {
+	padding: 1em;
+	border: 1px dashed #c4c7ca;
+	color: #6b7280;
+	background: #f9fafb;
+	font-size: 0.9em;
+	text-align: center;
+	border-radius: 4px;
+}
+
+/* Event Title. */
+.kdna-events-event-title {
+	margin: 0;
+}
+.kdna-events-event-title__link {
+	color: inherit;
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+/* Event Subtitle. */
+.kdna-events-event-subtitle {
+	margin: 0;
+	font-size: 1.05em;
+	color: #4b5563;
+}
+
+/* Event Date / Time. */
+.kdna-events-event-datetime {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+}
+.kdna-events-event-datetime--icon-right {
+	flex-direction: row-reverse;
+}
+.kdna-events-event-datetime__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+.kdna-events-event-datetime__icon svg,
+.kdna-events-event-datetime__icon i {
+	width: 1em;
+	height: 1em;
+	font-size: 1em;
+}
+
+/* Event Price. */
+.kdna-events-event-price {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 0.1em;
+}
+.kdna-events-event-price--badge {
+	padding: 0.3em 0.75em;
+	border-radius: 999px;
+	background-color: #f3f4f6;
+}
+.kdna-events-event-price__from {
+	margin-right: 0.35em;
+	font-size: 0.85em;
+	opacity: 0.8;
+}
+.kdna-events-event-price__currency {
+	font-size: 0.85em;
+	opacity: 0.9;
+}
+.kdna-events-event-price__amount {
+	font-weight: 700;
+}
+
+/* Event Type Badge. */
+.kdna-events-event-type-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4em;
+	padding: 0.3em 0.8em;
+	border-radius: 999px;
+	font-size: 0.85em;
+	line-height: 1;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+}
+.kdna-events-event-type-badge--in-person {
+	background-color: #ecfdf5;
+	color: #065f46;
+}
+.kdna-events-event-type-badge--virtual {
+	background-color: #eff6ff;
+	color: #1e3a8a;
+}
+.kdna-events-event-type-badge--hybrid {
+	background-color: #fef3c7;
+	color: #92400e;
+}
+.kdna-events-event-type-badge__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+.kdna-events-event-type-badge__icon svg,
+.kdna-events-event-type-badge__icon i {
+	width: 1em;
+	height: 1em;
+	font-size: 1em;
+}
+
+/* Event Description. */
+.kdna-events-event-description {
+	color: inherit;
+}
+.kdna-events-event-description > *:first-child {
+	margin-top: 0;
+}
+.kdna-events-event-description > *:last-child {
+	margin-bottom: 0;
+}
+.kdna-events-event-description p {
+	margin: 0 0 1em;
+}
+.kdna-events-event-description h1,
+.kdna-events-event-description h2,
+.kdna-events-event-description h3,
+.kdna-events-event-description h4,
+.kdna-events-event-description h5,
+.kdna-events-event-description h6 {
+	margin: 1.25em 0 0.5em;
+	line-height: 1.25;
+}
+.kdna-events-event-description ul,
+.kdna-events-event-description ol {
+	margin: 0 0 1em;
+	padding-inline-start: 1.25em;
+}
+.kdna-events-event-description blockquote {
+	margin: 1.25em 0;
+	padding: 0.75em 1em;
+	border-left: 4px solid #e5e7eb;
+	background-color: #f9fafb;
+	font-style: italic;
+}
+.kdna-events-event-description a {
+	color: #1d4ed8;
+	text-decoration: underline;
+}
+.kdna-events-event-description a:hover {
+	color: #1e40af;
+}
+.kdna-events-event-description__read-more {
+	display: inline-block;
+	margin-top: 0.25em;
+	font-weight: 600;
+}
+
+/* Event Image. */
+.kdna-events-event-image {
+	position: relative;
+	overflow: hidden;
+	display: block;
+	line-height: 0;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.kdna-events-event-image__link {
+	display: block;
+	position: relative;
+	line-height: 0;
+}
+.kdna-events-event-image__img {
+	display: block;
+	width: 100%;
+	height: auto;
+	max-width: 100%;
+	transition: transform 0.3s ease, filter 0.3s ease;
+}
+.kdna-events-event-image__overlay {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+.kdna-events-event-image--hover-zoom:hover .kdna-events-event-image__img {
+	transform: scale(1.05);
+}
+.kdna-events-event-image--hover-brighten:hover .kdna-events-event-image__img {
+	filter: brightness(1.15);
+}
+.kdna-events-event-image--hover-darken:hover .kdna-events-event-image__img {
+	filter: brightness(0.8);
+}
+.kdna-events-event-image--hover-lift:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Event Organiser. */
+.kdna-events-event-organiser {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+}
+.kdna-events-event-organiser--stacked {
+	flex-direction: column;
+	align-items: flex-start;
+	text-align: start;
+}
+.kdna-events-event-organiser--icon-right {
+	flex-direction: row-reverse;
+}
+.kdna-events-event-organiser--stacked.kdna-events-event-organiser--icon-right {
+	flex-direction: column-reverse;
+}
+.kdna-events-event-organiser__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+.kdna-events-event-organiser__icon svg,
+.kdna-events-event-organiser__icon i {
+	width: 1em;
+	height: 1em;
+	font-size: 1em;
+}
+.kdna-events-event-organiser__text {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0 0.35em;
+}
+.kdna-events-event-organiser--stacked .kdna-events-event-organiser__text {
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.1em;
+}
+.kdna-events-event-organiser__prefix {
+	color: #6b7280;
+}
+.kdna-events-event-organiser__name {
+	font-weight: 600;
+	color: inherit;
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+a.kdna-events-event-organiser__name:hover {
+	text-decoration: underline;
+}
+.kdna-events-event-organiser__email {
+	color: #1d4ed8;
+	text-decoration: none;
+	font-size: 0.9em;
+	transition: color 0.2s ease;
+}
+.kdna-events-event-organiser__email:hover {
+	color: #1e40af;
+	text-decoration: underline;
+}

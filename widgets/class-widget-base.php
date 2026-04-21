@@ -43,6 +43,19 @@ abstract class KDNA_Events_Widget_Base extends \Elementor\Widget_Base {
 	}
 
 	/**
+	 * Declare the shared front-end stylesheet as a dependency.
+	 *
+	 * Elementor enqueues the registered 'kdna-events-frontend' handle
+	 * whenever any concrete widget is rendered, including inside the
+	 * editor preview where is_page() is false.
+	 *
+	 * @return string[]
+	 */
+	public function get_style_depends() {
+		return array( 'kdna-events-frontend' );
+	}
+
+	/**
 	 * Control whether Elementor wraps the widget in its inner container.
 	 *
 	 * When the e_optimized_markup experiment is active we skip the
@@ -154,9 +167,8 @@ abstract class KDNA_Events_Widget_Base extends \Elementor\Widget_Base {
 	 * Resolve the event ID the widget should read from.
 	 *
 	 * Pulls from the current post when on a kdna_event single view and
-	 * falls back to the most recent published event in the Elementor
-	 * editor preview. Child widgets can override when checkout widgets
-	 * want to read from a query parameter.
+	 * falls back to the most recent published event so the Elementor
+	 * editor preview always has content to render.
 	 *
 	 * @return int
 	 */
@@ -182,6 +194,50 @@ abstract class KDNA_Events_Widget_Base extends \Elementor\Widget_Base {
 		);
 
 		return empty( $latest ) ? 0 : (int) $latest[0];
+	}
+
+	/**
+	 * Detect whether the widget is being rendered inside the Elementor editor.
+	 *
+	 * Used to decide whether to show placeholder content or to hide empty
+	 * widgets entirely on the front end.
+	 *
+	 * @return bool
+	 */
+	protected function is_editor_mode() {
+		if ( ! class_exists( '\\Elementor\\Plugin' ) ) {
+			return false;
+		}
+
+		$instance = \Elementor\Plugin::$instance;
+
+		if ( isset( $instance->editor ) && method_exists( $instance->editor, 'is_edit_mode' ) && $instance->editor->is_edit_mode() ) {
+			return true;
+		}
+
+		if ( isset( $instance->preview ) && method_exists( $instance->preview, 'is_preview_mode' ) && $instance->preview->is_preview_mode() ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Render a small placeholder for the editor when a widget has no data.
+	 *
+	 * Always safe to call. Outputs nothing on the front end.
+	 *
+	 * @param string $message Translated message to display.
+	 * @return void
+	 */
+	protected function render_editor_placeholder( $message ) {
+		if ( ! $this->is_editor_mode() ) {
+			return;
+		}
+		printf(
+			'<div class="kdna-events-widget-placeholder">%s</div>',
+			esc_html( $message )
+		);
 	}
 }
 
