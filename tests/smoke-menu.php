@@ -14,8 +14,9 @@
 
 define( 'ABSPATH', __DIR__ . '/' );
 define( 'KDNA_EVENTS_VERSION', '1.0.0' );
-define( 'KDNA_EVENTS_FILE', dirname( __DIR__ ) . '/kdna-events.php' );
-define( 'KDNA_EVENTS_PATH', dirname( __DIR__ ) . '/' );
+define( 'PLUGIN_DIR', dirname( __DIR__ ) . '/kdna-events' );
+define( 'KDNA_EVENTS_FILE', PLUGIN_DIR . '/kdna-events.php' );
+define( 'KDNA_EVENTS_PATH', PLUGIN_DIR . '/' );
 define( 'KDNA_EVENTS_URL', 'https://example.test/wp-content/plugins/kdna-events/' );
 define( 'KDNA_EVENTS_BASENAME', 'kdna-events/kdna-events.php' );
 define( 'MINUTE_IN_SECONDS', 60 );
@@ -70,8 +71,8 @@ function __( $text, $domain = '' ) { return $text; }
 function esc_html__( $text, $domain = '' ) { return $text; }
 function get_current_screen() { return $GLOBALS['__stub_screen']; }
 
-require_once dirname( __DIR__ ) . '/includes/class-kdna-events-cpt.php';
-require_once dirname( __DIR__ ) . '/includes/class-kdna-events-settings.php';
+require_once PLUGIN_DIR . '/includes/class-kdna-events-cpt.php';
+require_once PLUGIN_DIR . '/includes/class-kdna-events-settings.php';
 
 $failures = 0;
 $assert = function ( $cond, $msg ) use ( &$failures ) {
