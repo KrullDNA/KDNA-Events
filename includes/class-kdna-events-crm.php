@@ -410,10 +410,13 @@ class KDNA_Events_CRM {
 				),
 				'price'     => $price,
 				'currency'  => $currency,
-				'organiser' => array(
-					'name'  => (string) get_post_meta( $event_id, '_kdna_event_organiser_name', true ),
-					'email' => (string) get_post_meta( $event_id, '_kdna_event_organiser_email', true ),
-				),
+				'organiser' => ( function () use ( $event_id ) {
+					$organiser = kdna_events_get_event_organiser( $event_id );
+					return array(
+						'name'  => (string) $organiser['name'],
+						'email' => (string) $organiser['email'],
+					);
+				} )(),
 			),
 			'attendee'        => array(
 				'name'          => (string) $ticket->attendee_name,

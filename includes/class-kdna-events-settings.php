@@ -121,6 +121,22 @@ class KDNA_Events_Settings {
 
 		add_submenu_page(
 			self::MENU_SLUG,
+			__( 'Locations', 'kdna-events' ),
+			__( 'Locations', 'kdna-events' ),
+			'edit_posts',
+			'edit.php?post_type=' . KDNA_Events_CPT::LOCATION_POST_TYPE
+		);
+
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Organisers', 'kdna-events' ),
+			__( 'Organisers', 'kdna-events' ),
+			'edit_posts',
+			'edit.php?post_type=' . KDNA_Events_CPT::ORGANISER_POST_TYPE
+		);
+
+		add_submenu_page(
+			self::MENU_SLUG,
 			__( 'KDNA Events Settings', 'kdna-events' ),
 			__( 'Settings', 'kdna-events' ),
 			'manage_options',

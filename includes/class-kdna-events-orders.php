@@ -268,7 +268,8 @@ class KDNA_Events_Orders {
 		}
 
 		if ( $notify_org ) {
-			$organiser_email = (string) get_post_meta( (int) $order->event_id, '_kdna_event_organiser_email', true );
+			$organiser_data  = kdna_events_get_event_organiser( (int) $order->event_id );
+			$organiser_email = (string) $organiser_data['email'];
 			if ( '' !== $organiser_email && $organiser_email !== $admin_email ) {
 				wp_mail(
 					$organiser_email,

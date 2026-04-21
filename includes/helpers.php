@@ -47,15 +47,17 @@ function kdna_events_get_event_meta( $post_id, $key, $default = '' ) {
 /**
  * Return the parsed location array for an event.
  *
- * Location is stored as a JSON blob under _kdna_event_location with keys
- * name, address, lat and lng. This helper guarantees a consistent shape.
+ * If the event links to a shared Location CPT via
+ * _kdna_event_location_ref, the helper returns the venue data from
+ * that CPT. Otherwise it falls back to the legacy per-event
+ * _kdna_event_location JSON meta so events created before the CPT
+ * landed keep rendering their address and coordinates.
  *
  * @param int $post_id Event post ID.
  * @return array{name:string,address:string,lat:float,lng:float}
  */
 function kdna_events_get_event_location( $post_id ) {
-	$raw = get_post_meta( absint( $post_id ), '_kdna_event_location', true );
-
+	$post_id  = absint( $post_id );
 	$defaults = array(
 		'name'    => '',
 		'address' => '',
@@ -63,12 +65,22 @@ function kdna_events_get_event_location( $post_id ) {
 		'lng'     => 0.0,
 	);
 
+	$ref = (int) get_post_meta( $post_id, '_kdna_event_location_ref', true );
+	if ( $ref > 0 && 'kdna_event_location' === get_post_type( $ref ) ) {
+		return array(
+			'name'    => sanitize_text_field( (string) get_the_title( $ref ) ),
+			'address' => sanitize_text_field( (string) get_post_meta( $ref, '_kdna_event_loc_address', true ) ),
+			'lat'     => (float) get_post_meta( $ref, '_kdna_event_loc_lat', true ),
+			'lng'     => (float) get_post_meta( $ref, '_kdna_event_loc_lng', true ),
+		);
+	}
+
+	$raw = get_post_meta( $post_id, '_kdna_event_location', true );
 	if ( empty( $raw ) ) {
 		return $defaults;
 	}
 
 	$decoded = is_array( $raw ) ? $raw : json_decode( (string) $raw, true );
-
 	if ( ! is_array( $decoded ) ) {
 		return $defaults;
 	}
@@ -78,6 +90,35 @@ function kdna_events_get_event_location( $post_id ) {
 		'address' => isset( $decoded['address'] ) ? sanitize_text_field( (string) $decoded['address'] ) : '',
 		'lat'     => isset( $decoded['lat'] ) ? (float) $decoded['lat'] : 0.0,
 		'lng'     => isset( $decoded['lng'] ) ? (float) $decoded['lng'] : 0.0,
+	);
+}
+
+/**
+ * Return the resolved organiser array for an event.
+ *
+ * Mirrors kdna_events_get_event_location: if the event points at a
+ * shared Organiser CPT, data comes from there; otherwise we fall back
+ * to the legacy _kdna_event_organiser_name / _email meta fields.
+ *
+ * @param int $post_id Event post ID.
+ * @return array{name:string,email:string,phone:string}
+ */
+function kdna_events_get_event_organiser( $post_id ) {
+	$post_id = absint( $post_id );
+
+	$ref = (int) get_post_meta( $post_id, '_kdna_event_organiser_ref', true );
+	if ( $ref > 0 && 'kdna_event_organiser' === get_post_type( $ref ) ) {
+		return array(
+			'name'  => sanitize_text_field( (string) get_the_title( $ref ) ),
+			'email' => sanitize_email( (string) get_post_meta( $ref, '_kdna_event_org_email', true ) ),
+			'phone' => sanitize_text_field( (string) get_post_meta( $ref, '_kdna_event_org_phone', true ) ),
+		);
+	}
+
+	return array(
+		'name'  => sanitize_text_field( (string) get_post_meta( $post_id, '_kdna_event_organiser_name', true ) ),
+		'email' => sanitize_email( (string) get_post_meta( $post_id, '_kdna_event_organiser_email', true ) ),
+		'phone' => '',
 	);
 }
 

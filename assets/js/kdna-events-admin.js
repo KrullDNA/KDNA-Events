@@ -38,11 +38,38 @@
 			refreshTypeSections();
 		}
 
+		// Hide the manual Venue table when a saved Location is picked; same for Organiser.
+		bindReferenceToggle('#kdna_event_location_ref', '[data-kdna-events-location-manual]');
+		bindReferenceToggle('#kdna_event_organiser_ref', '[data-kdna-events-organiser-manual]');
+
 		// Every attendee-fields repeater on the page.
 		$('[data-kdna-events-attendee-fields]').each(function () {
 			wireAttendeeRepeater($(this));
 		});
 	});
+
+	/**
+	 * Hide a manual-entry table whenever a reference dropdown picks a saved CPT row.
+	 *
+	 * Used for the Location and Organiser dropdowns on the event meta
+	 * box. Zero means 'enter manually', so the manual table is visible
+	 * only for that value.
+	 *
+	 * @param {string} selectSelector  jQuery selector for the dropdown.
+	 * @param {string} manualSelector  jQuery selector for the table of free-text fields.
+	 */
+	function bindReferenceToggle(selectSelector, manualSelector) {
+		var $select = $(selectSelector);
+		var $manual = $(manualSelector);
+		if (!$select.length || !$manual.length) {
+			return;
+		}
+		function refresh() {
+			$manual.toggle(0 === parseInt($select.val(), 10));
+		}
+		$select.on('change', refresh);
+		refresh();
+	}
 
 	/**
 	 * Attach add / remove / reindex behaviour to a single repeater.

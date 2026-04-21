@@ -42,6 +42,12 @@ class KDNA_Events_Admin {
 		add_action( 'manage_' . KDNA_Events_CPT::POST_TYPE . '_posts_custom_column', array( __CLASS__, 'render_column' ), 10, 2 );
 		add_filter( 'manage_edit-' . KDNA_Events_CPT::POST_TYPE . '_sortable_columns', array( __CLASS__, 'register_sortable_columns' ) );
 		add_action( 'pre_get_posts', array( __CLASS__, 'apply_sortable_orderby' ) );
+
+		// Location + Organiser CPT meta boxes.
+		add_action( 'add_meta_boxes', array( __CLASS__, 'register_location_meta_box' ) );
+		add_action( 'add_meta_boxes', array( __CLASS__, 'register_organiser_meta_box' ) );
+		add_action( 'save_post_' . KDNA_Events_CPT::LOCATION_POST_TYPE, array( __CLASS__, 'save_location_meta' ), 10, 2 );
+		add_action( 'save_post_' . KDNA_Events_CPT::ORGANISER_POST_TYPE, array( __CLASS__, 'save_organiser_meta' ), 10, 2 );
 	}
 
 	/**
@@ -126,6 +132,11 @@ class KDNA_Events_Admin {
 
 		$ignore_global_fields = (bool) get_post_meta( $post->ID, '_kdna_event_ignore_global_attendee_fields', true );
 		$has_globals          = '' !== trim( (string) get_option( 'kdna_events_global_attendee_fields', '' ) );
+
+		$location_ref  = (int) get_post_meta( $post->ID, '_kdna_event_location_ref', true );
+		$organiser_ref = (int) get_post_meta( $post->ID, '_kdna_event_organiser_ref', true );
+		$locations     = self::fetch_reference_posts( KDNA_Events_CPT::LOCATION_POST_TYPE );
+		$organisers    = self::fetch_reference_posts( KDNA_Events_CPT::ORGANISER_POST_TYPE );
 
 		if ( '' === $type ) {
 			$type = 'in-person';
@@ -243,6 +254,25 @@ class KDNA_Events_Admin {
 				<table class="form-table" role="presentation">
 					<tbody>
 					<tr>
+						<th scope="row"><label for="kdna_event_location_ref"><?php esc_html_e( 'Use saved location', 'kdna-events' ); ?></label></th>
+						<td>
+							<select id="kdna_event_location_ref" name="kdna_event_location_ref">
+								<option value="0"><?php esc_html_e( 'Enter manually below', 'kdna-events' ); ?></option>
+								<?php foreach ( $locations as $loc ) : ?>
+									<option value="<?php echo esc_attr( (string) $loc->ID ); ?>" <?php selected( $location_ref, $loc->ID ); ?>><?php echo esc_html( $loc->post_title ); ?></option>
+								<?php endforeach; ?>
+							</select>
+							<a class="button button-secondary" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=' . KDNA_Events_CPT::LOCATION_POST_TYPE ) ); ?>" target="_blank" rel="noopener">
+								<?php esc_html_e( 'Add new location', 'kdna-events' ); ?>
+							</a>
+							<p class="description"><?php esc_html_e( 'Pick a saved venue or leave this on "Enter manually below" to capture a one-off location.', 'kdna-events' ); ?></p>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+				<table class="form-table" role="presentation" data-kdna-events-location-manual>
+					<tbody>
+					<tr>
 						<th scope="row"><label for="kdna_event_location_name"><?php esc_html_e( 'Venue name', 'kdna-events' ); ?></label></th>
 						<td><input type="text" class="regular-text" id="kdna_event_location_name" name="kdna_event_location[name]" value="<?php echo esc_attr( $location['name'] ); ?>" /></td>
 					</tr>
@@ -302,6 +332,24 @@ class KDNA_Events_Admin {
 
 			<h3 class="kdna-events-section-heading"><?php esc_html_e( 'Organiser', 'kdna-events' ); ?></h3>
 			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><label for="kdna_event_organiser_ref"><?php esc_html_e( 'Use saved organiser', 'kdna-events' ); ?></label></th>
+					<td>
+						<select id="kdna_event_organiser_ref" name="kdna_event_organiser_ref">
+							<option value="0"><?php esc_html_e( 'Enter manually below', 'kdna-events' ); ?></option>
+							<?php foreach ( $organisers as $org ) : ?>
+								<option value="<?php echo esc_attr( (string) $org->ID ); ?>" <?php selected( $organiser_ref, $org->ID ); ?>><?php echo esc_html( $org->post_title ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<a class="button button-secondary" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=' . KDNA_Events_CPT::ORGANISER_POST_TYPE ) ); ?>" target="_blank" rel="noopener">
+							<?php esc_html_e( 'Add new organiser', 'kdna-events' ); ?>
+						</a>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+			<table class="form-table" role="presentation" data-kdna-events-organiser-manual>
 				<tbody>
 				<tr>
 					<th scope="row"><label for="kdna_event_organiser_name"><?php esc_html_e( 'Organiser name', 'kdna-events' ); ?></label></th>
@@ -551,6 +599,202 @@ class KDNA_Events_Admin {
 		$ignore_global = isset( $_POST['kdna_event_ignore_global_attendee_fields'] ) ? 1 : 0;
 		update_post_meta( $post_id, '_kdna_event_ignore_global_attendee_fields', $ignore_global );
 
+		$location_ref = isset( $_POST['kdna_event_location_ref'] ) ? absint( wp_unslash( $_POST['kdna_event_location_ref'] ) ) : 0;
+		if ( $location_ref && 'kdna_event_location' !== get_post_type( $location_ref ) ) {
+			$location_ref = 0;
+		}
+		update_post_meta( $post_id, '_kdna_event_location_ref', $location_ref );
+
+		$organiser_ref = isset( $_POST['kdna_event_organiser_ref'] ) ? absint( wp_unslash( $_POST['kdna_event_organiser_ref'] ) ) : 0;
+		if ( $organiser_ref && 'kdna_event_organiser' !== get_post_type( $organiser_ref ) ) {
+			$organiser_ref = 0;
+		}
+		update_post_meta( $post_id, '_kdna_event_organiser_ref', $organiser_ref );
+
+		unset( $post );
+	}
+
+	/**
+	 * Fetch published posts of a CPT for reference dropdowns, id ASC by title.
+	 *
+	 * @param string $post_type Post type slug.
+	 * @return WP_Post[]
+	 */
+	protected static function fetch_reference_posts( $post_type ) {
+		$posts = get_posts(
+			array(
+				'post_type'      => $post_type,
+				'post_status'    => array( 'publish', 'private' ),
+				'posts_per_page' => 200,
+				'orderby'        => 'title',
+				'order'          => 'ASC',
+			)
+		);
+		return is_array( $posts ) ? $posts : array();
+	}
+
+	/**
+	 * Register the meta box on the Location CPT edit screen.
+	 *
+	 * @return void
+	 */
+	public static function register_location_meta_box() {
+		add_meta_box(
+			'kdna_events_location_details',
+			__( 'Location Details', 'kdna-events' ),
+			array( __CLASS__, 'render_location_meta_box' ),
+			KDNA_Events_CPT::LOCATION_POST_TYPE,
+			'normal',
+			'high'
+		);
+	}
+
+	/**
+	 * Render the Location CPT meta box.
+	 *
+	 * @param WP_Post $post Current post.
+	 * @return void
+	 */
+	public static function render_location_meta_box( $post ) {
+		wp_nonce_field( self::NONCE_ACTION . '_location', self::NONCE_NAME );
+
+		$address = (string) get_post_meta( $post->ID, '_kdna_event_loc_address', true );
+		$lat     = (string) get_post_meta( $post->ID, '_kdna_event_loc_lat', true );
+		$lng     = (string) get_post_meta( $post->ID, '_kdna_event_loc_lng', true );
+		?>
+		<div class="kdna-events-metabox">
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><label for="kdna_event_loc_address"><?php esc_html_e( 'Address', 'kdna-events' ); ?></label></th>
+					<td>
+						<input type="text" class="regular-text" id="kdna_event_loc_address" name="kdna_event_loc_address" value="<?php echo esc_attr( $address ); ?>" autocomplete="off" />
+						<p class="description"><?php esc_html_e( 'Street address. Start typing to auto-fill from Google Places when a Maps API key is configured.', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_event_loc_lat"><?php esc_html_e( 'Latitude', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="regular-text" id="kdna_event_loc_lat" name="kdna_event_loc_lat" value="<?php echo esc_attr( $lat ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_event_loc_lng"><?php esc_html_e( 'Longitude', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="regular-text" id="kdna_event_loc_lng" name="kdna_event_loc_lng" value="<?php echo esc_attr( $lng ); ?>" /></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Save Location CPT meta.
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post    Post object.
+	 * @return void
+	 */
+	public static function save_location_meta( $post_id, $post ) {
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+		if ( ! isset( $_POST[ self::NONCE_NAME ] ) ) {
+			return;
+		}
+		$nonce = sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) );
+		if ( ! wp_verify_nonce( $nonce, self::NONCE_ACTION . '_location' ) ) {
+			return;
+		}
+		if ( ! current_user_can( 'edit_post', $post_id ) || wp_is_post_revision( $post_id ) ) {
+			return;
+		}
+
+		$address = isset( $_POST['kdna_event_loc_address'] ) ? sanitize_text_field( wp_unslash( $_POST['kdna_event_loc_address'] ) ) : '';
+		$lat     = isset( $_POST['kdna_event_loc_lat'] ) ? (float) wp_unslash( $_POST['kdna_event_loc_lat'] ) : 0.0;
+		$lng     = isset( $_POST['kdna_event_loc_lng'] ) ? (float) wp_unslash( $_POST['kdna_event_loc_lng'] ) : 0.0;
+
+		update_post_meta( $post_id, '_kdna_event_loc_address', $address );
+		update_post_meta( $post_id, '_kdna_event_loc_lat', $lat );
+		update_post_meta( $post_id, '_kdna_event_loc_lng', $lng );
+
+		unset( $post );
+	}
+
+	/**
+	 * Register the meta box on the Organiser CPT edit screen.
+	 *
+	 * @return void
+	 */
+	public static function register_organiser_meta_box() {
+		add_meta_box(
+			'kdna_events_organiser_details',
+			__( 'Organiser Details', 'kdna-events' ),
+			array( __CLASS__, 'render_organiser_meta_box' ),
+			KDNA_Events_CPT::ORGANISER_POST_TYPE,
+			'normal',
+			'high'
+		);
+	}
+
+	/**
+	 * Render the Organiser CPT meta box.
+	 *
+	 * @param WP_Post $post Current post.
+	 * @return void
+	 */
+	public static function render_organiser_meta_box( $post ) {
+		wp_nonce_field( self::NONCE_ACTION . '_organiser', self::NONCE_NAME );
+
+		$email = (string) get_post_meta( $post->ID, '_kdna_event_org_email', true );
+		$phone = (string) get_post_meta( $post->ID, '_kdna_event_org_phone', true );
+		?>
+		<div class="kdna-events-metabox">
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><label for="kdna_event_org_email"><?php esc_html_e( 'Email', 'kdna-events' ); ?></label></th>
+					<td>
+						<input type="email" class="regular-text" id="kdna_event_org_email" name="kdna_event_org_email" value="<?php echo esc_attr( $email ); ?>" />
+						<p class="description"><?php esc_html_e( 'Optional. Receives organiser notifications when enabled in Settings.', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_event_org_phone"><?php esc_html_e( 'Phone', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="regular-text" id="kdna_event_org_phone" name="kdna_event_org_phone" value="<?php echo esc_attr( $phone ); ?>" /></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Save Organiser CPT meta.
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post    Post object.
+	 * @return void
+	 */
+	public static function save_organiser_meta( $post_id, $post ) {
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+		if ( ! isset( $_POST[ self::NONCE_NAME ] ) ) {
+			return;
+		}
+		$nonce = sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) );
+		if ( ! wp_verify_nonce( $nonce, self::NONCE_ACTION . '_organiser' ) ) {
+			return;
+		}
+		if ( ! current_user_can( 'edit_post', $post_id ) || wp_is_post_revision( $post_id ) ) {
+			return;
+		}
+
+		$email = isset( $_POST['kdna_event_org_email'] ) ? sanitize_email( wp_unslash( $_POST['kdna_event_org_email'] ) ) : '';
+		$phone = isset( $_POST['kdna_event_org_phone'] ) ? sanitize_text_field( wp_unslash( $_POST['kdna_event_org_phone'] ) ) : '';
+
+		update_post_meta( $post_id, '_kdna_event_org_email', $email );
+		update_post_meta( $post_id, '_kdna_event_org_phone', $phone );
+
 		unset( $post );
 	}
 
@@ -591,7 +835,12 @@ class KDNA_Events_Admin {
 		}
 
 		$screen = get_current_screen();
-		if ( ! $screen || KDNA_Events_CPT::POST_TYPE !== $screen->post_type ) {
+		$ours   = array(
+			KDNA_Events_CPT::POST_TYPE,
+			KDNA_Events_CPT::LOCATION_POST_TYPE,
+			KDNA_Events_CPT::ORGANISER_POST_TYPE,
+		);
+		if ( ! $screen || ! in_array( $screen->post_type, $ours, true ) ) {
 			return;
 		}
 
