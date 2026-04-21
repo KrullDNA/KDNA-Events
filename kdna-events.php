@@ -116,6 +116,7 @@ function kdna_events_bootstrap() {
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-tickets.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-orders.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-stripe.php';
+	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-emails.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-checkout.php';
 	if ( file_exists( KDNA_EVENTS_PATH . 'vendor/autoload.php' ) ) {
 		require_once KDNA_EVENTS_PATH . 'vendor/autoload.php';
@@ -140,12 +141,14 @@ function kdna_events_bootstrap() {
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-checkout-pay-button.php';
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-success-confirmation.php';
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-success-tickets.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-my-tickets.php';
 
 	KDNA_Events_CPT::init();
 	KDNA_Events_Templates::init();
 	KDNA_Events_Grid::init();
 	KDNA_Events_Checkout::init();
 	KDNA_Events_Stripe::init();
+	KDNA_Events_Emails::init();
 
 	if ( is_admin() ) {
 		KDNA_Events_Admin::init();
@@ -188,6 +191,7 @@ function kdna_events_register_stage3_widgets( $widgets_manager ) {
 		'KDNA_Events_Widget_Checkout_Pay_Button',
 		'KDNA_Events_Widget_Success_Confirmation',
 		'KDNA_Events_Widget_Success_Tickets',
+		'KDNA_Events_Widget_My_Tickets',
 	);
 
 	foreach ( $classes as $class ) {

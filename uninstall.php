@@ -31,6 +31,7 @@ $option_keys = array(
 	'kdna_events_admin_notification_email',
 	'kdna_events_notify_organiser',
 	'kdna_events_booking_email_body',
+	'kdna_events_per_attendee_emails',
 );
 
 foreach ( $option_keys as $option_key ) {

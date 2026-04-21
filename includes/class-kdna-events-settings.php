@@ -213,6 +213,15 @@ class KDNA_Events_Settings {
 				'default'           => '',
 			)
 		);
+		register_setting(
+			'kdna_events_general',
+			'kdna_events_per_attendee_emails',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ),
+				'default'           => false,
+			)
+		);
 
 		// Stripe.
 		register_setting(
@@ -472,6 +481,8 @@ class KDNA_Events_Settings {
 		$notify_org   = (bool) get_option( 'kdna_events_notify_organiser', false );
 		$from_name    = (string) get_option( 'kdna_events_email_from_name', '' );
 		$from_address = (string) get_option( 'kdna_events_email_from_address', '' );
+		$per_attendee = (bool) get_option( 'kdna_events_per_attendee_emails', false );
+		$test_nonce   = wp_create_nonce( 'kdna_events_test_email' );
 		?>
 		<table class="form-table" role="presentation">
 			<tbody>
@@ -497,7 +508,18 @@ class KDNA_Events_Settings {
 				<th scope="row"><label for="kdna_events_admin_notification_email"><?php esc_html_e( 'Admin notification email', 'kdna-events' ); ?></label></th>
 				<td>
 					<input type="email" class="regular-text" id="kdna_events_admin_notification_email" name="kdna_events_admin_notification_email" value="<?php echo esc_attr( $admin_email ); ?>" />
-					<p class="description"><?php esc_html_e( 'Booking notifications are sent to this address.', 'kdna-events' ); ?></p>
+					<button
+						type="button"
+						class="button button-secondary"
+						id="kdna-events-send-test-email"
+						data-nonce="<?php echo esc_attr( $test_nonce ); ?>"
+						data-ajax-url="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
+						style="margin-left:8px;"
+					>
+						<?php esc_html_e( 'Send test email', 'kdna-events' ); ?>
+					</button>
+					<span id="kdna-events-send-test-email-result" role="status" aria-live="polite" style="margin-left:8px;"></span>
+					<p class="description"><?php esc_html_e( 'Booking notifications are sent to this address. Use the button to verify SMTP without completing a booking.', 'kdna-events' ); ?></p>
 				</td>
 			</tr>
 			<tr>
@@ -521,8 +543,54 @@ class KDNA_Events_Settings {
 					<input type="email" class="regular-text" id="kdna_events_email_from_address" name="kdna_events_email_from_address" value="<?php echo esc_attr( $from_address ); ?>" />
 				</td>
 			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Per-attendee emails', 'kdna-events' ); ?></th>
+				<td>
+					<label>
+						<input type="checkbox" name="kdna_events_per_attendee_emails" value="1" <?php checked( $per_attendee ); ?> />
+						<?php esc_html_e( 'Also send a personalised ticket email to each attendee when their email address is captured.', 'kdna-events' ); ?>
+					</label>
+				</td>
+			</tr>
 			</tbody>
 		</table>
+		<script>
+		(function () {
+			var btn = document.getElementById('kdna-events-send-test-email');
+			var result = document.getElementById('kdna-events-send-test-email-result');
+			if (!btn || !result) { return; }
+			btn.addEventListener('click', function () {
+				result.textContent = '<?php echo esc_js( __( 'Sending...', 'kdna-events' ) ); ?>';
+				result.style.color = '#4b5563';
+				var body = new URLSearchParams();
+				body.append('action', 'kdna_events_send_test_email');
+				body.append('nonce', btn.getAttribute('data-nonce') || '');
+				fetch(btn.getAttribute('data-ajax-url') || '', {
+					method: 'POST',
+					credentials: 'same-origin',
+					headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+					body: body.toString()
+				}).then(function (r) {
+					return r.json().then(function (json) { return { status: r.status, json: json }; });
+				}).then(function (res) {
+					var message = '';
+					if (res.json && res.json.data && res.json.data.message) {
+						message = res.json.data.message;
+					}
+					if (res.json && res.json.success) {
+						result.style.color = '#059669';
+						result.textContent = message || '<?php echo esc_js( __( 'Sent.', 'kdna-events' ) ); ?>';
+					} else {
+						result.style.color = '#b91c1c';
+						result.textContent = message || '<?php echo esc_js( __( 'Send failed.', 'kdna-events' ) ); ?>';
+					}
+				}).catch(function () {
+					result.style.color = '#b91c1c';
+					result.textContent = '<?php echo esc_js( __( 'Network error.', 'kdna-events' ) ); ?>';
+				});
+			});
+		})();
+		</script>
 		<?php
 	}
 

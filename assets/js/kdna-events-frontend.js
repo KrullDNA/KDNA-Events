@@ -366,6 +366,43 @@
 	}
 
 	/**
+	 * Wire the Upcoming / Past tabs on a My Tickets widget.
+	 *
+	 * @param {HTMLElement} root
+	 */
+	function wireMyTickets(root) {
+		if (root.getAttribute('data-kdna-events-my-tickets-wired') === '1') {
+			return;
+		}
+		root.setAttribute('data-kdna-events-my-tickets-wired', '1');
+
+		var tabs = root.querySelectorAll('.kdna-events-my-tickets__tab');
+		var panels = root.querySelectorAll('.kdna-events-my-tickets__panel');
+		if (!tabs.length || !panels.length) {
+			return;
+		}
+
+		function activate(target) {
+			for (var i = 0; i < tabs.length; i++) {
+				var active = tabs[i].getAttribute('data-target') === target;
+				tabs[i].classList.toggle('is-active', active);
+				tabs[i].setAttribute('aria-selected', active ? 'true' : 'false');
+			}
+			for (var j = 0; j < panels.length; j++) {
+				panels[j].classList.toggle('is-active', panels[j].getAttribute('data-panel') === target);
+			}
+		}
+
+		for (var k = 0; k < tabs.length; k++) {
+			tabs[k].addEventListener('click', function (event) {
+				event.preventDefault();
+				var target = event.currentTarget.getAttribute('data-target') || 'upcoming';
+				activate(target);
+			});
+		}
+	}
+
+	/**
 	 * Scan the document for filter and grid widgets and wire them up.
 	 */
 	function initAll() {
@@ -376,6 +413,10 @@
 		var grids = document.querySelectorAll('[data-kdna-events-grid]');
 		for (var j = 0; j < grids.length; j++) {
 			wireGrid(grids[j]);
+		}
+		var tickets = document.querySelectorAll('[data-kdna-events-my-tickets]');
+		for (var k = 0; k < tickets.length; k++) {
+			wireMyTickets(tickets[k]);
 		}
 	}
 
@@ -404,6 +445,14 @@
 					if (!$scope || !$scope[0]) { return; }
 					var grid = $scope[0].querySelector('[data-kdna-events-grid]');
 					if (grid) { wireGrid(grid); }
+				}
+			);
+			window.elementorFrontend.hooks.addAction(
+				'frontend/element_ready/kdna-events-my-tickets.default',
+				function ($scope) {
+					if (!$scope || !$scope[0]) { return; }
+					var root = $scope[0].querySelector('[data-kdna-events-my-tickets]');
+					if (root) { wireMyTickets(root); }
 				}
 			);
 		});

@@ -178,7 +178,12 @@ class KDNA_Events_Orders {
 		kdna_events_invalidate_sold_count( (int) $order->event_id );
 
 		try {
-			self::send_confirmation_emails( (int) $order->order_id );
+			if ( class_exists( 'KDNA_Events_Emails' ) ) {
+				KDNA_Events_Emails::send_booking_confirmation( (int) $order->order_id );
+				KDNA_Events_Emails::send_admin_notification( (int) $order->order_id );
+			} else {
+				self::send_confirmation_emails_fallback( (int) $order->order_id );
+			}
 		} catch ( Exception $e ) {
 			// Email failures must not prevent ticket creation. Log to debug.log
 			// so site owners can diagnose SMTP issues after the fact.
@@ -205,15 +210,17 @@ class KDNA_Events_Orders {
 	}
 
 	/**
-	 * Send the Stage 8 confirmation emails.
+	 * Plain-text fallback used only when KDNA_Events_Emails is missing.
 	 *
-	 * Stage 9 replaces this with templated HTML emails. Stage 8 only
-	 * needs end-to-end delivery so the buyer gets their ticket codes.
+	 * Stage 9 replaces the primary pathway with templated HTML emails
+	 * via the emails class. This fallback keeps an end-to-end path for
+	 * extraordinary cases where the emails file is unavailable at
+	 * runtime (for example, a partial deployment).
 	 *
 	 * @param int $order_id Order ID.
 	 * @return void
 	 */
-	protected static function send_confirmation_emails( $order_id ) {
+	protected static function send_confirmation_emails_fallback( $order_id ) {
 		$order = self::get_order( $order_id );
 		if ( ! $order ) {
 			return;

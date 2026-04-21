@@ -1181,3 +1181,163 @@ a.kdna-events-event-organiser__name:hover {
 	border-radius: 6px;
 	background-color: #ffffff;
 }
+
+/* My Tickets. */
+.kdna-events-my-tickets__tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35em;
+	margin-bottom: 1em;
+}
+.kdna-events-my-tickets__tab {
+	appearance: none;
+	padding: 0.5em 1em;
+	background-color: #f3f4f6;
+	color: #1f2937;
+	border: 1px solid transparent;
+	border-radius: 999px;
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.kdna-events-my-tickets__tab:hover {
+	background-color: #e5e7eb;
+}
+.kdna-events-my-tickets__tab.is-active {
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border-color: #1d4ed8;
+}
+.kdna-events-my-tickets__tab-count {
+	margin-left: 0.4em;
+	font-weight: 500;
+	opacity: 0.8;
+}
+.kdna-events-my-tickets__panel {
+	display: none;
+}
+.kdna-events-my-tickets__panel.is-active {
+	display: block;
+}
+.kdna-events-my-tickets__group {
+	margin-bottom: 20px;
+}
+.kdna-events-my-tickets__group:last-child {
+	margin-bottom: 0;
+}
+.kdna-events-my-tickets__group-heading {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.75em;
+	margin: 0 0 0.75em;
+	font-size: 1.15em;
+}
+.kdna-events-my-tickets__group-date {
+	font-size: 0.8em;
+	color: #6b7280;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	font-weight: 500;
+}
+.kdna-events-my-tickets__list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+.kdna-events-my-ticket {
+	display: flex;
+	gap: 16px;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	background-color: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	padding: 16px;
+	overflow: hidden;
+}
+.kdna-events-my-ticket__details {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35em;
+	flex: 1 1 auto;
+	min-width: 200px;
+}
+.kdna-events-my-ticket__name {
+	font-weight: 600;
+}
+.kdna-events-my-ticket__code {
+	align-self: flex-start;
+	display: inline-block;
+	padding: 0.4em 0.7em;
+	background-color: #f3f4f6;
+	color: #111827;
+	border: 1px solid #e5e7eb;
+	border-radius: 6px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+}
+.kdna-events-my-ticket__code--mono {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.kdna-events-my-ticket__download {
+	align-self: flex-start;
+	padding: 0.45em 0.85em;
+	background-color: #e5e7eb;
+	color: #374151;
+	border: 1px solid transparent;
+	border-radius: 6px;
+	cursor: not-allowed;
+	font: inherit;
+	font-size: 0.9em;
+}
+.kdna-events-my-ticket__qr {
+	flex: 0 0 auto;
+	width: 108px;
+	height: 108px;
+}
+.kdna-events-my-ticket__qr img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background-color: #ffffff;
+	border-radius: 6px;
+}
+.kdna-events-my-tickets__empty {
+	margin: 0;
+	padding: 1.25em;
+	background-color: #f9fafb;
+	border: 1px dashed #e5e7eb;
+	border-radius: 8px;
+	text-align: center;
+	color: #6b7280;
+}
+.kdna-events-my-tickets__login {
+	padding: 24px;
+	background-color: #f9fafb;
+	border: 1px solid #e5e7eb;
+	border-radius: 10px;
+	text-align: center;
+}
+.kdna-events-my-tickets__login-message {
+	margin: 0 0 12px;
+	color: #374151;
+}
+.kdna-events-my-tickets__login-button {
+	display: inline-block;
+	padding: 0.6em 1.2em;
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border: 1px solid #1d4ed8;
+	border-radius: 6px;
+	text-decoration: none;
+	font-weight: 600;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.kdna-events-my-tickets__login-button:hover {
+	background-color: #1e40af;
+	border-color: #1e40af;
+	color: #ffffff;
+}
