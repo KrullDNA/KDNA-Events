@@ -1042,3 +1042,142 @@ a.kdna-events-event-organiser__name:hover {
 .kdna-events-checkout-pay-button__error[hidden] {
 	display: none;
 }
+
+/* Success Confirmation. */
+.kdna-events-success-confirmation {
+	padding: 2em;
+	background-color: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	text-align: center;
+}
+.kdna-events-success-confirmation--not-found {
+	background-color: #fef9c3;
+	border-color: #fde68a;
+	color: #713f12;
+}
+.kdna-events-success-confirmation__icon {
+	margin-bottom: 0.5em;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+.kdna-events-success-confirmation__icon svg,
+.kdna-events-success-confirmation__icon i {
+	font-size: 64px;
+	width: 64px;
+	height: 64px;
+	color: #059669;
+	fill: #059669;
+}
+.kdna-events-success-confirmation__heading {
+	margin: 0 0 0.25em;
+	font-size: 1.75em;
+	line-height: 1.2;
+}
+.kdna-events-success-confirmation__subheading {
+	margin: 0;
+	color: #4b5563;
+}
+.kdna-events-success-confirmation__spinner {
+	display: inline-block;
+	margin-top: 1em;
+	width: 36px;
+	height: 36px;
+	border: 3px solid rgba(29, 78, 216, 0.2);
+	border-top-color: #1d4ed8;
+	border-radius: 50%;
+	animation: kdna-events-spin 0.7s linear infinite;
+}
+.kdna-events-success-confirmation.is-loading {
+	color: #4b5563;
+}
+
+/* Success Tickets. */
+.kdna-events-success-tickets__list {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+.kdna-events-success-ticket {
+	display: flex;
+	flex-direction: column;
+	background-color: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	overflow: hidden;
+}
+.kdna-events-success-ticket__header {
+	padding: 0.75em 1em;
+	background-color: #f9fafb;
+	border-bottom: 1px solid #e5e7eb;
+}
+.kdna-events-success-ticket__heading {
+	margin: 0;
+	font-size: 1em;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	color: #374151;
+}
+.kdna-events-success-ticket__body {
+	display: flex;
+	gap: 16px;
+	padding: 16px;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+}
+.kdna-events-success-ticket__details {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4em;
+	flex: 1 1 auto;
+	min-width: 200px;
+}
+.kdna-events-success-ticket__name {
+	font-weight: 600;
+	font-size: 1.05em;
+}
+.kdna-events-success-ticket__email {
+	font-size: 0.9em;
+	color: #4b5563;
+}
+.kdna-events-success-ticket__code {
+	align-self: flex-start;
+	display: inline-block;
+	padding: 0.5em 0.75em;
+	background-color: #f3f4f6;
+	color: #111827;
+	border: 1px solid #e5e7eb;
+	border-radius: 6px;
+	font-size: 1.15em;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+}
+.kdna-events-success-ticket__code--mono {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.kdna-events-success-ticket__download {
+	align-self: flex-start;
+	padding: 0.5em 0.9em;
+	background-color: #e5e7eb;
+	color: #374151;
+	border: 1px solid transparent;
+	border-radius: 6px;
+	cursor: not-allowed;
+	font: inherit;
+}
+.kdna-events-success-ticket__qr {
+	flex: 0 0 auto;
+	width: 140px;
+	height: 140px;
+}
+.kdna-events-success-ticket__qr img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border-radius: 6px;
+	background-color: #ffffff;
+}

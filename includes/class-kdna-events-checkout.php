@@ -303,6 +303,11 @@ class KDNA_Events_Checkout {
 			$success_url = kdna_events_get_page_url( 'success' );
 			$redirect    = '' === $success_url ? '' : add_query_arg( 'order_ref', rawurlencode( $reference ), $success_url );
 
+			// Turn the pending_free row into a real free booking: create
+			// tickets, invalidate the sold-count transient, send emails
+			// and fire the ticket_created hooks.
+			KDNA_Events_Orders::finalise_order( $order_id );
+
 			wp_send_json_success(
 				array(
 					'success'             => true,
@@ -314,14 +319,30 @@ class KDNA_Events_Checkout {
 			);
 		}
 
-		// Stage 7 stub: Stripe integration ships in Stage 8.
-		wp_send_json_error(
+		// Paid flow: create a Stripe Checkout Session and hand the hosted
+		// URL back so the client can redirect. The webhook finalises the
+		// order once Stripe confirms payment.
+		$stripe_url = KDNA_Events_Stripe::create_checkout_session( $order_id );
+		if ( is_wp_error( $stripe_url ) || '' === $stripe_url ) {
+			$message = is_wp_error( $stripe_url ) ? $stripe_url->get_error_message() : __( 'Could not start Stripe checkout. Please try again.', 'kdna-events' );
+			wp_send_json_error(
+				array(
+					'message'   => $message,
+					'order_ref' => $reference,
+					'is_free'   => false,
+				),
+				500
+			);
+		}
+
+		wp_send_json_success(
 			array(
-				'message'   => __( 'Stripe checkout is not yet implemented. Free events work end-to-end today.', 'kdna-events' ),
-				'order_ref' => $reference,
-				'is_free'   => false,
-			),
-			501
+				'success'             => true,
+				'order_ref'           => $reference,
+				'is_free'             => false,
+				'stripe_session_url'  => $stripe_url,
+				'redirect_url'        => $stripe_url,
+			)
 		);
 	}
 }
