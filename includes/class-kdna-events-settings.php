@@ -39,6 +39,8 @@ class KDNA_Events_Settings {
 		add_action( 'admin_menu', array( __CLASS__, 'prune_parent_submenu' ), 999 );
 		add_action( 'admin_init', array( __CLASS__, 'register_settings' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
+		add_filter( 'parent_file', array( __CLASS__, 'filter_parent_file' ) );
+		add_filter( 'submenu_file', array( __CLASS__, 'filter_submenu_file' ), 10, 2 );
 	}
 
 	/**
@@ -155,6 +157,60 @@ class KDNA_Events_Settings {
 	 */
 	public static function prune_parent_submenu() {
 		remove_submenu_page( self::MENU_SLUG, self::MENU_SLUG );
+	}
+
+	/**
+	 * Highlight the Events top-level menu when editing any of our CPTs.
+	 *
+	 * Our CPTs register with show_in_menu=false so WordPress' auto
+	 * submenu adder doesn't create duplicates. The trade-off is that
+	 * the edit.php / post.php screens lose their default highlighting,
+	 * so we point parent_file at the Events parent slug here.
+	 *
+	 * @param string $parent_file Default parent file.
+	 * @return string
+	 */
+	public static function filter_parent_file( $parent_file ) {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen ) {
+			return $parent_file;
+		}
+
+		$ours = array(
+			KDNA_Events_CPT::POST_TYPE,
+			KDNA_Events_CPT::LOCATION_POST_TYPE,
+			KDNA_Events_CPT::ORGANISER_POST_TYPE,
+		);
+		if ( in_array( $screen->post_type, $ours, true ) ) {
+			return self::MENU_SLUG;
+		}
+		return $parent_file;
+	}
+
+	/**
+	 * Highlight the correct sub-item on each CPT list / edit screen.
+	 *
+	 * @param string $submenu_file Default submenu file.
+	 * @param string $parent_file  Resolved parent file.
+	 * @return string
+	 */
+	public static function filter_submenu_file( $submenu_file, $parent_file ) {
+		unset( $parent_file );
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen ) {
+			return $submenu_file;
+		}
+
+		switch ( $screen->post_type ) {
+			case KDNA_Events_CPT::POST_TYPE:
+				return 'edit.php?post_type=' . KDNA_Events_CPT::POST_TYPE;
+			case KDNA_Events_CPT::LOCATION_POST_TYPE:
+				return 'edit.php?post_type=' . KDNA_Events_CPT::LOCATION_POST_TYPE;
+			case KDNA_Events_CPT::ORGANISER_POST_TYPE:
+				return 'edit.php?post_type=' . KDNA_Events_CPT::ORGANISER_POST_TYPE;
+		}
+
+		return $submenu_file;
 	}
 
 	/**
