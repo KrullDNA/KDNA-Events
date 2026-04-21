@@ -214,10 +214,25 @@ class KDNA_Events_Grid {
 	 * @return string
 	 */
 	public static function render_card( $event_id, $card_settings ) {
+		$default = KDNA_EVENTS_PATH . 'templates/partials/event-card.php';
+
+		/**
+		 * Filter the resolved path to the shared event card partial.
+		 *
+		 * Themes can override the card markup by returning a path to a
+		 * copy of the partial inside their theme.
+		 *
+		 * @param string $default Absolute default path.
+		 */
+		$path = (string) apply_filters( 'kdna_events_event_card_template', $default );
+		if ( ! file_exists( $path ) ) {
+			$path = $default;
+		}
+
 		ob_start();
 		$event_id      = (int) $event_id; // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$card_settings = is_array( $card_settings ) ? $card_settings : array(); // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		include KDNA_EVENTS_PATH . 'templates/partials/event-card.php';
+		include $path;
 		return (string) ob_get_clean();
 	}
 

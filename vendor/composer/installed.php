@@ -3,7 +3,7 @@
         'name' => 'kdna/kdna-events',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '9a628104018f45b8d623589e4405a3ed5eafe05c',
+        'reference' => '2b737462261f0869f6d8d473c03f3317b1c32b04',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'kdna/kdna-events' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '9a628104018f45b8d623589e4405a3ed5eafe05c',
+            'reference' => '2b737462261f0869f6d8d473c03f3317b1c32b04',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

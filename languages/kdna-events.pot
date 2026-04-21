@@ -1,0 +1,3053 @@
+# Copyright (C) 2026 KDNA
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: KDNA Events 1.0.0\n"
+"Report-Msgid-Bugs-To: https://krulldna.com/\n"
+"Last-Translator: KDNA <hello@krulldna.com>\n"
+"Language-Team: KDNA <hello@krulldna.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: kdna-events\n"
+
+#: includes/class-kdna-events-admin.php:651
+msgid "%1$d / %2$d"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:642
+msgid "%s background"
+msgstr ""
+
+#: widgets/class-widget-event-type-badge.php:257
+msgid "%s colours"
+msgstr ""
+
+#: widgets/class-widget-event-type-badge.php:121
+msgid "%s icon"
+msgstr ""
+
+#: widgets/class-widget-event-type-badge.php:100
+msgid "%s label"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:406
+msgid "%s per ticket"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:653
+msgid "%s text"
+msgstr ""
+
+#: templates/emails/booking-confirmation.php:144
+msgid "&copy; %1$s %2$s. All rights reserved."
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:377
+msgid "+61 400 000 000"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:281
+msgid "0 = unlimited. Maximum total tickets this event can sell."
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:485
+msgid "16:9"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:483
+msgid "1:1 (square)"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:486
+msgid "3:4 (portrait)"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:484
+msgid "4:3"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:211
+msgid "AJAX"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:482
+#: widgets/class-widget-event-register-button.php:145
+#: widgets/class-widget-my-tickets.php:272
+msgid "Active"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:65
+msgid "Active label"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:340
+msgid "Active state"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:342
+#: widgets/class-widget-checkout-order-summary.php:272
+#: widgets/class-widget-checkout-pay-button.php:272
+#: widgets/class-widget-checkout-quantity.php:343
+msgid "Add ?event_id=X to the checkout URL to preview."
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:55
+#: includes/class-kdna-events-settings.php:108
+msgid "Add New"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:56
+#: includes/class-kdna-events-settings.php:107
+msgid "Add New Event"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:118
+msgid "Add New Event Category"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:699
+msgid "Add a key on the %s to render the map. This notice is visible only to admins."
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:329
+msgid "Add field"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:247
+#: widgets/class-widget-event-location.php:315
+msgid "Address"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:649
+msgid "Admin notification email"
+msgstr ""
+
+#: widgets/class-widget-event-price.php:94
+msgid "After amount"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:182
+#: widgets/class-widget-event-filter.php:172
+#: widgets/class-widget-event-organiser.php:170
+#: widgets/class-widget-event-register-button.php:247
+#: widgets/class-widget-event-subtitle.php:88
+#: widgets/class-widget-event-title.php:101
+#: widgets/class-widget-success-confirmation.php:136
+msgid "Alignment"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:115
+#: widgets/class-widget-event-filter.php:543
+msgid "All"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:113
+msgid "All Event Categories"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:60
+#: includes/class-kdna-events-settings.php:100
+msgid "All Events"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:62
+#: widgets/class-widget-event-grid.php:65
+msgid "All categories"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:113
+msgid "All label"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:692
+msgid "Also send a personalised ticket email to each attendee when their email address is captured."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:671
+msgid "Also send admin notifications to the event organiser email when one is set."
+msgstr ""
+
+#: widgets/class-widget-event-image.php:92
+msgid "Alt fallback"
+msgstr ""
+
+#: widgets/class-widget-event-price.php:123
+msgid "Amount colour"
+msgstr ""
+
+#: widgets/class-widget-event-price.php:131
+msgid "Amount typography"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:183
+msgid "Appearance"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:650
+msgid "Apply"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:146
+msgid "Ascending"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:479
+msgid "Aspect ratio"
+msgstr ""
+
+#: includes/class-kdna-events-checkout.php:200
+msgid "Attendee %1$d: %2$s is required."
+msgstr ""
+
+#: includes/class-kdna-events-checkout.php:187
+msgid "Attendee %d: a valid email is required."
+msgstr ""
+
+#: includes/class-kdna-events-checkout.php:184
+msgid "Attendee %d: name is required."
+msgstr ""
+
+#: includes/class-kdna-events-checkout.php:190
+msgid "Attendee %d: phone is required."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1157
+msgid "Attendee full name."
+msgstr ""
+
+#: widgets/class-widget-success-tickets.php:229
+msgid "Attendee name"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:450
+msgid "Attendee name colour"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:74
+#: widgets/class-widget-checkout-attendees.php:348
+msgid "Attendee {n}"
+msgstr ""
+
+#: templates/emails/admin-notification.php:88
+msgid "Attendees"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:80
+msgid "Aubergine"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:54
+#: includes/class-kdna-events-settings.php:70
+msgid "Australian Dollar (AUD)"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:144
+msgid "Automatic"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1169
+msgid "Available merge tags:"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:91
+msgid "Available text template"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:231
+#: widgets/class-widget-checkout-order-summary.php:236
+#: widgets/class-widget-checkout-pay-button.php:185
+#: widgets/class-widget-checkout-pay-button.php:216
+#: widgets/class-widget-checkout-summary.php:184
+#: widgets/class-widget-event-description.php:255
+#: widgets/class-widget-event-filter.php:305
+#: widgets/class-widget-event-filter.php:442
+#: widgets/class-widget-event-filter.php:473
+#: widgets/class-widget-event-filter.php:497
+#: widgets/class-widget-event-grid.php:360
+#: widgets/class-widget-event-grid.php:735
+#: widgets/class-widget-event-grid.php:769
+#: widgets/class-widget-event-grid.php:860
+#: widgets/class-widget-event-grid.php:883
+#: widgets/class-widget-event-grid.php:906
+#: widgets/class-widget-event-location.php:539
+#: widgets/class-widget-event-location.php:578
+#: widgets/class-widget-event-price.php:173
+#: widgets/class-widget-event-register-button.php:361
+#: widgets/class-widget-event-register-button.php:460
+#: widgets/class-widget-event-register-button.php:554
+#: widgets/class-widget-event-type-badge.php:265
+#: widgets/class-widget-my-tickets.php:233
+#: widgets/class-widget-my-tickets.php:263
+#: widgets/class-widget-my-tickets.php:287
+#: widgets/class-widget-my-tickets.php:366
+#: widgets/class-widget-my-tickets.php:504
+#: widgets/class-widget-my-tickets.php:566
+#: widgets/class-widget-my-tickets.php:635
+#: widgets/class-widget-success-confirmation.php:172
+#: widgets/class-widget-success-tickets.php:142
+#: widgets/class-widget-success-tickets.php:268
+msgid "Background"
+msgstr ""
+
+#: widgets/class-widget-event-price.php:154
+#: widgets/class-widget-event-type-badge.php:137
+msgid "Badge"
+msgstr ""
+
+#: widgets/class-widget-event-price.php:162
+msgid "Badge mode"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:149
+msgid "Basics"
+msgstr ""
+
+#: widgets/class-widget-event-price.php:93
+msgid "Before amount"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:199
+msgid "Behaviour"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:236
+msgid "Blockquote"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:400
+msgid "Body padding"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1166
+msgid "Booking confirmation body"
+msgstr ""
+
+#: templates/emails/booking-confirmation.php:43
+msgid "Booking confirmed"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:663
+msgid "Booking notifications are sent to this address. Use the button to verify SMTP without completing a booking."
+msgstr ""
+
+#: widgets/class-widget-success-confirmation.php:87
+msgid "Booking {order_ref} for {event_title}. {attendee_count} ticket(s) confirmed."
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:508
+#: widgets/class-widget-event-grid.php:780
+#: widgets/class-widget-event-location.php:589
+#: widgets/class-widget-event-register-button.php:471
+#: widgets/class-widget-event-register-button.php:566
+#: widgets/class-widget-my-tickets.php:298
+msgid "Border colour"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:158
+#: widgets/class-widget-checkout-summary.php:203
+#: widgets/class-widget-checkout-summary.php:265
+#: widgets/class-widget-event-filter.php:346
+#: widgets/class-widget-event-filter.php:408
+#: widgets/class-widget-event-grid.php:380
+#: widgets/class-widget-event-grid.php:519
+#: widgets/class-widget-event-grid.php:706
+#: widgets/class-widget-event-grid.php:835
+#: widgets/class-widget-event-image.php:199
+#: widgets/class-widget-event-location.php:380
+#: widgets/class-widget-event-location.php:451
+#: widgets/class-widget-event-price.php:194
+#: widgets/class-widget-event-register-button.php:378
+#: widgets/class-widget-event-type-badge.php:155
+#: widgets/class-widget-my-tickets.php:208
+#: widgets/class-widget-my-tickets.php:384
+#: widgets/class-widget-my-tickets.php:584
+#: widgets/class-widget-success-confirmation.php:189
+#: widgets/class-widget-success-tickets.php:160
+#: widgets/class-widget-success-tickets.php:280
+msgid "Border radius"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:151
+#: widgets/class-widget-checkout-summary.php:305
+#: widgets/class-widget-event-grid.php:593
+msgid "Bottom spacing"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:235
+msgid "Brighten"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:131
+msgid "Button"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:290
+#: widgets/class-widget-checkout-quantity.php:321
+msgid "Button background"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:316
+msgid "Button label"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:280
+#: widgets/class-widget-checkout-quantity.php:311
+msgid "Button text"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:56
+msgid "CRM"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:870
+msgid "CRM framework is not available."
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:278
+msgid "Capacity"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:274
+msgid "Capacity and Limits"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:229
+#: widgets/class-widget-checkout-summary.php:176
+#: widgets/class-widget-event-grid.php:352
+#: widgets/class-widget-success-tickets.php:135
+msgid "Card"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:245
+msgid "Card elements"
+msgstr ""
+
+#: widgets/class-widget-success-tickets.php:80
+msgid "Card heading"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:675
+msgid "Card register button"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:626
+msgid "Card type badge"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:120
+#: includes/class-kdna-events-settings.php:116
+msgid "Categories"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:94
+#: widgets/class-widget-event-filter.php:596
+#: widgets/class-widget-event-grid.php:118
+msgid "Category"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:180
+#: widgets/class-widget-event-organiser.php:178
+#: widgets/class-widget-event-register-button.php:255
+#: widgets/class-widget-event-subtitle.php:96
+#: widgets/class-widget-event-title.php:109
+#: widgets/class-widget-success-confirmation.php:145
+msgid "Centre"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:323
+msgid "Checkbox accent colour"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:38
+msgid "Checkout Attendees"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:35
+msgid "Checkout Event Summary"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:36
+msgid "Checkout Order Summary"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:36
+msgid "Checkout Pay Button"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:37
+msgid "Checkout Quantity"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:824
+msgid "Checkout page"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1029
+msgid "Clear log"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1112
+msgid "Clearing..."
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:147
+msgid "Closed"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:122
+msgid "Closed label"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:187
+msgid "Closes at"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:156
+#: widgets/class-widget-checkout-attendees.php:188
+#: widgets/class-widget-checkout-quantity.php:140
+#: widgets/class-widget-checkout-summary.php:294
+#: widgets/class-widget-event-datetime.php:187
+#: widgets/class-widget-event-filter.php:250
+#: widgets/class-widget-event-grid.php:580
+#: widgets/class-widget-event-location.php:288
+#: widgets/class-widget-event-location.php:324
+#: widgets/class-widget-event-organiser.php:245
+#: widgets/class-widget-event-organiser.php:268
+#: widgets/class-widget-event-organiser.php:303
+#: widgets/class-widget-event-organiser.php:338
+#: widgets/class-widget-event-subtitle.php:134
+#: widgets/class-widget-my-tickets.php:328
+#: widgets/class-widget-success-confirmation.php:230
+#: widgets/class-widget-success-confirmation.php:283
+#: widgets/class-widget-success-tickets.php:236
+msgid "Colour"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:176
+msgid "Columns"
+msgstr ""
+
+#: widgets/class-widget-success-confirmation.php:106
+#: widgets/class-widget-success-confirmation.php:320
+msgid "Confirming your booking..."
+msgstr ""
+
+#: includes/class-kdna-events-crm.php:536
+msgid "Connection to %s OK."
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:92
+#: widgets/class-widget-event-organiser.php:405
+msgid "Contact organiser"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:165
+msgid "Contain"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:64
+#: widgets/class-widget-checkout-order-summary.php:62
+#: widgets/class-widget-checkout-pay-button.php:62
+#: widgets/class-widget-checkout-quantity.php:63
+#: widgets/class-widget-checkout-summary.php:61
+#: widgets/class-widget-event-datetime.php:61
+#: widgets/class-widget-event-description.php:61
+#: widgets/class-widget-event-image.php:61
+#: widgets/class-widget-event-organiser.php:62
+#: widgets/class-widget-event-price.php:62
+#: widgets/class-widget-event-subtitle.php:61
+#: widgets/class-widget-event-title.php:62
+#: widgets/class-widget-event-type-badge.php:91
+#: widgets/class-widget-my-tickets.php:67
+#: widgets/class-widget-success-confirmation.php:68
+#: widgets/class-widget-success-tickets.php:72
+msgid "Content"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:174
+msgid "Controls"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:94
+#: widgets/class-widget-checkout-attendees.php:349
+msgid "Copy details from ticket 1"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:92
+msgid "Copy-from-first label"
+msgstr ""
+
+#: includes/class-kdna-events-checkout.php:275
+msgid "Could not create the order. Please try again."
+msgstr ""
+
+#: includes/class-kdna-events-checkout.php:327
+msgid "Could not start Stripe checkout. Please try again."
+msgstr ""
+
+#: widgets/class-widget-event-image.php:164
+msgid "Cover"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:802
+msgid "Create an API key in the %s. Enable the Maps JavaScript API and the Geocoding API, then restrict the key by HTTP referrer to this site."
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:286
+msgid "Create an event to preview the date."
+msgstr ""
+
+#: widgets/class-widget-event-description.php:294
+msgid "Create an event to preview the description."
+msgstr ""
+
+#: widgets/class-widget-event-image.php:298
+msgid "Create an event to preview the image."
+msgstr ""
+
+#: widgets/class-widget-event-location.php:612
+msgid "Create an event to preview the location."
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:384
+msgid "Create an event to preview the organiser."
+msgstr ""
+
+#: widgets/class-widget-event-price.php:228
+msgid "Create an event to preview the price."
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:685
+msgid "Create an event to preview the register button."
+msgstr ""
+
+#: widgets/class-widget-event-title.php:181
+msgid "Create an event to preview the title."
+msgstr ""
+
+#: widgets/class-widget-event-type-badge.php:300
+msgid "Create an event to preview the type badge."
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:207
+msgid "Currency"
+msgstr ""
+
+#: widgets/class-widget-event-price.php:136
+msgid "Currency colour"
+msgstr ""
+
+#: widgets/class-widget-event-price.php:89
+msgid "Currency position"
+msgstr ""
+
+#: widgets/class-widget-event-price.php:145
+msgid "Currency typography"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:892
+msgid "Current"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:487
+msgid "Custom"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:317
+msgid "Custom Attendee Fields"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:495
+msgid "Custom aspect ratio"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:78
+msgid "Dark"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:236
+msgid "Darken"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:279
+#: widgets/class-widget-event-grid.php:253
+#: widgets/class-widget-event-grid.php:560
+msgid "Date"
+msgstr ""
+
+#: templates/emails/admin-notification.php:48
+msgid "Date TBA"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:114
+#: widgets/class-widget-event-grid.php:306
+msgid "Date format"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:104
+msgid "Date merge tag format"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:95
+msgid "Date range"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:383
+msgid "Decrease quantity"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:75
+msgid "Default"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:631
+msgid "Default currency"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:642
+msgid "Default max tickets per order"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:190
+msgid "Defaults to event start if blank."
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:170
+msgid "Defaults to the site timezone."
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:147
+msgid "Descending"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:132
+msgid "Direction"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:534
+msgid "Disabled state"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:84
+msgid "Displays remaining capacity when the event sets one."
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:132
+msgid "Divider between attendees"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:171
+msgid "Divider colour"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:823
+#: widgets/class-widget-success-tickets.php:398
+msgid "Download PDF (coming soon)"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:58
+msgid "Edit Event"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:116
+msgid "Edit Event Category"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:829
+msgid "Elementor page shown after a successful booking."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:825
+msgid "Elementor page used for the checkout flow."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:833
+msgid "Elementor page where logged-in users view their tickets."
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:358
+msgid "Email"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:369
+msgid "Email address"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:682
+msgid "Email from address"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:676
+msgid "Email from name"
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:90
+msgid "Email label"
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:294
+msgid "Email link"
+msgstr ""
+
+#: includes/class-kdna-events-emails.php:201
+msgid "Email template missing."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:55
+msgid "Emails"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:124
+msgid "Empty tab message"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:925
+msgid "Enable"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:884
+msgid "Enable CRM sync"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:161
+msgid "End"
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:111
+msgid "End date format"
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:121
+msgid "End time format"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1054
+msgid "Error"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:270
+msgid "Error text colour"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:56
+#: includes/class-kdna-events-settings.php:72
+msgid "Euro (EUR)"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:115
+msgid "Event Categories"
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:40
+msgid "Event Date / Time"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:40
+msgid "Event Description"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:83
+msgid "Event Details"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:65
+msgid "Event Featured Image"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:37
+msgid "Event Filter"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:37
+msgid "Event Grid"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:40
+msgid "Event Image"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:41
+msgid "Event Location"
+msgstr ""
+
+#: includes/class-kdna-events-emails.php:366
+#: widgets/class-widget-event-organiser.php:41
+msgid "Event Organiser"
+msgstr ""
+
+#: widgets/class-widget-event-price.php:41
+msgid "Event Price"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:38
+msgid "Event Register Button"
+msgstr ""
+
+#: widgets/class-widget-event-subtitle.php:40
+msgid "Event Subtitle"
+msgstr ""
+
+#: widgets/class-widget-event-title.php:40
+msgid "Event Title"
+msgstr ""
+
+#: widgets/class-widget-event-type-badge.php:40
+msgid "Event Type Badge"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:69
+msgid "Event archives"
+msgstr ""
+
+#: templates/emails/booking-confirmation.php:81
+msgid "Event details"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:321
+msgid "Event group heading"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1159
+msgid "Event location, venue or virtual link."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1160
+msgid "Event organiser name."
+msgstr ""
+
+#: widgets/class-widget-event-image.php:83
+msgid "Event single"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1156
+msgid "Event start date and time."
+msgstr ""
+
+#: widgets/class-widget-event-subtitle.php:167
+msgid "Event subtitle preview"
+msgstr ""
+
+#: includes/class-kdna-events-stripe.php:118
+msgid "Event ticket"
+msgstr ""
+
+#: widgets/class-widget-event-title.php:189
+msgid "Event title is empty."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1155
+msgid "Event title."
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:223
+msgid "Event type"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:89
+#: includes/class-kdna-events-settings.php:99
+msgid "Events"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:743
+msgid "Events Settings, Pages tab"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:79
+msgid "Events created with KDNA Events."
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:74
+msgid "Events list"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:73
+msgid "Events list navigation"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:74
+#: widgets/class-widget-event-grid.php:257
+#: widgets/class-widget-event-grid.php:564
+msgid "Excerpt"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:294
+msgid "Excerpt length (words)"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:318
+msgid "Extra fields captured for every ticket at checkout. Name, email and phone are always collected."
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:239
+msgid "Extra large"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1080
+msgid "Failed"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:645
+msgid "Fallback cap applied when an event does not set its own maximum per order."
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:181
+msgid "Field labels"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:295
+msgid "Fieldsets"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:166
+msgid "Fill"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:72
+msgid "Filter events list"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:86
+msgid "Filters"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:259
+#: widgets/class-widget-event-filter.php:358
+msgid "Focus border colour"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:121
+msgid "Force phone required"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:150
+msgid "Forces the button state in the editor preview. Front-end always resolves live."
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:638
+#: includes/class-kdna-events-emails.php:328
+#: includes/class-kdna-events-grid.php:332
+#: includes/class-kdna-events-grid.php:377
+#: templates/partials/event-card.php:49
+#: widgets/class-widget-checkout-order-summary.php:87
+#: widgets/class-widget-checkout-order-summary.php:287
+#: widgets/class-widget-event-filter.php:553
+#: widgets/class-widget-event-grid.php:328
+#: widgets/class-widget-event-grid.php:940
+#: widgets/class-widget-event-price.php:72
+#: widgets/class-widget-event-price.php:248
+msgid "Free"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:78
+#: widgets/class-widget-event-register-button.php:84
+msgid "Free event label"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:85
+#: widgets/class-widget-event-grid.php:326
+#: widgets/class-widget-event-price.php:70
+msgid "Free label"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:613
+msgid "From"
+msgstr ""
+
+#: widgets/class-widget-event-price.php:103
+msgid "From prefix"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:368
+msgid "Full name"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:263
+msgid "Full width"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:146
+#: widgets/class-widget-event-filter.php:145
+#: widgets/class-widget-event-grid.php:192
+#: widgets/class-widget-event-organiser.php:205
+msgid "Gap"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:429
+#: widgets/class-widget-success-tickets.php:205
+msgid "Gap between tickets"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:51
+msgid "General"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:803
+msgid "Google Cloud Console"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:53
+msgid "Google Maps"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:795
+msgid "Google Maps API key"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:694
+msgid "Google Maps API key missing"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:700
+msgid "Google Maps settings tab"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:133
+msgid "Guest message"
+msgstr ""
+
+#: widgets/class-widget-event-subtitle.php:69
+#: widgets/class-widget-event-title.php:70
+msgid "HTML tag"
+msgstr ""
+
+#: widgets/class-widget-success-confirmation.php:76
+#: widgets/class-widget-success-confirmation.php:269
+msgid "Heading"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:141
+msgid "Heading colour"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:149
+msgid "Heading typography"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:133
+msgid "Headings"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:173
+msgid "Height"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:508
+msgid "Height as a percentage of width."
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:282
+msgid "Helper text colour"
+msgstr ""
+
+#: includes/class-kdna-events-orders.php:240
+#: templates/emails/booking-confirmation.php:66
+msgid "Hi %s,"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:136
+msgid "Horizontal"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:202
+#: widgets/class-widget-checkout-quantity.php:307
+#: widgets/class-widget-event-filter.php:459
+#: widgets/class-widget-event-grid.php:753
+#: widgets/class-widget-event-grid.php:869
+#: widgets/class-widget-event-image.php:221
+#: widgets/class-widget-event-location.php:559
+#: widgets/class-widget-my-tickets.php:249
+#: widgets/class-widget-my-tickets.php:621
+msgid "Hover"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:441
+msgid "Hover (active only)"
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:314
+msgid "Hover colour"
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:279
+msgid "Hover colour (when linked)"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:229
+msgid "Hover effect"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:437
+msgid "Hover lift"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:429
+msgid "Hover shadow"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:531
+msgid "Hover zoom"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:71
+#: templates/partials/event-card.php:59
+#: widgets/class-widget-event-filter.php:549
+#: widgets/class-widget-event-grid.php:635
+#: widgets/class-widget-event-type-badge.php:72
+msgid "Hybrid"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:103
+#: widgets/class-widget-event-datetime.php:150
+#: widgets/class-widget-event-datetime.php:204
+#: widgets/class-widget-event-location.php:263
+#: widgets/class-widget-event-organiser.php:123
+#: widgets/class-widget-event-organiser.php:329
+#: widgets/class-widget-event-register-button.php:177
+#: widgets/class-widget-success-confirmation.php:123
+#: widgets/class-widget-success-confirmation.php:222
+msgid "Icon"
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:213
+#: widgets/class-widget-event-register-button.php:419
+#: widgets/class-widget-event-register-button.php:490
+#: widgets/class-widget-event-register-button.php:598
+msgid "Icon colour"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:115
+#: widgets/class-widget-event-datetime.php:163
+#: widgets/class-widget-event-organiser.php:136
+#: widgets/class-widget-event-register-button.php:190
+msgid "Icon position"
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:224
+#: widgets/class-widget-event-location.php:463
+#: widgets/class-widget-event-register-button.php:301
+#: widgets/class-widget-event-type-badge.php:195
+msgid "Icon size"
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:251
+#: widgets/class-widget-event-location.php:490
+#: widgets/class-widget-event-register-button.php:204
+#: widgets/class-widget-event-type-badge.php:223
+msgid "Icon spacing"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:67
+#: widgets/class-widget-checkout-summary.php:230
+#: widgets/class-widget-event-grid.php:251
+#: widgets/class-widget-event-grid.php:470
+msgid "Image"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:70
+msgid "Image size"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:69
+#: templates/partials/event-card.php:57
+#: widgets/class-widget-event-filter.php:547
+#: widgets/class-widget-event-grid.php:633
+#: widgets/class-widget-event-type-badge.php:60
+msgid "In-person"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:107
+msgid "Include past events"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:396
+msgid "Increase quantity"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:207
+msgid "Indent"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1158
+msgid "Individual ticket code."
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:104
+msgid "Inline"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:216
+msgid "Input background"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:255
+msgid "Input border radius"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:266
+msgid "Input focus border colour"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:206
+msgid "Input text colour"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:223
+msgid "Input typography"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:227
+msgid "Input width"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:214
+#: widgets/class-widget-event-filter.php:284
+msgid "Inputs"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:70
+msgid "Insert into event"
+msgstr ""
+
+#: includes/class-kdna-events-crm.php:512
+#: includes/class-kdna-events-crm.php:552
+#: includes/class-kdna-events-emails.php:190
+msgid "Insufficient permissions."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1037
+msgid "Integration"
+msgstr ""
+
+#: includes/class-kdna-events-crm.php:519
+msgid "Integration not found."
+msgstr ""
+
+#: includes/class-kdna-events-checkout.php:133
+msgid "Invalid event."
+msgstr ""
+
+#: includes/class-kdna-events-emails.php:344
+#: includes/class-kdna-events-emails.php:355
+#: widgets/class-widget-my-tickets.php:885
+#: widgets/class-widget-success-tickets.php:346
+msgid "Jane Doe"
+msgstr ""
+
+#: includes/class-kdna-events-emails.php:356
+#: widgets/class-widget-success-tickets.php:351
+msgid "John Smith"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:244
+#: widgets/class-widget-event-location.php:735
+msgid "Join virtual event"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:191
+msgid "Justified"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:88
+msgid "KDNA Events"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:123
+#: includes/class-kdna-events-settings.php:562
+msgid "KDNA Events Settings"
+msgstr ""
+
+#: kdna-events.php:48
+msgid "KDNA Events requires Elementor to be installed and active. The plugin has been deactivated."
+msgstr ""
+
+#: includes/class-kdna-events-emails.php:204
+msgid "KDNA Events test email"
+msgstr ""
+
+#: includes/class-kdna-events-templates.php:79
+msgid "KDNA Widgets"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:369
+msgid "Key"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:365
+#: widgets/class-widget-checkout-quantity.php:71
+#: widgets/class-widget-checkout-quantity.php:133
+#: widgets/class-widget-event-location.php:242
+msgid "Label"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:242
+#: widgets/class-widget-event-register-button.php:57
+msgid "Labels"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:238
+msgid "Large"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:251
+msgid "Latitude"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:125
+#: widgets/class-widget-checkout-summary.php:133
+#: widgets/class-widget-event-filter.php:124
+#: widgets/class-widget-event-grid.php:168
+#: widgets/class-widget-event-organiser.php:100
+#: widgets/class-widget-event-organiser.php:197
+#: widgets/class-widget-event-register-button.php:159
+msgid "Layout"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:203
+msgid "Leave at 0 for a free event."
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:103
+msgid "Leave blank to hide the time."
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:187
+#: widgets/class-widget-checkout-pay-button.php:119
+#: widgets/class-widget-event-datetime.php:167
+#: widgets/class-widget-event-filter.php:176
+#: widgets/class-widget-event-organiser.php:140
+#: widgets/class-widget-event-organiser.php:174
+#: widgets/class-widget-event-register-button.php:194
+#: widgets/class-widget-event-register-button.php:251
+#: widgets/class-widget-event-subtitle.php:92
+#: widgets/class-widget-event-title.php:105
+#: widgets/class-widget-success-confirmation.php:141
+msgid "Left"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:237
+msgid "Lift"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:503
+msgid "Lift (translateY)"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:137
+msgid "Line"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:121
+msgid "Line item template"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:122
+msgid "Link address to Google Maps"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:164
+msgid "Link colour"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:175
+#: widgets/class-widget-event-location.php:335
+#: widgets/class-widget-event-title.php:147
+msgid "Link hover colour"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:78
+msgid "Link to"
+msgstr ""
+
+#: widgets/class-widget-event-title.php:89
+msgid "Link to event"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:156
+msgid "Links"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:196
+msgid "List colour"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:188
+msgid "Lists"
+msgstr ""
+
+#: includes/class-kdna-events-grid.php:266
+#: includes/class-kdna-events-grid.php:341
+#: includes/class-kdna-events-grid.php:378
+#: widgets/class-widget-event-grid.php:225
+#: widgets/class-widget-event-grid.php:235
+#: widgets/class-widget-event-grid.php:941
+msgid "Load more"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:233
+msgid "Load more label"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:226
+msgid "Loading"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:86
+msgid "Loading label"
+msgstr ""
+
+#: widgets/class-widget-success-confirmation.php:104
+msgid "Loading message"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:71
+#: widgets/class-widget-checkout-summary.php:280
+#: widgets/class-widget-event-grid.php:255
+#: widgets/class-widget-event-grid.php:562
+#: widgets/class-widget-event-location.php:94
+msgid "Location"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:279
+msgid "Location Name"
+msgstr ""
+
+#: includes/class-kdna-events-crm.php:556
+msgid "Log cleared."
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:144
+#: widgets/class-widget-my-tickets.php:854
+msgid "Log in"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:135
+#: widgets/class-widget-my-tickets.php:853
+msgid "Log in to see your tickets."
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:142
+msgid "Login button label"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:497
+msgid "Login prompt"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:255
+msgid "Longitude"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:136
+#: widgets/class-widget-event-location.php:363
+msgid "Map"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:210
+msgid "Map style"
+msgstr ""
+
+#: widgets/class-widget-base.php:108
+#: widgets/class-widget-checkout-attendees.php:167
+#: widgets/class-widget-event-filter.php:263
+#: widgets/class-widget-event-location.php:301
+#: widgets/class-widget-event-location.php:349
+#: widgets/class-widget-event-location.php:400
+#: widgets/class-widget-my-tickets.php:339
+#: widgets/class-widget-success-confirmation.php:294
+msgid "Margin"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:200
+msgid "Marker icon"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:888
+msgid "Master switch. When off, no integrations receive sync calls."
+msgstr ""
+
+#: widgets/class-widget-event-image.php:138
+msgid "Max height"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:291
+msgid "Max tickets per order"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:84
+msgid "Media file"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:237
+msgid "Medium"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:97
+msgid "Merge tags: {date}, {time}, {datetime}"
+msgstr ""
+
+#: widgets/class-widget-success-tickets.php:83
+msgid "Merge tags: {n}, {attendee_name}"
+msgstr ""
+
+#: widgets/class-widget-success-confirmation.php:88
+msgid "Merge tags: {order_ref}, {event_title}, {attendee_count}"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:72
+msgid "Merge tags: {total}, {currency}"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1040
+msgid "Message"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:541
+msgid "Message colour"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:548
+msgid "Message typography"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:285
+msgid "Min tickets per order"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:121
+msgid "Min/max helper text"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:123
+#: widgets/class-widget-checkout-quantity.php:425
+msgid "Minimum {min}, maximum {max} per order."
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:207
+msgid "Mode"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:151
+#: widgets/class-widget-success-tickets.php:122
+msgid "Monospace ticket code"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:41
+msgid "My Tickets"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:832
+msgid "My Tickets page"
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:260
+msgid "Name"
+msgstr ""
+
+#: templates/emails/booking-confirmation.php:130
+msgid "Need help? Reply to this email or contact us at %s."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:730
+#: includes/class-kdna-events-settings.php:1103
+#: includes/class-kdna-events-settings.php:1131
+msgid "Network error."
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:57
+msgid "New Event"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:119
+msgid "New Event Category Name"
+msgstr ""
+
+#: includes/class-kdna-events-emails.php:165
+msgid "New KDNA Events booking: %1$s for %2$s"
+msgstr ""
+
+#: includes/class-kdna-events-orders.php:264
+#: includes/class-kdna-events-orders.php:275
+msgid "New KDNA Events booking: %s"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:58
+#: includes/class-kdna-events-settings.php:74
+msgid "New Zealand Dollar (NZD)"
+msgstr ""
+
+#: templates/emails/admin-notification.php:39
+msgid "New booking received"
+msgstr ""
+
+#: includes/class-kdna-events-grid.php:265
+msgid "Next"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:79
+msgid "Night"
+msgstr ""
+
+#: widgets/class-widget-event-title.php:92
+msgid "No"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:901
+msgid "No CRM integrations are registered yet. Build one by extending KDNA_Events_CRM_Integration and calling $registry->register on %s."
+msgstr ""
+
+#: includes/class-kdna-events-stripe.php:134
+msgid "No Success page assigned. See Settings, Pages tab."
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:742
+msgid "No checkout page is assigned. Admins: configure one in %s to enable this button."
+msgstr ""
+
+#: widgets/class-widget-event-description.php:321
+msgid "No content set for this event."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1045
+#: includes/class-kdna-events-settings.php:1127
+msgid "No entries yet."
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:320
+msgid "No event date set."
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:64
+msgid "No events found in Trash."
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:63
+msgid "No events found."
+msgstr ""
+
+#: includes/class-kdna-events-grid.php:398
+msgid "No events match these filters."
+msgstr ""
+
+#: widgets/class-widget-event-description.php:306
+msgid "No excerpt set for this event."
+msgstr ""
+
+#: widgets/class-widget-event-image.php:303
+msgid "No featured image set for this event."
+msgstr ""
+
+#: widgets/class-widget-event-location.php:629
+msgid "No location set for this event."
+msgstr ""
+
+#: widgets/class-widget-success-confirmation.php:95
+msgid "No order found message"
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:392
+msgid "No organiser set for this event."
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:126
+#: widgets/class-widget-my-tickets.php:756
+msgid "No tickets here yet."
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:136
+#: widgets/class-widget-event-grid.php:223
+#: widgets/class-widget-event-image.php:82
+#: widgets/class-widget-event-image.php:167
+#: widgets/class-widget-event-image.php:233
+msgid "None"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:170
+#: widgets/class-widget-checkout-quantity.php:276
+#: widgets/class-widget-event-filter.php:427
+#: widgets/class-widget-event-grid.php:719
+#: widgets/class-widget-event-grid.php:846
+#: widgets/class-widget-event-location.php:520
+#: widgets/class-widget-my-tickets.php:219
+#: widgets/class-widget-my-tickets.php:551
+msgid "Normal"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:146
+msgid "Not yet open"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:94
+msgid "Not yet open label"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:667
+msgid "Notify organiser"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:224
+msgid "Numbered"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1077
+msgid "OK"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:160
+msgid "Object fit"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:82
+msgid "Offer copy-from-first for 2+ attendees"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:235
+msgid "Only rendered for virtual or hybrid events that have a virtual URL set."
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:230
+#: widgets/class-widget-event-register-button.php:577
+msgid "Opacity"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:336
+msgid "Open the checkout page with ?event_id=X to preview this widget."
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:180
+msgid "Opens at"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:126
+msgid "Opens the Maps search for the address in a new tab."
+msgstr ""
+
+#: widgets/class-widget-event-price.php:106
+msgid "Optional text shown before the price, e.g. \"From\"."
+msgstr ""
+
+#: widgets/class-widget-event-location.php:202
+msgid "Optional. Falls back to the default Google pin."
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:311
+msgid "Optional. If set and organiser notifications are enabled in Settings, this address receives booking alerts for this event."
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:183
+msgid "Optional. Leave blank to open registration immediately."
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:142
+msgid "Order"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:128
+msgid "Order by"
+msgstr ""
+
+#: includes/class-kdna-events-stripe.php:110
+msgid "Order not found."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1154
+msgid "Order reference code."
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:162
+#: widgets/class-widget-event-organiser.php:404
+msgid "Organised by"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:300
+#: templates/emails/booking-confirmation.php:97
+msgid "Organiser"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:308
+msgid "Organiser email"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:304
+msgid "Organiser name"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:249
+msgid "Overlay"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:257
+msgid "Overlay colour"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:268
+msgid "Overlay opacity"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:401
+msgid "Overrides the size preset padding when set."
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:111
+msgid "Overrides the upcoming-only filter."
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:92
+msgid "PHP date format. Leave blank to hide the date."
+msgstr ""
+
+#: widgets/class-widget-base.php:120
+#: widgets/class-widget-checkout-order-summary.php:253
+#: widgets/class-widget-checkout-pay-button.php:139
+#: widgets/class-widget-checkout-summary.php:215
+#: widgets/class-widget-event-description.php:274
+#: widgets/class-widget-event-filter.php:318
+#: widgets/class-widget-event-filter.php:388
+#: widgets/class-widget-event-grid.php:686
+#: widgets/class-widget-event-grid.php:815
+#: widgets/class-widget-event-location.php:439
+#: widgets/class-widget-event-price.php:207
+#: widgets/class-widget-event-register-button.php:398
+#: widgets/class-widget-event-type-badge.php:175
+#: widgets/class-widget-my-tickets.php:188
+#: widgets/class-widget-my-tickets.php:403
+#: widgets/class-widget-my-tickets.php:522
+#: widgets/class-widget-my-tickets.php:603
+#: widgets/class-widget-success-confirmation.php:200
+#: widgets/class-widget-success-tickets.php:179
+#: widgets/class-widget-success-tickets.php:306
+msgid "Padding"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:54
+msgid "Pages"
+msgstr ""
+
+#: includes/class-kdna-events-grid.php:280
+#: widgets/class-widget-event-grid.php:219
+#: widgets/class-widget-event-grid.php:804
+msgid "Pagination"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:554
+msgid "Paid"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:69
+msgid "Paid label template"
+msgstr ""
+
+#: includes/class-kdna-events-stripe.php:127
+msgid "Paid orders must have a non-zero price."
+msgstr ""
+
+#: widgets/class-widget-event-description.php:116
+msgid "Paragraph colour"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:124
+msgid "Paragraph typography"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:108
+msgid "Paragraphs"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:114
+msgid "Parent Event Category"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:115
+msgid "Parent Event Category:"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:62
+msgid "Parent Events:"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:96
+#: widgets/class-widget-my-tickets.php:755
+msgid "Past"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:94
+msgid "Past tab label"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:71
+#: widgets/class-widget-checkout-pay-button.php:285
+msgid "Pay {total}"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:294
+msgid "Per single buyer, not total."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:688
+msgid "Per-attendee emails"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:359
+#: templates/emails/admin-notification.php:68
+#: widgets/class-widget-checkout-attendees.php:370
+msgid "Phone"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:378
+msgid "Pill buttons"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:241
+msgid "Placeholder colour"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:106
+msgid "Placeholder for a future tax breakdown."
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:117
+#: widgets/class-widget-success-tickets.php:115
+msgid "Placeholder. PDF ticket generation is scheduled for a post-launch release."
+msgstr ""
+
+#: includes/class-kdna-events-checkout.php:152
+msgid "Please choose a quantity between %1$d and %2$d."
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:371
+msgid "Please enter a name."
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:373
+msgid "Please enter a phone number."
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:372
+msgid "Please enter a valid email."
+msgstr ""
+
+#: includes/class-kdna-events-checkout.php:219
+msgid "Please fix the highlighted fields."
+msgstr ""
+
+#: widgets/class-widget-event-description.php:73
+msgid "Post content"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:155
+msgid "Posts per page"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:57
+#: includes/class-kdna-events-settings.php:73
+msgid "Pound Sterling (GBP)"
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:236
+msgid "Prefix"
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:160
+msgid "Prefix text"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:140
+msgid "Preview state (editor only)"
+msgstr ""
+
+#: includes/class-kdna-events-grid.php:264
+msgid "Previous"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:200
+#: includes/class-kdna-events-admin.php:604
+#: widgets/class-widget-event-filter.php:581
+#: widgets/class-widget-event-grid.php:134
+#: widgets/class-widget-event-grid.php:256
+#: widgets/class-widget-event-grid.php:563
+#: widgets/class-widget-event-price.php:115
+msgid "Price"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:93
+msgid "Price (free / paid)"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:196
+msgid "Pricing"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:88
+#: widgets/class-widget-checkout-pay-button.php:287
+msgid "Processing..."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:761
+msgid "Publishable key"
+msgstr ""
+
+#: templates/emails/admin-notification.php:57
+msgid "Purchaser"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:831
+#: widgets/class-widget-success-tickets.php:406
+msgid "QR code for ticket %s"
+msgstr ""
+
+#: templates/emails/admin-notification.php:73
+msgid "Quantity"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:95
+#: widgets/class-widget-event-description.php:314
+msgid "Read more"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:93
+msgid "Read more text"
+msgstr ""
+
+#: templates/emails/admin-notification.php:53
+msgid "Reference"
+msgstr ""
+
+#: templates/emails/booking-confirmation.php:52
+msgid "Reference: %s"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:67
+#: widgets/class-widget-event-register-button.php:809
+msgid "Register"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:258
+msgid "Register button"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:895
+msgid "Registered integrations"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:176
+msgid "Registration Window"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:124
+#: widgets/class-widget-event-register-button.php:795
+msgid "Registration closed"
+msgstr ""
+
+#: includes/class-kdna-events-checkout.php:137
+msgid "Registration is not open for this event."
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:96
+#: widgets/class-widget-event-register-button.php:791
+msgid "Registration opens {date}"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:212
+msgid "Reload page"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:388
+msgid "Remove"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:67
+msgid "Remove featured image"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:252
+msgid "Render as button"
+msgstr ""
+
+#: widgets/class-widget-event-subtitle.php:117
+msgid "Renders a placeholder in the Elementor editor. Front-end output stays hidden when the subtitle is empty."
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:383
+msgid "Required"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:102
+msgid "Required marker"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:199
+msgid "Required marker colour"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:80
+#: widgets/class-widget-checkout-pay-button.php:286
+#: widgets/class-widget-event-register-button.php:86
+#: widgets/class-widget-event-register-button.php:804
+msgid "Reserve Free Spot"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:653
+msgid "Reset"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:77
+msgid "Retro"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:195
+#: widgets/class-widget-checkout-pay-button.php:120
+#: widgets/class-widget-event-datetime.php:168
+#: widgets/class-widget-event-filter.php:184
+#: widgets/class-widget-event-organiser.php:141
+#: widgets/class-widget-event-organiser.php:182
+#: widgets/class-widget-event-register-button.php:195
+#: widgets/class-widget-event-register-button.php:259
+#: widgets/class-widget-event-subtitle.php:100
+#: widgets/class-widget-event-title.php:113
+#: widgets/class-widget-success-confirmation.php:149
+msgid "Right"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1017
+msgid "Rolling log, most recent first. Capped at %d entries."
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:139
+msgid "Row colour"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:150
+msgid "Row spacing"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:146
+msgid "Row typography"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:132
+msgid "Rows"
+msgstr ""
+
+#: includes/class-kdna-events-emails.php:361
+msgid "Sample Event"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:875
+msgid "Sample Past Event"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:875
+msgid "Sample Upcoming Event"
+msgstr ""
+
+#: includes/class-kdna-events-emails.php:365
+msgid "Sample Venue, 123 Example Street"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:168
+msgid "Scale down"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:96
+#: widgets/class-widget-event-filter.php:636
+msgid "Search"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:112
+msgid "Search Event Categories"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:61
+msgid "Search Events"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:643
+msgid "Search events..."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:767
+msgid "Secret key"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:149
+msgid "Section heading"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:72
+msgid "Section heading format"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:360
+msgid "Select"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:849
+msgid "Select a page"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:726
+msgid "Send failed."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:660
+msgid "Send test email"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:704
+msgid "Sending..."
+msgstr ""
+
+#: templates/emails/admin-notification.php:115
+msgid "Sent by %s"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:723
+msgid "Sent."
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:131
+msgid "Separator"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:66
+msgid "Set featured image"
+msgstr ""
+
+#: includes/class-kdna-events-emails.php:195
+msgid "Set the admin notification email first."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:776
+msgid "Set when you add the webhook endpoint in the Stripe dashboard."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:124
+msgid "Settings"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:566
+msgid "Settings tabs"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:291
+msgid "Shared"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:103
+#: widgets/class-widget-success-tickets.php:100
+msgid "Show QR code"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:112
+msgid "Show address"
+msgstr ""
+
+#: widgets/class-widget-success-tickets.php:90
+msgid "Show attendee email"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:93
+msgid "Show currency code"
+msgstr ""
+
+#: widgets/class-widget-event-price.php:79
+msgid "Show currency symbol"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:113
+#: widgets/class-widget-success-tickets.php:111
+msgid "Show download PDF button"
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:80
+msgid "Show email link"
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:79
+msgid "Show end"
+msgstr ""
+
+#: widgets/class-widget-event-subtitle.php:113
+msgid "Show even if empty (editor only)"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:111
+msgid "Show field helper text"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:94
+#: widgets/class-widget-event-datetime.php:140
+#: widgets/class-widget-event-organiser.php:113
+#: widgets/class-widget-event-register-button.php:167
+#: widgets/class-widget-event-type-badge.php:110
+#: widgets/class-widget-success-confirmation.php:113
+msgid "Show icon"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:102
+msgid "Show location name"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:144
+msgid "Show map"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:111
+msgid "Show min/max helper text"
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:70
+msgid "Show name"
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:150
+msgid "Show prefix"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:101
+msgid "Show price per ticket"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:82
+msgid "Show read more link"
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:69
+msgid "Show start"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:102
+msgid "Show tax line"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:80
+msgid "Show tickets available"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:75
+msgid "Show upcoming / past tabs"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:231
+msgid "Show virtual link"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:138
+msgid "Side by side"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:76
+msgid "Silver"
+msgstr ""
+
+#: widgets/class-widget-event-organiser.php:349
+#: widgets/class-widget-success-confirmation.php:242
+msgid "Size"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:104
+msgid "Size and fit"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:232
+msgid "Size preset"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:236
+msgid "Small"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:133
+#: widgets/class-widget-event-register-button.php:798
+msgid "Sold Out"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:148
+msgid "Sold out"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:131
+msgid "Sold out label"
+msgstr ""
+
+#: widgets/class-widget-event-description.php:69
+#: widgets/class-widget-event-grid.php:89
+msgid "Source"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:138
+msgid "Spacer"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:302
+msgid "Spacing between attendees"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:182
+msgid "Spacing between controls"
+msgstr ""
+
+#: widgets/class-widget-checkout-pay-button.php:249
+msgid "Spinner colour"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:137
+#: widgets/class-widget-event-organiser.php:105
+msgid "Stacked"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:157
+msgid "Start"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:602
+msgid "Start Date"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:132
+msgid "Start date"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:70
+msgid "Start date and time"
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:89
+msgid "Start date format"
+msgstr ""
+
+#: widgets/class-widget-event-datetime.php:100
+msgid "Start time format"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1039
+#: templates/emails/admin-notification.php:81
+msgid "Status"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:52
+msgid "Stripe"
+msgstr ""
+
+#: includes/class-kdna-events-stripe.php:100
+msgid "Stripe PHP library is not installed. Run composer install."
+msgstr ""
+
+#: includes/class-kdna-events-stripe.php:105
+msgid "Stripe secret key is not set in Settings."
+msgstr ""
+
+#: widgets/class-widget-success-confirmation.php:85
+#: widgets/class-widget-success-confirmation.php:270
+msgid "Sub-heading"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:153
+#: widgets/class-widget-checkout-summary.php:69
+#: widgets/class-widget-checkout-summary.php:278
+#: widgets/class-widget-event-subtitle.php:126
+msgid "Subtitle"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:71
+#: widgets/class-widget-checkout-order-summary.php:285
+msgid "Subtotal"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:69
+msgid "Subtotal label"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1056
+msgid "Success"
+msgstr ""
+
+#: widgets/class-widget-success-confirmation.php:42
+msgid "Success Confirmation"
+msgstr ""
+
+#: widgets/class-widget-success-tickets.php:46
+msgid "Success Tickets"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:828
+msgid "Success page"
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:74
+msgid "Swap label for free events"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1012
+msgid "Sync log"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:929
+msgid "Sync new tickets to this integration."
+msgstr ""
+
+#: includes/class-kdna-events-crm.php:471
+msgid "Synced"
+msgstr ""
+
+#: templates/emails/booking-confirmation.php:88
+msgid "TBA"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:177
+msgid "Tabs"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:220
+msgid "Target grid selector"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:114
+#: widgets/class-widget-checkout-order-summary.php:288
+msgid "Tax"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:112
+msgid "Tax label"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1002
+msgid "Test"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:994
+msgid "Test connection"
+msgstr ""
+
+#: includes/class-kdna-events-emails.php:212
+msgid "Test email sent to %s."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:752
+msgid "Test mode"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1091
+msgid "Testing..."
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:357
+#: widgets/class-widget-event-datetime.php:179
+msgid "Text"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:221
+#: widgets/class-widget-checkout-pay-button.php:174
+#: widgets/class-widget-checkout-pay-button.php:206
+#: widgets/class-widget-event-description.php:244
+#: widgets/class-widget-event-filter.php:294
+#: widgets/class-widget-event-filter.php:431
+#: widgets/class-widget-event-filter.php:463
+#: widgets/class-widget-event-filter.php:486
+#: widgets/class-widget-event-grid.php:724
+#: widgets/class-widget-event-grid.php:758
+#: widgets/class-widget-event-grid.php:850
+#: widgets/class-widget-event-grid.php:873
+#: widgets/class-widget-event-grid.php:896
+#: widgets/class-widget-event-location.php:526
+#: widgets/class-widget-event-location.php:565
+#: widgets/class-widget-event-register-button.php:348
+#: widgets/class-widget-event-register-button.php:449
+#: widgets/class-widget-event-register-button.php:542
+#: widgets/class-widget-event-title.php:136
+#: widgets/class-widget-event-type-badge.php:277
+#: widgets/class-widget-my-tickets.php:223
+#: widgets/class-widget-my-tickets.php:253
+#: widgets/class-widget-my-tickets.php:276
+#: widgets/class-widget-my-tickets.php:555
+#: widgets/class-widget-my-tickets.php:625
+#: widgets/class-widget-success-tickets.php:257
+msgid "Text colour"
+msgstr ""
+
+#: widgets/class-widget-success-confirmation.php:78
+#: widgets/class-widget-success-confirmation.php:317
+msgid "Thank you, your booking is confirmed"
+msgstr ""
+
+#: includes/class-kdna-events-orders.php:242
+msgid "Thanks for booking %1$s. Your booking reference is %2$s."
+msgstr ""
+
+#: includes/class-kdna-events-checkout.php:144
+msgid "This event is sold out."
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:374
+msgid "This field is required."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1038
+msgid "Ticket"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:359
+msgid "Ticket card"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:818
+#: widgets/class-widget-success-tickets.php:250
+#: widgets/class-widget-success-tickets.php:393
+msgid "Ticket code"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:470
+msgid "Ticket code background"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:460
+msgid "Ticket code colour"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:394
+msgid "Ticket quantity"
+msgstr ""
+
+#: widgets/class-widget-success-tickets.php:82
+#: widgets/class-widget-success-tickets.php:364
+msgid "Ticket {n}"
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:73
+#: widgets/class-widget-checkout-quantity.php:379
+msgid "Tickets"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:605
+msgid "Tickets Sold"
+msgstr ""
+
+#: widgets/class-widget-success-tickets.php:359
+msgid "Tickets will appear here once the buyer lands on the success page."
+msgstr ""
+
+#: widgets/class-widget-event-register-button.php:113
+msgid "Time merge tag format"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:1036
+msgid "Timestamp"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:165
+msgid "Timezone"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:68
+#: widgets/class-widget-checkout-summary.php:277
+#: widgets/class-widget-event-grid.php:133
+#: widgets/class-widget-event-grid.php:254
+#: widgets/class-widget-event-grid.php:561
+#: widgets/class-widget-event-title.php:128
+msgid "Title"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:97
+#: widgets/class-widget-event-grid.php:275
+msgid "Title HTML tag"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:622
+msgid "To"
+msgstr ""
+
+#: templates/emails/admin-notification.php:77
+#: widgets/class-widget-checkout-order-summary.php:79
+#: widgets/class-widget-checkout-order-summary.php:286
+msgid "Total"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:216
+msgid "Total colour"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:77
+msgid "Total label"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:209
+msgid "Total row"
+msgstr ""
+
+#: widgets/class-widget-base.php:145
+msgid "Transition duration"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:373
+#: includes/class-kdna-events-admin.php:603
+#: widgets/class-widget-event-filter.php:92
+#: widgets/class-widget-event-filter.php:567
+msgid "Type"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:219
+msgid "Type and Location"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:252
+msgid "Type badge"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:163
+#: widgets/class-widget-checkout-attendees.php:195
+#: widgets/class-widget-checkout-attendees.php:248
+#: widgets/class-widget-checkout-order-summary.php:223
+#: widgets/class-widget-checkout-pay-button.php:135
+#: widgets/class-widget-checkout-quantity.php:147
+#: widgets/class-widget-checkout-summary.php:301
+#: widgets/class-widget-event-datetime.php:195
+#: widgets/class-widget-event-filter.php:258
+#: widgets/class-widget-event-filter.php:313
+#: widgets/class-widget-event-filter.php:383
+#: widgets/class-widget-event-grid.php:588
+#: widgets/class-widget-event-grid.php:681
+#: widgets/class-widget-event-grid.php:810
+#: widgets/class-widget-event-location.php:296
+#: widgets/class-widget-event-location.php:344
+#: widgets/class-widget-event-location.php:434
+#: widgets/class-widget-event-organiser.php:253
+#: widgets/class-widget-event-organiser.php:287
+#: widgets/class-widget-event-organiser.php:322
+#: widgets/class-widget-event-register-button.php:296
+#: widgets/class-widget-event-subtitle.php:142
+#: widgets/class-widget-event-title.php:158
+#: widgets/class-widget-event-type-badge.php:142
+#: widgets/class-widget-my-tickets.php:183
+#: widgets/class-widget-my-tickets.php:335
+#: widgets/class-widget-success-confirmation.php:290
+#: widgets/class-widget-success-tickets.php:243
+#: widgets/class-widget-success-tickets.php:276
+msgid "Typography"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:55
+#: includes/class-kdna-events-settings.php:71
+msgid "US Dollar (USD)"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:87
+#: widgets/class-widget-my-tickets.php:754
+msgid "Upcoming"
+msgstr ""
+
+#: widgets/class-widget-event-grid.php:97
+msgid "Upcoming only"
+msgstr ""
+
+#: widgets/class-widget-my-tickets.php:85
+msgid "Upcoming tab label"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:117
+msgid "Update Event Category"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:71
+msgid "Uploaded to this event"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:756
+msgid "Use Stripe test keys and test webhooks."
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:68
+msgid "Use as featured image"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:75
+msgid "Use {n} for the ticket number."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:638
+msgid "Used as the fallback currency for new events."
+msgstr ""
+
+#: widgets/class-widget-event-image.php:95
+msgid "Used when the attachment has no alt text."
+msgstr ""
+
+#: widgets/class-widget-success-tickets.php:104
+msgid "Uses an external QR service. Disable if you prefer to keep ticket codes off third-party endpoints."
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:239
+msgid "Venue"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:243
+msgid "Venue name"
+msgstr ""
+
+#: widgets/class-widget-event-filter.php:137
+msgid "Vertical"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:59
+msgid "View Event"
+msgstr ""
+
+#: includes/class-kdna-events-grid.php:331
+#: includes/class-kdna-events-grid.php:376
+#: templates/partials/event-card.php:48
+#: widgets/class-widget-event-grid.php:318
+#: widgets/class-widget-event-grid.php:939
+msgid "View event"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:70
+#: templates/partials/event-card.php:58
+#: widgets/class-widget-event-filter.php:548
+#: widgets/class-widget-event-grid.php:634
+#: widgets/class-widget-event-type-badge.php:66
+msgid "Virtual"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:223
+msgid "Virtual Link"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:428
+msgid "Virtual Link Button"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:267
+msgid "Virtual URL"
+msgstr ""
+
+#: includes/class-kdna-events-admin.php:263
+msgid "Virtual link"
+msgstr ""
+
+#: widgets/class-widget-event-location.php:148
+msgid "Virtual-only events never render the map."
+msgstr ""
+
+#: widgets/class-widget-success-confirmation.php:319
+msgid "We could not find that booking."
+msgstr ""
+
+#: widgets/class-widget-success-confirmation.php:97
+msgid "We could not find that booking. If you have just paid, please refresh."
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:773
+msgid "Webhook signing secret"
+msgstr ""
+
+#: templates/emails/booking-confirmation.php:86
+msgid "When"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:125
+msgid "When on, phone becomes mandatory on every ticket."
+msgstr ""
+
+#: templates/emails/booking-confirmation.php:91
+msgid "Where"
+msgstr ""
+
+#: widgets/class-widget-checkout-summary.php:239
+#: widgets/class-widget-event-image.php:112
+msgid "Width"
+msgstr ""
+
+#: widgets/class-widget-success-confirmation.php:165
+msgid "Wrapper"
+msgstr ""
+
+#: widgets/class-widget-event-price.php:166
+msgid "Wraps the price in a styled badge."
+msgstr ""
+
+#: widgets/class-widget-event-title.php:91
+msgid "Yes"
+msgstr ""
+
+#: includes/class-kdna-events-settings.php:545
+msgid "You do not have permission to access this page."
+msgstr ""
+
+#: includes/class-kdna-events-emails.php:93
+msgid "Your booking %1$s is confirmed for %2$s"
+msgstr ""
+
+#: includes/class-kdna-events-orders.php:253
+msgid "Your booking %s is confirmed"
+msgstr ""
+
+#: templates/emails/booking-confirmation.php:105
+msgid "Your ticket"
+msgid_plural "Your tickets"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-kdna-events-emails.php:126
+msgid "Your ticket for %1$s, %2$s"
+msgstr ""
+
+#: includes/class-kdna-events-orders.php:244
+msgid "Your tickets:"
+msgstr ""
+
+#: widgets/class-widget-event-image.php:234
+#: widgets/class-widget-event-location.php:155
+msgid "Zoom"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:375
+msgid "e.g. Jane Doe"
+msgstr ""
+
+#: widgets/class-widget-checkout-attendees.php:376
+msgid "name@example.com"
+msgstr ""
+
+#: includes/class-kdna-events-emails.php:218
+msgid "wp_mail returned false. Check your SMTP config."
+msgstr ""
+
+#: widgets/class-widget-checkout-quantity.php:93
+#: widgets/class-widget-checkout-quantity.php:416
+msgid "{n} tickets available"
+msgstr ""
+
+#: widgets/class-widget-checkout-order-summary.php:123
+#: widgets/class-widget-checkout-order-summary.php:291
+msgid "{qty} x {event_title}"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:54
+msgctxt "Add New on Toolbar"
+msgid "Event"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:53
+msgctxt "Admin Menu text"
+msgid "Events"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:51
+msgctxt "Post type general name"
+msgid "Events"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:52
+msgctxt "Post type singular name"
+msgid "Event"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:110
+msgctxt "taxonomy general name"
+msgid "Event Categories"
+msgstr ""
+
+#: includes/class-kdna-events-cpt.php:111
+msgctxt "taxonomy singular name"
+msgid "Event Category"
+msgstr ""
+

@@ -374,12 +374,27 @@ class KDNA_Events_Emails {
 	/**
 	 * Include an email template and return its HTML string.
 	 *
+	 * Themes can override either template by copying the shipped file
+	 * into their own tree and filtering `kdna_events_email_template_path`
+	 * to point at the copy.
+	 *
 	 * @param string $name Template base name (no extension).
 	 * @param array  $data Variables available inside the template.
 	 * @return string
 	 */
 	protected static function load_template( $name, $data ) {
-		$path = KDNA_EVENTS_PATH . 'templates/emails/' . $name . '.php';
+		$default = KDNA_EVENTS_PATH . 'templates/emails/' . $name . '.php';
+
+		/**
+		 * Filter the resolved absolute path to an email template.
+		 *
+		 * @param string $default Absolute default path.
+		 * @param string $name    Template name.
+		 */
+		$path = (string) apply_filters( 'kdna_events_email_template_path', $default, $name );
+		if ( ! file_exists( $path ) ) {
+			$path = $default;
+		}
 		if ( ! file_exists( $path ) ) {
 			return '';
 		}
