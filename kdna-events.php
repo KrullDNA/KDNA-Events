@@ -113,6 +113,7 @@ function kdna_events_bootstrap() {
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-settings.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-templates.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-grid.php';
+	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-checkout.php';
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-base.php';
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-title.php';
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-subtitle.php';
@@ -126,10 +127,16 @@ function kdna_events_bootstrap() {
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-grid.php';
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-filter.php';
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-event-register-button.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-checkout-summary.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-checkout-quantity.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-checkout-attendees.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-checkout-order-summary.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-checkout-pay-button.php';
 
 	KDNA_Events_CPT::init();
 	KDNA_Events_Templates::init();
 	KDNA_Events_Grid::init();
+	KDNA_Events_Checkout::init();
 
 	if ( is_admin() ) {
 		KDNA_Events_Admin::init();
@@ -165,6 +172,11 @@ function kdna_events_register_stage3_widgets( $widgets_manager ) {
 		'KDNA_Events_Widget_Event_Grid',
 		'KDNA_Events_Widget_Event_Filter',
 		'KDNA_Events_Widget_Event_Register_Button',
+		'KDNA_Events_Widget_Checkout_Summary',
+		'KDNA_Events_Widget_Checkout_Quantity',
+		'KDNA_Events_Widget_Checkout_Attendees',
+		'KDNA_Events_Widget_Checkout_Order_Summary',
+		'KDNA_Events_Widget_Checkout_Pay_Button',
 	);
 
 	foreach ( $classes as $class ) {

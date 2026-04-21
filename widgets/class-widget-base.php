@@ -197,6 +197,30 @@ abstract class KDNA_Events_Widget_Base extends \Elementor\Widget_Base {
 	}
 
 	/**
+	 * Resolve the event ID for checkout widgets.
+	 *
+	 * Reads ?event_id= from the request on the front end and falls back
+	 * to the most recent published event in the Elementor editor so
+	 * authors always see a populated preview.
+	 *
+	 * @return int
+	 */
+	protected function get_checkout_event_id() {
+		if ( $this->is_editor_mode() ) {
+			return $this->get_event_id();
+		}
+
+		if ( isset( $_GET['event_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$raw = absint( wp_unslash( $_GET['event_id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( $raw && 'kdna_event' === get_post_type( $raw ) ) {
+				return $raw;
+			}
+		}
+
+		return 0;
+	}
+
+	/**
 	 * Detect whether the widget is being rendered inside the Elementor editor.
 	 *
 	 * Used to decide whether to show placeholder content or to hide empty
