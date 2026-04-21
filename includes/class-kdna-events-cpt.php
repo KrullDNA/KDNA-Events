@@ -80,7 +80,7 @@ class KDNA_Events_CPT {
 			'public'             => true,
 			'publicly_queryable' => true,
 			'show_ui'            => true,
-			'show_in_menu'       => true,
+			'show_in_menu'       => 'kdna-events',
 			'show_in_rest'       => true,
 			'rest_base'          => 'events',
 			'query_var'          => true,

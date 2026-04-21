@@ -110,11 +110,16 @@ function kdna_events_bootstrap() {
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-db.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-cpt.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-admin.php';
+	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-settings.php';
+	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-templates.php';
+	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-base.php';
 
 	KDNA_Events_CPT::init();
+	KDNA_Events_Templates::init();
 
 	if ( is_admin() ) {
 		KDNA_Events_Admin::init();
+		KDNA_Events_Settings::init();
 		add_action( 'admin_init', array( 'KDNA_Events_DB', 'maybe_upgrade' ) );
 	}
 }
