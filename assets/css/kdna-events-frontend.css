@@ -645,3 +645,92 @@ a.kdna-events-event-organiser__name:hover {
 .kdna-events-filter__reset:hover {
 	background-color: #f3f4f6;
 }
+
+/* Event Register Button. */
+.kdna-events-event-register-button-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5em;
+	align-items: flex-start;
+}
+.kdna-events-event-register-button {
+	--kdna-events-btn-padding-y: 0.75em;
+	--kdna-events-btn-padding-x: 1.5em;
+	--kdna-events-btn-font-size: 1em;
+	--kdna-events-btn-radius: 8px;
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5em;
+	padding: var(--kdna-events-btn-padding-y) var(--kdna-events-btn-padding-x);
+	background-color: #1d4ed8;
+	color: #ffffff;
+	font-size: var(--kdna-events-btn-font-size);
+	font-weight: 600;
+	line-height: 1.2;
+	text-decoration: none;
+	border: 1px solid transparent;
+	border-radius: var(--kdna-events-btn-radius);
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+.kdna-events-event-register-button--size-sm {
+	--kdna-events-btn-padding-y: 0.4em;
+	--kdna-events-btn-padding-x: 0.9em;
+	--kdna-events-btn-font-size: 0.875em;
+}
+.kdna-events-event-register-button--size-md {
+	--kdna-events-btn-padding-y: 0.6em;
+	--kdna-events-btn-padding-x: 1.2em;
+	--kdna-events-btn-font-size: 0.95em;
+}
+.kdna-events-event-register-button--size-lg {
+	--kdna-events-btn-padding-y: 0.75em;
+	--kdna-events-btn-padding-x: 1.5em;
+	--kdna-events-btn-font-size: 1em;
+}
+.kdna-events-event-register-button--size-xl {
+	--kdna-events-btn-padding-y: 1em;
+	--kdna-events-btn-padding-x: 2em;
+	--kdna-events-btn-font-size: 1.1em;
+}
+.kdna-events-event-register-button__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+.kdna-events-event-register-button__icon svg,
+.kdna-events-event-register-button__icon i {
+	width: 1em;
+	height: 1em;
+	font-size: 1em;
+}
+.kdna-events-event-register-button--icon-right {
+	flex-direction: row-reverse;
+}
+.kdna-events-event-register-button.is-active:hover {
+	background-color: #1e40af;
+	color: #ffffff;
+}
+.kdna-events-event-register-button.is-disabled {
+	background-color: #e5e7eb;
+	color: #6b7280;
+	cursor: not-allowed;
+	pointer-events: none;
+	opacity: 0.9;
+}
+.kdna-events-event-register-button-notice {
+	margin: 0;
+	padding: 0.5em 0.75em;
+	background-color: #fef3c7;
+	border: 1px solid #fcd34d;
+	border-radius: 4px;
+	color: #92400e;
+	font-size: 0.85em;
+}
+.kdna-events-event-register-button-notice a {
+	color: #92400e;
+	text-decoration: underline;
+}
