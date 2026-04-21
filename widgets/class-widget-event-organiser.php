@@ -385,8 +385,9 @@ class KDNA_Events_Widget_Event_Organiser extends KDNA_Events_Widget_Base {
 			return;
 		}
 
-		$name  = (string) get_post_meta( $event_id, '_kdna_event_organiser_name', true );
-		$email = (string) get_post_meta( $event_id, '_kdna_event_organiser_email', true );
+		$organiser = kdna_events_get_event_organiser( $event_id );
+		$name      = (string) $organiser['name'];
+		$email     = (string) $organiser['email'];
 
 		if ( '' === $name && '' === $email ) {
 			$this->render_editor_placeholder( __( 'No organiser set for this event.', 'kdna-events' ) );

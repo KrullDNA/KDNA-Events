@@ -28,6 +28,16 @@ class KDNA_Events_CPT {
 	const TAXONOMY = 'kdna_event_category';
 
 	/**
+	 * Shared Location CPT slug.
+	 */
+	const LOCATION_POST_TYPE = 'kdna_event_location';
+
+	/**
+	 * Shared Organiser CPT slug.
+	 */
+	const ORGANISER_POST_TYPE = 'kdna_event_organiser';
+
+	/**
 	 * Wire up the CPT, taxonomy and meta registration on init.
 	 *
 	 * @return void
@@ -35,6 +45,8 @@ class KDNA_Events_CPT {
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'register_post_type' ) );
 		add_action( 'init', array( __CLASS__, 'register_taxonomy' ) );
+		add_action( 'init', array( __CLASS__, 'register_location_post_type' ) );
+		add_action( 'init', array( __CLASS__, 'register_organiser_post_type' ) );
 		add_action( 'init', array( __CLASS__, 'register_meta' ) );
 	}
 
@@ -138,6 +150,93 @@ class KDNA_Events_CPT {
 	}
 
 	/**
+	 * Register the kdna_event_location CPT.
+	 *
+	 * Sits under the Events sidebar menu; not public on the front end
+	 * so the admin can curate a library of venues without exposing a
+	 * standalone URL. The title is the venue name; meta holds address
+	 * and coordinates.
+	 *
+	 * @return void
+	 */
+	public static function register_location_post_type() {
+		$labels = array(
+			'name'               => _x( 'Locations', 'Post type general name', 'kdna-events' ),
+			'singular_name'      => _x( 'Location', 'Post type singular name', 'kdna-events' ),
+			'menu_name'          => _x( 'Locations', 'Admin Menu text', 'kdna-events' ),
+			'add_new'            => __( 'Add New', 'kdna-events' ),
+			'add_new_item'       => __( 'Add New Location', 'kdna-events' ),
+			'new_item'           => __( 'New Location', 'kdna-events' ),
+			'edit_item'          => __( 'Edit Location', 'kdna-events' ),
+			'view_item'          => __( 'View Location', 'kdna-events' ),
+			'all_items'          => __( 'All Locations', 'kdna-events' ),
+			'search_items'       => __( 'Search Locations', 'kdna-events' ),
+			'not_found'          => __( 'No locations found.', 'kdna-events' ),
+			'not_found_in_trash' => __( 'No locations found in Trash.', 'kdna-events' ),
+		);
+
+		register_post_type(
+			self::LOCATION_POST_TYPE,
+			array(
+				'labels'             => $labels,
+				'description'        => __( 'Reusable venues for KDNA Events.', 'kdna-events' ),
+				'public'             => false,
+				'show_ui'            => true,
+				'show_in_menu'       => 'kdna-events',
+				'show_in_rest'       => true,
+				'rest_base'          => 'event-locations',
+				'supports'           => array( 'title', 'editor' ),
+				'has_archive'        => false,
+				'rewrite'            => false,
+				'capability_type'    => 'post',
+				'hierarchical'       => false,
+				'publicly_queryable' => false,
+			)
+		);
+	}
+
+	/**
+	 * Register the kdna_event_organiser CPT.
+	 *
+	 * @return void
+	 */
+	public static function register_organiser_post_type() {
+		$labels = array(
+			'name'               => _x( 'Organisers', 'Post type general name', 'kdna-events' ),
+			'singular_name'      => _x( 'Organiser', 'Post type singular name', 'kdna-events' ),
+			'menu_name'          => _x( 'Organisers', 'Admin Menu text', 'kdna-events' ),
+			'add_new'            => __( 'Add New', 'kdna-events' ),
+			'add_new_item'       => __( 'Add New Organiser', 'kdna-events' ),
+			'new_item'           => __( 'New Organiser', 'kdna-events' ),
+			'edit_item'          => __( 'Edit Organiser', 'kdna-events' ),
+			'view_item'          => __( 'View Organiser', 'kdna-events' ),
+			'all_items'          => __( 'All Organisers', 'kdna-events' ),
+			'search_items'       => __( 'Search Organisers', 'kdna-events' ),
+			'not_found'          => __( 'No organisers found.', 'kdna-events' ),
+			'not_found_in_trash' => __( 'No organisers found in Trash.', 'kdna-events' ),
+		);
+
+		register_post_type(
+			self::ORGANISER_POST_TYPE,
+			array(
+				'labels'             => $labels,
+				'description'        => __( 'Reusable event organisers for KDNA Events.', 'kdna-events' ),
+				'public'             => false,
+				'show_ui'            => true,
+				'show_in_menu'       => 'kdna-events',
+				'show_in_rest'       => true,
+				'rest_base'          => 'event-organisers',
+				'supports'           => array( 'title', 'editor' ),
+				'has_archive'        => false,
+				'rewrite'            => false,
+				'capability_type'    => 'post',
+				'hierarchical'       => false,
+				'publicly_queryable' => false,
+			)
+		);
+	}
+
+	/**
 	 * Shared auth callback for every event meta field.
 	 *
 	 * Gates REST writes to users who can edit the specific event. For
@@ -203,6 +302,19 @@ class KDNA_Events_CPT {
 			)
 		);
 
+		register_post_meta(
+			self::POST_TYPE,
+			'_kdna_event_ignore_global_attendee_fields',
+			array(
+				'type'              => 'boolean',
+				'single'            => true,
+				'show_in_rest'      => true,
+				'default'           => false,
+				'sanitize_callback' => 'rest_sanitize_boolean',
+				'auth_callback'     => $auth,
+			)
+		);
+
 		$int_fields = array(
 			'_kdna_event_capacity',
 			'_kdna_event_min_tickets_per_order',
@@ -245,6 +357,99 @@ class KDNA_Events_CPT {
 				'show_in_rest'      => true,
 				'sanitize_callback' => array( __CLASS__, 'sanitize_attendee_fields_json' ),
 				'auth_callback'     => $auth,
+			)
+		);
+
+		// References into the new Location and Organiser CPTs. Zero means
+		// use the legacy per-event meta fields instead (back-compat).
+		register_post_meta(
+			self::POST_TYPE,
+			'_kdna_event_location_ref',
+			array(
+				'type'              => 'integer',
+				'single'            => true,
+				'show_in_rest'      => true,
+				'default'           => 0,
+				'sanitize_callback' => 'absint',
+				'auth_callback'     => $auth,
+			)
+		);
+		register_post_meta(
+			self::POST_TYPE,
+			'_kdna_event_organiser_ref',
+			array(
+				'type'              => 'integer',
+				'single'            => true,
+				'show_in_rest'      => true,
+				'default'           => 0,
+				'sanitize_callback' => 'absint',
+				'auth_callback'     => $auth,
+			)
+		);
+
+		// Location CPT meta (address + coordinates).
+		$location_auth = static function ( $allowed, $meta_key, $post_id ) {
+			unset( $allowed, $meta_key );
+			return current_user_can( 'edit_post', (int) $post_id );
+		};
+
+		register_post_meta(
+			self::LOCATION_POST_TYPE,
+			'_kdna_event_loc_address',
+			array(
+				'type'              => 'string',
+				'single'            => true,
+				'show_in_rest'      => true,
+				'sanitize_callback' => 'sanitize_text_field',
+				'auth_callback'     => $location_auth,
+			)
+		);
+		register_post_meta(
+			self::LOCATION_POST_TYPE,
+			'_kdna_event_loc_lat',
+			array(
+				'type'              => 'number',
+				'single'            => true,
+				'show_in_rest'      => true,
+				'default'           => 0,
+				'sanitize_callback' => array( __CLASS__, 'sanitize_float' ),
+				'auth_callback'     => $location_auth,
+			)
+		);
+		register_post_meta(
+			self::LOCATION_POST_TYPE,
+			'_kdna_event_loc_lng',
+			array(
+				'type'              => 'number',
+				'single'            => true,
+				'show_in_rest'      => true,
+				'default'           => 0,
+				'sanitize_callback' => array( __CLASS__, 'sanitize_float' ),
+				'auth_callback'     => $location_auth,
+			)
+		);
+
+		// Organiser CPT meta (email + phone, bio lives in post_content).
+		register_post_meta(
+			self::ORGANISER_POST_TYPE,
+			'_kdna_event_org_email',
+			array(
+				'type'              => 'string',
+				'single'            => true,
+				'show_in_rest'      => true,
+				'sanitize_callback' => 'sanitize_email',
+				'auth_callback'     => $location_auth,
+			)
+		);
+		register_post_meta(
+			self::ORGANISER_POST_TYPE,
+			'_kdna_event_org_phone',
+			array(
+				'type'              => 'string',
+				'single'            => true,
+				'show_in_rest'      => true,
+				'sanitize_callback' => 'sanitize_text_field',
+				'auth_callback'     => $location_auth,
 			)
 		);
 	}

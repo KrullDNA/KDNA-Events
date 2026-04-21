@@ -150,7 +150,8 @@ class KDNA_Events_Emails {
 		$tickets       = KDNA_Events_Tickets::get_tickets_for_order( (int) $order->order_id );
 		$admin_email   = (string) get_option( 'kdna_events_admin_notification_email', '' );
 		$notify_org    = (bool) get_option( 'kdna_events_notify_organiser', false );
-		$organiser_em  = (string) get_post_meta( (int) $order->event_id, '_kdna_event_organiser_email', true );
+		$organiser     = kdna_events_get_event_organiser( (int) $order->event_id );
+		$organiser_em  = (string) $organiser['email'];
 
 		$context = self::build_purchaser_context( $order, $tickets );
 		$data    = self::build_template_data( $order, $tickets, $context, '', 'admin' );
@@ -229,7 +230,8 @@ class KDNA_Events_Emails {
 		$event_title     = (string) get_the_title( (int) $order->event_id );
 		$event_start_raw = (string) get_post_meta( (int) $order->event_id, '_kdna_event_start', true );
 		$event_date      = '' === $event_start_raw ? '' : kdna_events_format_datetime( $event_start_raw, 'j F Y, g:i a', (int) $order->event_id );
-		$organiser_name  = (string) get_post_meta( (int) $order->event_id, '_kdna_event_organiser_name', true );
+		$organiser_data  = kdna_events_get_event_organiser( (int) $order->event_id );
+		$organiser_name  = (string) $organiser_data['name'];
 
 		$location = kdna_events_get_event_location( (int) $order->event_id );
 		$parts    = array_filter( array( $location['name'], $location['address'] ), static function ( $v ) { return '' !== $v; } );

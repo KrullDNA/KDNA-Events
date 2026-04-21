@@ -48,12 +48,13 @@ class KDNA_Events_Settings {
 	 */
 	public static function tabs() {
 		return array(
-			'general' => __( 'General', 'kdna-events' ),
-			'stripe'  => __( 'Stripe', 'kdna-events' ),
-			'maps'    => __( 'Google Maps', 'kdna-events' ),
-			'pages'   => __( 'Pages', 'kdna-events' ),
-			'emails'  => __( 'Emails', 'kdna-events' ),
-			'crm'     => __( 'CRM', 'kdna-events' ),
+			'general'   => __( 'General', 'kdna-events' ),
+			'attendees' => __( 'Attendees', 'kdna-events' ),
+			'stripe'    => __( 'Stripe', 'kdna-events' ),
+			'maps'      => __( 'Google Maps', 'kdna-events' ),
+			'pages'     => __( 'Pages', 'kdna-events' ),
+			'emails'    => __( 'Emails', 'kdna-events' ),
+			'crm'       => __( 'CRM', 'kdna-events' ),
 		);
 	}
 
@@ -116,6 +117,22 @@ class KDNA_Events_Settings {
 			__( 'Categories', 'kdna-events' ),
 			'manage_categories',
 			'edit-tags.php?taxonomy=' . KDNA_Events_CPT::TAXONOMY . '&post_type=' . KDNA_Events_CPT::POST_TYPE
+		);
+
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Locations', 'kdna-events' ),
+			__( 'Locations', 'kdna-events' ),
+			'edit_posts',
+			'edit.php?post_type=' . KDNA_Events_CPT::LOCATION_POST_TYPE
+		);
+
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Organisers', 'kdna-events' ),
+			__( 'Organisers', 'kdna-events' ),
+			'edit_posts',
+			'edit.php?post_type=' . KDNA_Events_CPT::ORGANISER_POST_TYPE
 		);
 
 		add_submenu_page(
@@ -313,6 +330,17 @@ class KDNA_Events_Settings {
 			)
 		);
 
+		// Attendees.
+		register_setting(
+			'kdna_events_attendees',
+			'kdna_events_global_attendee_fields',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_attendee_fields' ),
+				'default'           => '',
+			)
+		);
+
 		// CRM.
 		register_setting(
 			'kdna_events_crm',
@@ -390,6 +418,46 @@ class KDNA_Events_Settings {
 	 */
 	public static function sanitize_textarea( $value ) {
 		return sanitize_textarea_field( (string) $value );
+	}
+
+	/**
+	 * Sanitise the Attendees tab global-fields repeater input.
+	 *
+	 * Accepts the array shape posted by the repeater and stores it as
+	 * a JSON string so it round-trips cleanly to both the admin UI and
+	 * the front-end checkout merge helper.
+	 *
+	 * @param mixed $value Raw input.
+	 * @return string
+	 */
+	public static function sanitize_attendee_fields( $value ) {
+		if ( is_string( $value ) && '' === trim( $value ) ) {
+			return '';
+		}
+		$data = is_array( $value ) ? $value : json_decode( (string) $value, true );
+		if ( ! is_array( $data ) ) {
+			return '';
+		}
+		$allowed = array( 'text', 'email', 'tel', 'select' );
+		$clean   = array();
+		foreach ( $data as $row ) {
+			if ( ! is_array( $row ) || empty( $row['label'] ) ) {
+				continue;
+			}
+			$label = sanitize_text_field( (string) $row['label'] );
+			$key   = isset( $row['key'] ) && '' !== $row['key'] ? sanitize_key( (string) $row['key'] ) : sanitize_key( $label );
+			$type  = isset( $row['type'] ) ? sanitize_key( (string) $row['type'] ) : 'text';
+			if ( ! in_array( $type, $allowed, true ) ) {
+				$type = 'text';
+			}
+			$clean[] = array(
+				'label'    => $label,
+				'key'      => $key,
+				'type'     => $type,
+				'required' => ! empty( $row['required'] ),
+			);
+		}
+		return wp_json_encode( $clean );
 	}
 
 	/**
@@ -533,6 +601,13 @@ class KDNA_Events_Settings {
 			array(),
 			KDNA_EVENTS_VERSION
 		);
+		wp_enqueue_script(
+			'kdna-events-admin',
+			KDNA_EVENTS_URL . 'assets/js/kdna-events-admin.js',
+			array( 'jquery' ),
+			KDNA_EVENTS_VERSION,
+			true
+		);
 	}
 
 	/**
@@ -577,6 +652,10 @@ class KDNA_Events_Settings {
 			<form method="post" action="options.php" class="kdna-events-settings-form">
 				<?php
 				switch ( $current ) {
+					case 'attendees':
+						settings_fields( 'kdna_events_attendees' );
+						self::render_attendees_tab();
+						break;
 					case 'stripe':
 						settings_fields( 'kdna_events_stripe' );
 						self::render_stripe_tab();
@@ -799,7 +878,7 @@ class KDNA_Events_Settings {
 						<?php
 						printf(
 							/* translators: %s: link to Google Cloud Console */
-							esc_html__( 'Create an API key in the %s. Enable the Maps JavaScript API and the Geocoding API, then restrict the key by HTTP referrer to this site.', 'kdna-events' ),
+							esc_html__( 'Create an API key in the %s. Enable the Maps JavaScript API, the Geocoding API and the Places API (New), then restrict the key by HTTP referrer to this site. The Places API powers address autocomplete on the event and location edit screens.', 'kdna-events' ),
 							'<a href="https://console.cloud.google.com/google/maps-apis/credentials" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Google Cloud Console', 'kdna-events' ) . '</a>'
 						);
 						?>
@@ -1133,6 +1212,116 @@ class KDNA_Events_Settings {
 			}
 		})();
 		</script>
+		<?php
+	}
+
+	/**
+	 * Render the Attendees tab: a shared list of attendee fields
+	 * applied to every event unless the event opts out.
+	 *
+	 * @return void
+	 */
+	protected static function render_attendees_tab() {
+		$raw  = (string) get_option( 'kdna_events_global_attendee_fields', '' );
+		$rows = array();
+		if ( '' !== $raw ) {
+			$decoded = json_decode( $raw, true );
+			if ( is_array( $decoded ) ) {
+				$rows = $decoded;
+			}
+		}
+
+		$types = array(
+			'text'   => __( 'Text', 'kdna-events' ),
+			'email'  => __( 'Email', 'kdna-events' ),
+			'tel'    => __( 'Phone', 'kdna-events' ),
+			'select' => __( 'Select', 'kdna-events' ),
+		);
+		?>
+		<p class="description" style="max-width:64em;">
+			<?php esc_html_e( 'Custom fields here apply to every event by default. Individual events can add more fields or override a global field by declaring one with the same key. Events can also opt out of the global list entirely from the Event Details meta box.', 'kdna-events' ); ?>
+		</p>
+
+		<div
+			class="kdna-events-attendee-fields"
+			data-kdna-events-attendee-fields
+			data-kdna-events-attendee-fields-name="kdna_events_global_attendee_fields"
+		>
+			<div class="kdna-events-attendee-fields__list" data-kdna-events-attendee-fields-list>
+				<?php foreach ( $rows as $index => $row ) :
+					$label    = isset( $row['label'] ) ? (string) $row['label'] : '';
+					$key      = isset( $row['key'] ) ? (string) $row['key'] : '';
+					$type     = isset( $row['type'] ) ? (string) $row['type'] : 'text';
+					$required = ! empty( $row['required'] );
+					?>
+					<div class="kdna-events-attendee-field" data-kdna-events-attendee-field>
+						<div class="kdna-events-attendee-field__cell">
+							<label><?php esc_html_e( 'Label', 'kdna-events' ); ?></label>
+							<input type="text" name="kdna_events_global_attendee_fields[<?php echo esc_attr( (string) $index ); ?>][label]" value="<?php echo esc_attr( $label ); ?>" />
+						</div>
+						<div class="kdna-events-attendee-field__cell">
+							<label><?php esc_html_e( 'Key', 'kdna-events' ); ?></label>
+							<input type="text" name="kdna_events_global_attendee_fields[<?php echo esc_attr( (string) $index ); ?>][key]" value="<?php echo esc_attr( $key ); ?>" />
+						</div>
+						<div class="kdna-events-attendee-field__cell">
+							<label><?php esc_html_e( 'Type', 'kdna-events' ); ?></label>
+							<select name="kdna_events_global_attendee_fields[<?php echo esc_attr( (string) $index ); ?>][type]">
+								<?php foreach ( $types as $value => $type_label ) : ?>
+									<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $type, $value ); ?>><?php echo esc_html( $type_label ); ?></option>
+								<?php endforeach; ?>
+							</select>
+						</div>
+						<div class="kdna-events-attendee-field__cell kdna-events-attendee-field__cell--checkbox">
+							<label>
+								<input type="checkbox" name="kdna_events_global_attendee_fields[<?php echo esc_attr( (string) $index ); ?>][required]" value="1" <?php checked( $required ); ?> />
+								<?php esc_html_e( 'Required', 'kdna-events' ); ?>
+							</label>
+						</div>
+						<div class="kdna-events-attendee-field__cell kdna-events-attendee-field__cell--actions">
+							<button type="button" class="button-link-delete" data-kdna-events-attendee-field-remove>
+								<?php esc_html_e( 'Remove', 'kdna-events' ); ?>
+							</button>
+						</div>
+					</div>
+				<?php endforeach; ?>
+			</div>
+			<p>
+				<button type="button" class="button" data-kdna-events-attendee-fields-add>
+					<?php esc_html_e( 'Add field', 'kdna-events' ); ?>
+				</button>
+			</p>
+			<script type="text/html" data-kdna-events-attendee-fields-template>
+				<div class="kdna-events-attendee-field" data-kdna-events-attendee-field>
+					<div class="kdna-events-attendee-field__cell">
+						<label><?php esc_html_e( 'Label', 'kdna-events' ); ?></label>
+						<input type="text" name="kdna_events_global_attendee_fields[{{INDEX}}][label]" value="" />
+					</div>
+					<div class="kdna-events-attendee-field__cell">
+						<label><?php esc_html_e( 'Key', 'kdna-events' ); ?></label>
+						<input type="text" name="kdna_events_global_attendee_fields[{{INDEX}}][key]" value="" />
+					</div>
+					<div class="kdna-events-attendee-field__cell">
+						<label><?php esc_html_e( 'Type', 'kdna-events' ); ?></label>
+						<select name="kdna_events_global_attendee_fields[{{INDEX}}][type]">
+							<?php foreach ( $types as $value => $type_label ) : ?>
+								<option value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $type_label ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+					<div class="kdna-events-attendee-field__cell kdna-events-attendee-field__cell--checkbox">
+						<label>
+							<input type="checkbox" name="kdna_events_global_attendee_fields[{{INDEX}}][required]" value="1" />
+							<?php esc_html_e( 'Required', 'kdna-events' ); ?>
+						</label>
+					</div>
+					<div class="kdna-events-attendee-field__cell kdna-events-attendee-field__cell--actions">
+						<button type="button" class="button-link-delete" data-kdna-events-attendee-field-remove>
+							<?php esc_html_e( 'Remove', 'kdna-events' ); ?>
+						</button>
+					</div>
+				</div>
+			</script>
+		</div>
 		<?php
 	}
 
