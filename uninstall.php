@@ -32,6 +32,9 @@ $option_keys = array(
 	'kdna_events_notify_organiser',
 	'kdna_events_booking_email_body',
 	'kdna_events_per_attendee_emails',
+	'kdna_events_crm_master_enabled',
+	'kdna_events_crm_enabled',
+	'kdna_events_crm_settings',
 );
 
 foreach ( $option_keys as $option_key ) {
@@ -41,7 +44,11 @@ foreach ( $option_keys as $option_key ) {
 
 // Drop any cached tickets-sold transients.
 $transient_rows = $wpdb->get_col(
-	"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE '\_transient\_kdna\_events\_sold\_%' OR option_name LIKE '\_transient\_timeout\_kdna\_events\_sold\_%'"
+	"SELECT option_name FROM {$wpdb->options}
+	 WHERE option_name LIKE '\_transient\_kdna\_events\_sold\_%'
+	 OR option_name LIKE '\_transient\_timeout\_kdna\_events\_sold\_%'
+	 OR option_name LIKE '\_transient\_kdna\_events\_crm\_sync\_log%'
+	 OR option_name LIKE '\_transient\_timeout\_kdna\_events\_crm\_sync\_log%'"
 );
 if ( is_array( $transient_rows ) ) {
 	foreach ( $transient_rows as $row ) {

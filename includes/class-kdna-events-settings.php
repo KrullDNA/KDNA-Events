@@ -53,6 +53,7 @@ class KDNA_Events_Settings {
 			'maps'    => __( 'Google Maps', 'kdna-events' ),
 			'pages'   => __( 'Pages', 'kdna-events' ),
 			'emails'  => __( 'Emails', 'kdna-events' ),
+			'crm'     => __( 'CRM', 'kdna-events' ),
 		);
 	}
 
@@ -311,6 +312,35 @@ class KDNA_Events_Settings {
 				'default'           => self::default_booking_email_body(),
 			)
 		);
+
+		// CRM.
+		register_setting(
+			'kdna_events_crm',
+			'kdna_events_crm_master_enabled',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ),
+				'default'           => true,
+			)
+		);
+		register_setting(
+			'kdna_events_crm',
+			'kdna_events_crm_enabled',
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_crm_enabled' ),
+				'default'           => array(),
+			)
+		);
+		register_setting(
+			'kdna_events_crm',
+			'kdna_events_crm_settings',
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_crm_settings' ),
+				'default'           => array(),
+			)
+		);
 	}
 
 	/**
@@ -360,6 +390,113 @@ class KDNA_Events_Settings {
 	 */
 	public static function sanitize_textarea( $value ) {
 		return sanitize_textarea_field( (string) $value );
+	}
+
+	/**
+	 * Sanitise the CRM enabled map.
+	 *
+	 * Accepts { integration_id => truthy }, discards unknown ids by
+	 * whitelisting against the live registry so stale settings don't
+	 * accumulate when add-ons are deactivated.
+	 *
+	 * @param mixed $value Raw input.
+	 * @return array<string,bool>
+	 */
+	public static function sanitize_crm_enabled( $value ) {
+		if ( ! is_array( $value ) ) {
+			return array();
+		}
+
+		$known = array();
+		if ( class_exists( 'KDNA_Events_CRM' ) ) {
+			$known = array_keys( KDNA_Events_CRM::registry()->get_all() );
+		}
+
+		$clean = array();
+		foreach ( $value as $id => $flag ) {
+			$id = sanitize_key( (string) $id );
+			if ( '' === $id ) {
+				continue;
+			}
+			if ( ! empty( $known ) && ! in_array( $id, $known, true ) ) {
+				continue;
+			}
+			$clean[ $id ] = ! empty( $flag );
+		}
+		return $clean;
+	}
+
+	/**
+	 * Sanitise the CRM per-integration settings map.
+	 *
+	 * Only retains keys declared by each integration's
+	 * get_settings_fields. Text-like values are passed through
+	 * sanitize_textarea_field to preserve line breaks in API body
+	 * templates; checkboxes are coerced to booleans.
+	 *
+	 * @param mixed $value Raw input.
+	 * @return array<string,array<string,mixed>>
+	 */
+	public static function sanitize_crm_settings( $value ) {
+		if ( ! is_array( $value ) ) {
+			return array();
+		}
+
+		if ( ! class_exists( 'KDNA_Events_CRM' ) ) {
+			return array();
+		}
+
+		$integrations = KDNA_Events_CRM::registry()->get_all();
+		$clean        = array();
+
+		foreach ( $value as $id => $fields ) {
+			$id = sanitize_key( (string) $id );
+			if ( '' === $id || ! isset( $integrations[ $id ] ) || ! is_array( $fields ) ) {
+				continue;
+			}
+
+			$schema = $integrations[ $id ]->get_settings_fields();
+			if ( ! is_array( $schema ) ) {
+				continue;
+			}
+
+			$out = array();
+			foreach ( $schema as $field ) {
+				if ( empty( $field['key'] ) ) {
+					continue;
+				}
+				$key  = sanitize_key( (string) $field['key'] );
+				$type = isset( $field['type'] ) ? (string) $field['type'] : 'text';
+				$raw  = array_key_exists( $key, $fields ) ? $fields[ $key ] : '';
+
+				switch ( $type ) {
+					case 'checkbox':
+						$out[ $key ] = ! empty( $raw );
+						break;
+					case 'email':
+						$out[ $key ] = sanitize_email( (string) $raw );
+						break;
+					case 'url':
+						$out[ $key ] = esc_url_raw( (string) $raw );
+						break;
+					case 'textarea':
+						$out[ $key ] = sanitize_textarea_field( (string) $raw );
+						break;
+					case 'select':
+						$allowed    = isset( $field['options'] ) && is_array( $field['options'] ) ? array_keys( $field['options'] ) : array();
+						$out[ $key ] = in_array( (string) $raw, array_map( 'strval', $allowed ), true ) ? (string) $raw : '';
+						break;
+					case 'password':
+					case 'text':
+					default:
+						$out[ $key ] = sanitize_text_field( (string) $raw );
+				}
+			}
+
+			$clean[ $id ] = $out;
+		}
+
+		return $clean;
 	}
 
 	/**
@@ -455,6 +592,10 @@ class KDNA_Events_Settings {
 					case 'emails':
 						settings_fields( 'kdna_events_emails' );
 						self::render_emails_tab();
+						break;
+					case 'crm':
+						settings_fields( 'kdna_events_crm' );
+						self::render_crm_tab();
 						break;
 					case 'general':
 					default:
@@ -716,6 +857,282 @@ class KDNA_Events_Settings {
 			<?php endforeach; ?>
 			</tbody>
 		</table>
+		<?php
+	}
+
+	/**
+	 * Render the CRM tab: master switch, per-integration controls, sync log.
+	 *
+	 * @return void
+	 */
+	protected static function render_crm_tab() {
+		if ( ! class_exists( 'KDNA_Events_CRM' ) ) {
+			echo '<p>' . esc_html__( 'CRM framework is not available.', 'kdna-events' ) . '</p>';
+			return;
+		}
+
+		$master   = KDNA_Events_CRM::master_enabled();
+		$all      = KDNA_Events_CRM::registry()->get_all();
+		$enabled  = (array) get_option( 'kdna_events_crm_enabled', array() );
+		$settings = (array) get_option( 'kdna_events_crm_settings', array() );
+		$log      = KDNA_Events_CRM::get_log();
+		$nonce    = wp_create_nonce( 'kdna_events_crm_test' );
+		?>
+		<table class="form-table" role="presentation">
+			<tbody>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Enable CRM sync', 'kdna-events' ); ?></th>
+				<td>
+					<label>
+						<input type="checkbox" name="kdna_events_crm_master_enabled" value="1" <?php checked( $master ); ?> />
+						<?php esc_html_e( 'Master switch. When off, no integrations receive sync calls.', 'kdna-events' ); ?>
+					</label>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+
+		<h2 style="margin-top:1.5em;"><?php esc_html_e( 'Registered integrations', 'kdna-events' ); ?></h2>
+		<?php if ( empty( $all ) ) : ?>
+			<div class="notice notice-info inline"><p>
+				<?php
+				printf(
+					/* translators: %s: placeholder for a docs link */
+					esc_html__( 'No CRM integrations are registered yet. Build one by extending KDNA_Events_CRM_Integration and calling $registry->register on %s.', 'kdna-events' ),
+					'<code>kdna_events_register_crm_integrations</code>'
+				);
+				?>
+			</p></div>
+		<?php endif; ?>
+
+		<?php foreach ( $all as $id => $integration ) :
+			$is_enabled = ! empty( $enabled[ $id ] );
+			$mine       = isset( $settings[ $id ] ) && is_array( $settings[ $id ] ) ? $settings[ $id ] : array();
+			$fields     = (array) $integration->get_settings_fields();
+			?>
+			<div class="kdna-events-crm-integration" style="margin:1em 0;padding:1em 1.25em;border:1px solid #dcdcde;background:#fff;border-radius:4px;">
+				<h3 style="margin-top:0;display:flex;align-items:center;gap:0.5em;flex-wrap:wrap;">
+					<span><?php echo esc_html( (string) $integration->get_name() ); ?></span>
+					<code style="font-size:0.8em;opacity:0.7;"><?php echo esc_html( (string) $id ); ?></code>
+				</h3>
+				<p class="description" style="margin-top:0;">
+					<?php echo esc_html( (string) $integration->get_description() ); ?>
+				</p>
+
+				<table class="form-table" role="presentation">
+					<tbody>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Enable', 'kdna-events' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="kdna_events_crm_enabled[<?php echo esc_attr( $id ); ?>]" value="1" <?php checked( $is_enabled ); ?> />
+								<?php esc_html_e( 'Sync new tickets to this integration.', 'kdna-events' ); ?>
+							</label>
+						</td>
+					</tr>
+
+					<?php foreach ( $fields as $field ) :
+						if ( empty( $field['key'] ) ) {
+							continue;
+						}
+						$f_key     = sanitize_key( (string) $field['key'] );
+						$f_type    = isset( $field['type'] ) ? (string) $field['type'] : 'text';
+						$f_label   = isset( $field['label'] ) ? (string) $field['label'] : $f_key;
+						$f_desc    = isset( $field['description'] ) ? (string) $field['description'] : '';
+						$f_default = isset( $field['default'] ) ? $field['default'] : '';
+						$current   = array_key_exists( $f_key, $mine ) ? $mine[ $f_key ] : $f_default;
+						$name_attr = 'kdna_events_crm_settings[' . $id . '][' . $f_key . ']';
+						?>
+						<tr>
+							<th scope="row">
+								<label for="<?php echo esc_attr( $id . '_' . $f_key ); ?>"><?php echo esc_html( $f_label ); ?></label>
+							</th>
+							<td>
+								<?php if ( 'textarea' === $f_type ) : ?>
+									<textarea
+										class="large-text"
+										rows="4"
+										id="<?php echo esc_attr( $id . '_' . $f_key ); ?>"
+										name="<?php echo esc_attr( $name_attr ); ?>"
+									><?php echo esc_textarea( (string) $current ); ?></textarea>
+								<?php elseif ( 'select' === $f_type ) : ?>
+									<select
+										id="<?php echo esc_attr( $id . '_' . $f_key ); ?>"
+										name="<?php echo esc_attr( $name_attr ); ?>"
+									>
+										<?php foreach ( (array) ( $field['options'] ?? array() ) as $opt_val => $opt_label ) : ?>
+											<option value="<?php echo esc_attr( (string) $opt_val ); ?>" <?php selected( (string) $current, (string) $opt_val ); ?>><?php echo esc_html( (string) $opt_label ); ?></option>
+										<?php endforeach; ?>
+									</select>
+								<?php elseif ( 'checkbox' === $f_type ) : ?>
+									<label>
+										<input type="checkbox"
+											id="<?php echo esc_attr( $id . '_' . $f_key ); ?>"
+											name="<?php echo esc_attr( $name_attr ); ?>"
+											value="1"
+											<?php checked( (bool) $current ); ?> />
+										<?php echo esc_html( $f_desc ); ?>
+									</label>
+								<?php else :
+									$input_type = in_array( $f_type, array( 'password', 'email', 'url', 'text' ), true ) ? $f_type : 'text';
+									?>
+									<input type="<?php echo esc_attr( $input_type ); ?>"
+										class="regular-text"
+										autocomplete="off"
+										id="<?php echo esc_attr( $id . '_' . $f_key ); ?>"
+										name="<?php echo esc_attr( $name_attr ); ?>"
+										value="<?php echo esc_attr( (string) $current ); ?>" />
+								<?php endif; ?>
+								<?php if ( 'checkbox' !== $f_type && '' !== $f_desc ) : ?>
+									<p class="description"><?php echo esc_html( $f_desc ); ?></p>
+								<?php endif; ?>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Test connection', 'kdna-events' ); ?></th>
+						<td>
+							<button
+								type="button"
+								class="button button-secondary kdna-events-crm-test"
+								data-integration="<?php echo esc_attr( $id ); ?>"
+								data-nonce="<?php echo esc_attr( $nonce ); ?>"
+							>
+								<?php esc_html_e( 'Test', 'kdna-events' ); ?>
+							</button>
+							<span class="kdna-events-crm-test-result" role="status" aria-live="polite" style="margin-left:8px;"></span>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		<?php endforeach; ?>
+
+		<h2 style="margin-top:1.5em;"><?php esc_html_e( 'Sync log', 'kdna-events' ); ?></h2>
+		<p class="description">
+			<?php
+			printf(
+				/* translators: %d: max entries */
+				esc_html__( 'Rolling log, most recent first. Capped at %d entries.', 'kdna-events' ),
+				(int) KDNA_Events_CRM::LOG_MAX_ENTRIES
+			);
+			?>
+		</p>
+		<p>
+			<button
+				type="button"
+				class="button button-link-delete"
+				id="kdna-events-crm-clear-log"
+				data-nonce="<?php echo esc_attr( $nonce ); ?>"
+			>
+				<?php esc_html_e( 'Clear log', 'kdna-events' ); ?>
+			</button>
+			<span id="kdna-events-crm-clear-log-result" role="status" aria-live="polite" style="margin-left:8px;"></span>
+		</p>
+		<table class="widefat striped" id="kdna-events-crm-log-table">
+			<thead>
+				<tr>
+					<th><?php esc_html_e( 'Timestamp', 'kdna-events' ); ?></th>
+					<th><?php esc_html_e( 'Integration', 'kdna-events' ); ?></th>
+					<th><?php esc_html_e( 'Ticket', 'kdna-events' ); ?></th>
+					<th><?php esc_html_e( 'Status', 'kdna-events' ); ?></th>
+					<th><?php esc_html_e( 'Message', 'kdna-events' ); ?></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php if ( empty( $log ) ) : ?>
+					<tr><td colspan="5"><?php esc_html_e( 'No entries yet.', 'kdna-events' ); ?></td></tr>
+				<?php else : ?>
+					<?php foreach ( $log as $entry ) : ?>
+						<tr>
+							<td><?php echo esc_html( (string) ( $entry['timestamp'] ?? '' ) ); ?></td>
+							<td><code><?php echo esc_html( (string) ( $entry['integration'] ?? '' ) ); ?></code></td>
+							<td><code><?php echo esc_html( (string) ( $entry['ticket_code'] ?? '' ) ); ?></code></td>
+							<td>
+								<?php if ( 'error' === ( $entry['status'] ?? '' ) ) : ?>
+									<span style="color:#b91c1c;font-weight:600;"><?php esc_html_e( 'Error', 'kdna-events' ); ?></span>
+								<?php else : ?>
+									<span style="color:#047857;font-weight:600;"><?php esc_html_e( 'Success', 'kdna-events' ); ?></span>
+								<?php endif; ?>
+							</td>
+							<td><?php echo esc_html( (string) ( $entry['message'] ?? '' ) ); ?></td>
+						</tr>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</tbody>
+		</table>
+
+		<script>
+		(function () {
+			var ajaxUrl = <?php echo wp_json_encode( admin_url( 'admin-ajax.php' ) ); ?>;
+
+			function handleResponse(result, res) {
+				var message = '';
+				if (res.json && res.json.data && res.json.data.message) {
+					message = res.json.data.message;
+				}
+				if (res.json && res.json.success) {
+					result.style.color = '#047857';
+					result.textContent = message || <?php echo wp_json_encode( __( 'OK', 'kdna-events' ) ); ?>;
+				} else {
+					result.style.color = '#b91c1c';
+					result.textContent = message || <?php echo wp_json_encode( __( 'Failed', 'kdna-events' ) ); ?>;
+				}
+			}
+
+			var buttons = document.querySelectorAll('.kdna-events-crm-test');
+			for (var i = 0; i < buttons.length; i++) {
+				buttons[i].addEventListener('click', function (ev) {
+					var btn = ev.currentTarget;
+					var row = btn.parentNode;
+					var result = row.querySelector('.kdna-events-crm-test-result');
+					result.style.color = '#4b5563';
+					result.textContent = <?php echo wp_json_encode( __( 'Testing...', 'kdna-events' ) ); ?>;
+					var body = new URLSearchParams();
+					body.append('action', 'kdna_events_crm_test');
+					body.append('nonce', btn.getAttribute('data-nonce') || '');
+					body.append('integration_id', btn.getAttribute('data-integration') || '');
+					fetch(ajaxUrl, {
+						method: 'POST',
+						credentials: 'same-origin',
+						headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+						body: body.toString()
+					}).then(function (r) { return r.json().then(function (j) { return { status: r.status, json: j }; }); })
+					  .then(function (res) { handleResponse(result, res); })
+					  .catch(function () { result.style.color = '#b91c1c'; result.textContent = <?php echo wp_json_encode( __( 'Network error.', 'kdna-events' ) ); ?>; });
+				});
+			}
+
+			var clearBtn = document.getElementById('kdna-events-crm-clear-log');
+			if (clearBtn) {
+				clearBtn.addEventListener('click', function () {
+					var result = document.getElementById('kdna-events-crm-clear-log-result');
+					result.style.color = '#4b5563';
+					result.textContent = <?php echo wp_json_encode( __( 'Clearing...', 'kdna-events' ) ); ?>;
+					var body = new URLSearchParams();
+					body.append('action', 'kdna_events_crm_clear_log');
+					body.append('nonce', clearBtn.getAttribute('data-nonce') || '');
+					fetch(ajaxUrl, {
+						method: 'POST',
+						credentials: 'same-origin',
+						headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+						body: body.toString()
+					}).then(function (r) { return r.json().then(function (j) { return { status: r.status, json: j }; }); })
+					  .then(function (res) {
+					  	handleResponse(result, res);
+					  	if (res.json && res.json.success) {
+					  		var tbody = document.querySelector('#kdna-events-crm-log-table tbody');
+					  		if (tbody) {
+					  			tbody.innerHTML = '<tr><td colspan="5">' + <?php echo wp_json_encode( __( 'No entries yet.', 'kdna-events' ) ); ?> + '</td></tr>';
+					  		}
+					  	}
+					  })
+					  .catch(function () { result.style.color = '#b91c1c'; result.textContent = <?php echo wp_json_encode( __( 'Network error.', 'kdna-events' ) ); ?>; });
+				});
+			}
+		})();
+		</script>
 		<?php
 	}
 

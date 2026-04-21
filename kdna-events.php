@@ -117,6 +117,7 @@ function kdna_events_bootstrap() {
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-orders.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-stripe.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-emails.php';
+	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-crm.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-checkout.php';
 	if ( file_exists( KDNA_EVENTS_PATH . 'vendor/autoload.php' ) ) {
 		require_once KDNA_EVENTS_PATH . 'vendor/autoload.php';
@@ -149,6 +150,7 @@ function kdna_events_bootstrap() {
 	KDNA_Events_Checkout::init();
 	KDNA_Events_Stripe::init();
 	KDNA_Events_Emails::init();
+	KDNA_Events_CRM::bootstrap();
 
 	if ( is_admin() ) {
 		KDNA_Events_Admin::init();

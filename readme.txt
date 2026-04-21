@@ -79,3 +79,5 @@ The Stripe webhook is the authoritative signal. The order finalises (tickets, em
 * Stage 6: Event Register Button widget with registration-window states.
 * Stage 7: Checkout page widgets and AJAX order creation.
 * Stage 8: Stripe Checkout Sessions, webhook-driven fulfilment, free event flow, ticket generation, Success page widgets.
+* Stage 9: templated HTML booking emails, organiser notification path, admin test email button, My Tickets widget.
+* Stage 10: pluggable CRM integration framework with abstract base class, registry, ticket-created bridge, rolling sync log and a new CRM settings tab.
