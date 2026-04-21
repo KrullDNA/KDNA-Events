@@ -1,0 +1,285 @@
+<?php
+/**
+ * Base class for every KDNA Events Elementor widget.
+ *
+ * Provides a consistent category, atomic-markup handling, and a small
+ * set of shared helpers widgets can call to register typography,
+ * spacing and hover-transition controls without duplicating boilerplate.
+ *
+ * @package KDNA_Events
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+if ( ! class_exists( '\\Elementor\\Widget_Base' ) ) {
+	return;
+}
+
+/**
+ * Abstract base for KDNA Events widgets.
+ */
+abstract class KDNA_Events_Widget_Base extends \Elementor\Widget_Base {
+
+	/**
+	 * Return the widget categories this widget belongs to.
+	 *
+	 * @return string[]
+	 */
+	public function get_categories() {
+		return array( 'kdna-widgets' );
+	}
+
+	/**
+	 * Return the keywords Elementor uses to search for the widget.
+	 *
+	 * Child classes can override to tune discoverability.
+	 *
+	 * @return string[]
+	 */
+	public function get_keywords() {
+		return array( 'kdna', 'events', 'event' );
+	}
+
+	/**
+	 * Declare the shared front-end stylesheet as a dependency.
+	 *
+	 * Elementor enqueues the registered 'kdna-events-frontend' handle
+	 * whenever any concrete widget is rendered, including inside the
+	 * editor preview where is_page() is false.
+	 *
+	 * @return string[]
+	 */
+	public function get_style_depends() {
+		return array( 'kdna-events-frontend' );
+	}
+
+	/**
+	 * Control whether Elementor wraps the widget in its inner container.
+	 *
+	 * When the e_optimized_markup experiment is active we skip the
+	 * inner wrapper so our BEM wrapper div is the outermost element.
+	 *
+	 * @return bool
+	 */
+	public function has_widget_inner_wrapper(): bool {
+		if ( ! class_exists( '\\Elementor\\Plugin' ) ) {
+			return true;
+		}
+
+		$instance = \Elementor\Plugin::$instance;
+		if ( isset( $instance->experiments ) && method_exists( $instance->experiments, 'is_feature_active' ) ) {
+			return ! $instance->experiments->is_feature_active( 'e_optimized_markup' );
+		}
+		return true;
+	}
+
+	/**
+	 * Register a Typography group control scoped to a selector.
+	 *
+	 * @param string $control_name Control name (e.g. 'title_typography').
+	 * @param string $label        Visible label.
+	 * @param string $selector     CSS selector relative to the widget wrapper.
+	 * @return void
+	 */
+	protected function register_typography_control( $control_name, $label, $selector ) {
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => $control_name,
+				'label'    => $label,
+				'selector' => '{{WRAPPER}} ' . $selector,
+			)
+		);
+	}
+
+	/**
+	 * Register standard spacing controls (margin, padding) for a selector.
+	 *
+	 * @param string $prefix   Prefix used to namespace the two controls.
+	 * @param string $selector CSS selector relative to the widget wrapper.
+	 * @return void
+	 */
+	protected function register_spacing_controls( $prefix, $selector ) {
+		$this->add_responsive_control(
+			$prefix . '_margin',
+			array(
+				'label'      => __( 'Margin', 'kdna-events' ),
+				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} ' . $selector => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			$prefix . '_padding',
+			array(
+				'label'      => __( 'Padding', 'kdna-events' ),
+				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} ' . $selector => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+	}
+
+	/**
+	 * Register a hover transition-duration slider control.
+	 *
+	 * Applies a CSS transition-duration on the given selector so child
+	 * widgets can expose a single, tidy control for hover speed.
+	 *
+	 * @param string $control_name Control name (e.g. 'button_transition').
+	 * @param string $selector     CSS selector to apply the transition to.
+	 * @param int    $default_ms   Default duration in milliseconds.
+	 * @return void
+	 */
+	protected function register_hover_transition_control( $control_name, $selector, $default_ms = 200 ) {
+		$this->add_control(
+			$control_name,
+			array(
+				'label'      => __( 'Transition duration', 'kdna-events' ),
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'ms' ),
+				'range'      => array(
+					'ms' => array(
+						'min'  => 0,
+						'max'  => 1000,
+						'step' => 10,
+					),
+				),
+				'default'    => array(
+					'unit' => 'ms',
+					'size' => (int) $default_ms,
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} ' . $selector => 'transition-duration: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+	}
+
+	/**
+	 * Resolve the event ID the widget should read from.
+	 *
+	 * Pulls from the current post when on a kdna_event single view and
+	 * falls back to the most recent published event so the Elementor
+	 * editor preview always has content to render.
+	 *
+	 * @return int
+	 */
+	protected function get_event_id() {
+		if ( is_singular( 'kdna_event' ) ) {
+			return (int) get_queried_object_id();
+		}
+
+		$post_id = get_the_ID();
+		if ( $post_id && 'kdna_event' === get_post_type( $post_id ) ) {
+			return (int) $post_id;
+		}
+
+		$latest = get_posts(
+			array(
+				'post_type'      => 'kdna_event',
+				'posts_per_page' => 1,
+				'post_status'    => 'publish',
+				'orderby'        => 'date',
+				'order'          => 'DESC',
+				'fields'         => 'ids',
+			)
+		);
+
+		return empty( $latest ) ? 0 : (int) $latest[0];
+	}
+
+	/**
+	 * Resolve the event ID for checkout widgets.
+	 *
+	 * Reads ?event_id= from the request on the front end and falls back
+	 * to the most recent published event in the Elementor editor so
+	 * authors always see a populated preview.
+	 *
+	 * @return int
+	 */
+	protected function get_checkout_event_id() {
+		if ( $this->is_editor_mode() ) {
+			return $this->get_event_id();
+		}
+
+		if ( isset( $_GET['event_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$raw = absint( wp_unslash( $_GET['event_id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( $raw && 'kdna_event' === get_post_type( $raw ) ) {
+				return $raw;
+			}
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Detect whether the widget is being rendered inside the Elementor editor.
+	 *
+	 * Used to decide whether to show placeholder content or to hide empty
+	 * widgets entirely on the front end.
+	 *
+	 * @return bool
+	 */
+	protected function is_editor_mode() {
+		if ( ! class_exists( '\\Elementor\\Plugin' ) ) {
+			return false;
+		}
+
+		$instance = \Elementor\Plugin::$instance;
+
+		if ( isset( $instance->editor ) && method_exists( $instance->editor, 'is_edit_mode' ) && $instance->editor->is_edit_mode() ) {
+			return true;
+		}
+
+		if ( isset( $instance->preview ) && method_exists( $instance->preview, 'is_preview_mode' ) && $instance->preview->is_preview_mode() ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Render a small placeholder for the editor when a widget has no data.
+	 *
+	 * Always safe to call. Outputs nothing on the front end.
+	 *
+	 * @param string $message Translated message to display.
+	 * @return void
+	 */
+	protected function render_editor_placeholder( $message ) {
+		if ( ! $this->is_editor_mode() ) {
+			return;
+		}
+		printf(
+			'<div class="kdna-events-widget-placeholder">%s</div>',
+			esc_html( $message )
+		);
+	}
+}
+
+/**
+ * Widget loader.
+ *
+ * Registered at file load time per Section 2. Concrete widgets are
+ * attached in subsequent stages by hooking 'kdna_events_register_widgets'
+ * or by calling $widgets_manager->register() directly inside the action.
+ */
+add_action(
+	'elementor/widgets/register',
+	function ( $widgets_manager ) {
+		/**
+		 * Allow later stages to register concrete KDNA Events widgets.
+		 *
+		 * @param \Elementor\Widgets_Manager $widgets_manager Widgets manager.
+		 */
+		do_action( 'kdna_events_register_widgets', $widgets_manager );
+	}
+);

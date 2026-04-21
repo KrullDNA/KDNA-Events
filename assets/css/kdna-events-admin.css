@@ -1,0 +1,115 @@
+/**
+ * KDNA Events admin styles.
+ *
+ * Scoped to the Event Details meta box. Keeps the editor layout tidy
+ * without leaking styles into the rest of wp-admin.
+ */
+
+.kdna-events-metabox .kdna-events-section-heading {
+	margin: 1.5em 0 0.5em;
+	padding-bottom: 0.25em;
+	border-bottom: 1px solid #dcdcde;
+	font-size: 14px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #1d2327;
+}
+
+.kdna-events-metabox .kdna-events-section-heading:first-child {
+	margin-top: 0;
+}
+
+.kdna-events-metabox .form-table {
+	margin-top: 0;
+}
+
+.kdna-events-metabox .kdna-events-type-fieldset {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1em;
+}
+
+.kdna-events-metabox .kdna-events-type-option {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35em;
+}
+
+.kdna-events-metabox .kdna-events-location-fieldset,
+.kdna-events-metabox .kdna-events-virtual-fieldset {
+	margin: 1em 0;
+	padding: 0.5em 1em 1em;
+	border: 1px solid #dcdcde;
+	background: #fafbfc;
+	border-radius: 4px;
+}
+
+.kdna-events-metabox .kdna-events-location-fieldset legend,
+.kdna-events-metabox .kdna-events-virtual-fieldset legend {
+	padding: 0 0.5em;
+	font-weight: 600;
+}
+
+.kdna-events-attendee-fields__list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5em;
+	margin-bottom: 1em;
+}
+
+.kdna-events-attendee-field {
+	display: grid;
+	grid-template-columns: 1.4fr 1fr 1fr auto auto;
+	gap: 0.75em;
+	align-items: end;
+	padding: 0.75em;
+	border: 1px solid #dcdcde;
+	background: #fff;
+	border-radius: 4px;
+}
+
+.kdna-events-attendee-field__cell {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25em;
+}
+
+.kdna-events-attendee-field__cell > label {
+	font-size: 12px;
+	font-weight: 600;
+	color: #50575e;
+}
+
+.kdna-events-attendee-field__cell input[type="text"],
+.kdna-events-attendee-field__cell select {
+	width: 100%;
+}
+
+.kdna-events-attendee-field__cell--checkbox {
+	flex-direction: row;
+	align-items: center;
+	gap: 0.35em;
+}
+
+.kdna-events-attendee-field__cell--checkbox > label {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35em;
+	font-size: 13px;
+	color: #1d2327;
+	font-weight: 500;
+}
+
+.kdna-events-attendee-field__cell--actions {
+	justify-content: flex-end;
+}
+
+@media screen and (max-width: 782px) {
+	.kdna-events-attendee-field {
+		grid-template-columns: 1fr 1fr;
+	}
+	.kdna-events-attendee-field__cell--actions {
+		grid-column: 1 / -1;
+		justify-content: flex-start;
+	}
+}

@@ -1,0 +1,1343 @@
+/**
+ * KDNA Events front-end styles.
+ *
+ * Every rule is scoped to a widget-specific BEM wrapper so it will
+ * not bleed into the host theme. Elementor style controls override
+ * these defaults via inline selectors in the widget controls.
+ */
+
+/* Editor placeholder. */
+.kdna-events-widget-placeholder {
+	padding: 1em;
+	border: 1px dashed #c4c7ca;
+	color: #6b7280;
+	background: #f9fafb;
+	font-size: 0.9em;
+	text-align: center;
+	border-radius: 4px;
+}
+
+/* Event Title. */
+.kdna-events-event-title {
+	margin: 0;
+}
+.kdna-events-event-title__link {
+	color: inherit;
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+/* Event Subtitle. */
+.kdna-events-event-subtitle {
+	margin: 0;
+	font-size: 1.05em;
+	color: #4b5563;
+}
+
+/* Event Date / Time. */
+.kdna-events-event-datetime {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+}
+.kdna-events-event-datetime--icon-right {
+	flex-direction: row-reverse;
+}
+.kdna-events-event-datetime__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+.kdna-events-event-datetime__icon svg,
+.kdna-events-event-datetime__icon i {
+	width: 1em;
+	height: 1em;
+	font-size: 1em;
+}
+
+/* Event Price. */
+.kdna-events-event-price {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 0.1em;
+}
+.kdna-events-event-price--badge {
+	padding: 0.3em 0.75em;
+	border-radius: 999px;
+	background-color: #f3f4f6;
+}
+.kdna-events-event-price__from {
+	margin-right: 0.35em;
+	font-size: 0.85em;
+	opacity: 0.8;
+}
+.kdna-events-event-price__currency {
+	font-size: 0.85em;
+	opacity: 0.9;
+}
+.kdna-events-event-price__amount {
+	font-weight: 700;
+}
+
+/* Event Type Badge. */
+.kdna-events-event-type-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4em;
+	padding: 0.3em 0.8em;
+	border-radius: 999px;
+	font-size: 0.85em;
+	line-height: 1;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+}
+.kdna-events-event-type-badge--in-person {
+	background-color: #ecfdf5;
+	color: #065f46;
+}
+.kdna-events-event-type-badge--virtual {
+	background-color: #eff6ff;
+	color: #1e3a8a;
+}
+.kdna-events-event-type-badge--hybrid {
+	background-color: #fef3c7;
+	color: #92400e;
+}
+.kdna-events-event-type-badge__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+.kdna-events-event-type-badge__icon svg,
+.kdna-events-event-type-badge__icon i {
+	width: 1em;
+	height: 1em;
+	font-size: 1em;
+}
+
+/* Event Description. */
+.kdna-events-event-description {
+	color: inherit;
+}
+.kdna-events-event-description > *:first-child {
+	margin-top: 0;
+}
+.kdna-events-event-description > *:last-child {
+	margin-bottom: 0;
+}
+.kdna-events-event-description p {
+	margin: 0 0 1em;
+}
+.kdna-events-event-description h1,
+.kdna-events-event-description h2,
+.kdna-events-event-description h3,
+.kdna-events-event-description h4,
+.kdna-events-event-description h5,
+.kdna-events-event-description h6 {
+	margin: 1.25em 0 0.5em;
+	line-height: 1.25;
+}
+.kdna-events-event-description ul,
+.kdna-events-event-description ol {
+	margin: 0 0 1em;
+	padding-inline-start: 1.25em;
+}
+.kdna-events-event-description blockquote {
+	margin: 1.25em 0;
+	padding: 0.75em 1em;
+	border-left: 4px solid #e5e7eb;
+	background-color: #f9fafb;
+	font-style: italic;
+}
+.kdna-events-event-description a {
+	color: #1d4ed8;
+	text-decoration: underline;
+}
+.kdna-events-event-description a:hover {
+	color: #1e40af;
+}
+.kdna-events-event-description__read-more {
+	display: inline-block;
+	margin-top: 0.25em;
+	font-weight: 600;
+}
+
+/* Event Image. */
+.kdna-events-event-image {
+	position: relative;
+	overflow: hidden;
+	display: block;
+	line-height: 0;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.kdna-events-event-image__link {
+	display: block;
+	position: relative;
+	line-height: 0;
+}
+.kdna-events-event-image__img {
+	display: block;
+	width: 100%;
+	height: auto;
+	max-width: 100%;
+	transition: transform 0.3s ease, filter 0.3s ease;
+}
+.kdna-events-event-image__overlay {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+.kdna-events-event-image--hover-zoom:hover .kdna-events-event-image__img {
+	transform: scale(1.05);
+}
+.kdna-events-event-image--hover-brighten:hover .kdna-events-event-image__img {
+	filter: brightness(1.15);
+}
+.kdna-events-event-image--hover-darken:hover .kdna-events-event-image__img {
+	filter: brightness(0.8);
+}
+.kdna-events-event-image--hover-lift:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Event Organiser. */
+.kdna-events-event-organiser {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+}
+.kdna-events-event-organiser--stacked {
+	flex-direction: column;
+	align-items: flex-start;
+	text-align: start;
+}
+.kdna-events-event-organiser--icon-right {
+	flex-direction: row-reverse;
+}
+.kdna-events-event-organiser--stacked.kdna-events-event-organiser--icon-right {
+	flex-direction: column-reverse;
+}
+.kdna-events-event-organiser__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+.kdna-events-event-organiser__icon svg,
+.kdna-events-event-organiser__icon i {
+	width: 1em;
+	height: 1em;
+	font-size: 1em;
+}
+.kdna-events-event-organiser__text {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0 0.35em;
+}
+.kdna-events-event-organiser--stacked .kdna-events-event-organiser__text {
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.1em;
+}
+.kdna-events-event-organiser__prefix {
+	color: #6b7280;
+}
+.kdna-events-event-organiser__name {
+	font-weight: 600;
+	color: inherit;
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+a.kdna-events-event-organiser__name:hover {
+	text-decoration: underline;
+}
+.kdna-events-event-organiser__email {
+	color: #1d4ed8;
+	text-decoration: none;
+	font-size: 0.9em;
+	transition: color 0.2s ease;
+}
+.kdna-events-event-organiser__email:hover {
+	color: #1e40af;
+	text-decoration: underline;
+}
+
+/* Event Location. */
+.kdna-events-event-location {
+	display: block;
+}
+.kdna-events-event-location__name {
+	font-weight: 600;
+	margin: 0 0 0.25em;
+}
+.kdna-events-event-location__address {
+	margin: 0 0 0.75em;
+	color: #4b5563;
+	line-height: 1.45;
+}
+.kdna-events-event-location__address-link {
+	color: inherit;
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.15em;
+	transition: color 0.2s ease;
+}
+.kdna-events-event-location__map {
+	width: 100%;
+	height: 400px;
+	min-height: 180px;
+	background-color: #e5e7eb;
+	position: relative;
+	overflow: hidden;
+}
+.kdna-events-event-location__map--placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1em;
+	background: repeating-linear-gradient(
+		45deg,
+		#f9fafb,
+		#f9fafb 10px,
+		#f3f4f6 10px,
+		#f3f4f6 20px
+	);
+	color: #4b5563;
+	border: 1px dashed #c4c7ca;
+	text-align: center;
+}
+.kdna-events-event-location__map-placeholder-content {
+	max-width: 30em;
+}
+.kdna-events-event-location__map-placeholder-content strong {
+	display: block;
+	margin-bottom: 0.35em;
+	color: #1f2937;
+	font-size: 1.05em;
+}
+.kdna-events-event-location__map-placeholder-content a {
+	color: #1d4ed8;
+}
+.kdna-events-event-location__virtual-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	margin-top: 0.75em;
+	line-height: 1.25;
+	text-decoration: none;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.kdna-events-event-location__virtual-link--button {
+	padding: 0.6em 1.1em;
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border: 1px solid #1d4ed8;
+	border-radius: 0.4em;
+}
+.kdna-events-event-location__virtual-link--button:hover {
+	background-color: #1e40af;
+	border-color: #1e40af;
+	color: #ffffff;
+}
+.kdna-events-event-location__virtual-link--plain {
+	color: #1d4ed8;
+	padding: 0;
+	background: transparent;
+	border: none;
+}
+.kdna-events-event-location__virtual-link--plain:hover {
+	color: #1e40af;
+	text-decoration: underline;
+}
+.kdna-events-event-location__virtual-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+.kdna-events-event-location__virtual-icon svg,
+.kdna-events-event-location__virtual-icon i {
+	width: 1em;
+	height: 1em;
+	font-size: 1em;
+}
+
+/* Event Grid. */
+.kdna-events-grid {
+	position: relative;
+	display: block;
+}
+.kdna-events-grid.is-loading {
+	opacity: 0.6;
+	pointer-events: none;
+}
+.kdna-events-grid__wrapper {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 24px;
+}
+@media (max-width: 900px) {
+	.kdna-events-grid__wrapper {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+@media (max-width: 600px) {
+	.kdna-events-grid__wrapper {
+		grid-template-columns: 1fr;
+	}
+}
+.kdna-events-grid__card {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background-color: #ffffff;
+	border-radius: 12px;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.kdna-events-grid__card-image {
+	position: relative;
+	display: block;
+	width: 100%;
+	overflow: hidden;
+	line-height: 0;
+	background-color: #f3f4f6;
+}
+.kdna-events-grid--aspect-1-1 .kdna-events-grid__card-image { aspect-ratio: 1 / 1; }
+.kdna-events-grid--aspect-4-3 .kdna-events-grid__card-image { aspect-ratio: 4 / 3; }
+.kdna-events-grid--aspect-16-9 .kdna-events-grid__card-image { aspect-ratio: 16 / 9; }
+.kdna-events-grid--aspect-3-4 .kdna-events-grid__card-image { aspect-ratio: 3 / 4; }
+.kdna-events-grid__card-image-img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.3s ease;
+}
+.kdna-events-grid__card-body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4em;
+	padding: 16px;
+}
+.kdna-events-grid__card-type {
+	align-self: flex-start;
+}
+.kdna-events-grid__card-date {
+	font-size: 0.85em;
+	color: #4b5563;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+}
+.kdna-events-grid__card-title {
+	margin: 0;
+	font-size: 1.2em;
+	line-height: 1.3;
+}
+.kdna-events-grid__card-title-link {
+	color: inherit;
+	text-decoration: none;
+}
+.kdna-events-grid__card-title-link:hover {
+	text-decoration: underline;
+}
+.kdna-events-grid__card-location {
+	color: #4b5563;
+	font-size: 0.9em;
+}
+.kdna-events-grid__card-price {
+	font-weight: 600;
+}
+.kdna-events-grid__card-price-free {
+	color: #059669;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	font-size: 0.9em;
+}
+.kdna-events-grid__card-excerpt {
+	margin: 0;
+	color: #374151;
+	font-size: 0.95em;
+	line-height: 1.5;
+}
+.kdna-events-grid__card-button {
+	align-self: flex-start;
+	display: inline-flex;
+	align-items: center;
+	margin-top: 0.25em;
+	padding: 0.55em 1em;
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border: 1px solid #1d4ed8;
+	border-radius: 6px;
+	text-decoration: none;
+	font-weight: 600;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.kdna-events-grid__card-button:hover {
+	background-color: #1e40af;
+	border-color: #1e40af;
+	color: #ffffff;
+}
+.kdna-events-grid__empty {
+	grid-column: 1 / -1;
+	padding: 2em;
+	text-align: center;
+	color: #4b5563;
+	border: 1px dashed #e5e7eb;
+	border-radius: 8px;
+	background: #f9fafb;
+}
+.kdna-events-grid__pagination {
+	display: flex;
+	justify-content: center;
+	margin-top: 1.5em;
+}
+.kdna-events-grid__pagination ul {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35em;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.kdna-events-grid__page,
+.kdna-events-grid__load-more {
+	appearance: none;
+	padding: 0.4em 0.75em;
+	min-width: 2.5em;
+	border: 1px solid #e5e7eb;
+	border-radius: 6px;
+	background-color: #ffffff;
+	color: #1f2937;
+	font: inherit;
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.kdna-events-grid__page:hover,
+.kdna-events-grid__load-more:hover {
+	background-color: #f3f4f6;
+	border-color: #d1d5db;
+}
+.kdna-events-grid__page.is-current {
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border-color: #1d4ed8;
+	cursor: default;
+}
+.kdna-events-grid__page:disabled,
+.kdna-events-grid__load-more:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+/* Event Filter. */
+.kdna-events-filter {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	align-items: flex-end;
+	margin-bottom: 1.25em;
+}
+.kdna-events-filter--vertical {
+	flex-direction: column;
+	align-items: stretch;
+}
+.kdna-events-filter__group {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35em;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+.kdna-events-filter__group--pills .kdna-events-filter__pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35em;
+}
+.kdna-events-filter__group--dates {
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 0.5em;
+}
+.kdna-events-filter__group--dates .kdna-events-filter__label {
+	margin-right: 0.25em;
+}
+.kdna-events-filter__label {
+	font-size: 0.85em;
+	font-weight: 600;
+	color: #374151;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+}
+.kdna-events-filter__input,
+.kdna-events-filter__select,
+.kdna-events-filter__date {
+	appearance: none;
+	font: inherit;
+	padding: 0.5em 0.75em;
+	background-color: #ffffff;
+	color: #1f2937;
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.kdna-events-filter__input:focus,
+.kdna-events-filter__select:focus,
+.kdna-events-filter__date:focus {
+	border-color: #1d4ed8;
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.2);
+}
+.kdna-events-filter__pill {
+	appearance: none;
+	padding: 0.4em 0.9em;
+	border: 1px solid transparent;
+	border-radius: 999px;
+	background-color: #f3f4f6;
+	color: #1f2937;
+	font: inherit;
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.kdna-events-filter__pill:hover {
+	background-color: #e5e7eb;
+}
+.kdna-events-filter__pill.is-active {
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border-color: #1d4ed8;
+}
+.kdna-events-filter__actions {
+	display: flex;
+	gap: 0.5em;
+}
+.kdna-events-filter__submit,
+.kdna-events-filter__reset {
+	appearance: none;
+	padding: 0.5em 1em;
+	border-radius: 6px;
+	font: inherit;
+	cursor: pointer;
+	border: 1px solid transparent;
+}
+.kdna-events-filter__submit {
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border-color: #1d4ed8;
+}
+.kdna-events-filter__submit:hover {
+	background-color: #1e40af;
+	border-color: #1e40af;
+}
+.kdna-events-filter__reset {
+	background-color: transparent;
+	color: #4b5563;
+	border-color: #d1d5db;
+}
+.kdna-events-filter__reset:hover {
+	background-color: #f3f4f6;
+}
+
+/* Event Register Button. */
+.kdna-events-event-register-button-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5em;
+	align-items: flex-start;
+}
+.kdna-events-event-register-button {
+	--kdna-events-btn-padding-y: 0.75em;
+	--kdna-events-btn-padding-x: 1.5em;
+	--kdna-events-btn-font-size: 1em;
+	--kdna-events-btn-radius: 8px;
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5em;
+	padding: var(--kdna-events-btn-padding-y) var(--kdna-events-btn-padding-x);
+	background-color: #1d4ed8;
+	color: #ffffff;
+	font-size: var(--kdna-events-btn-font-size);
+	font-weight: 600;
+	line-height: 1.2;
+	text-decoration: none;
+	border: 1px solid transparent;
+	border-radius: var(--kdna-events-btn-radius);
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+.kdna-events-event-register-button--size-sm {
+	--kdna-events-btn-padding-y: 0.4em;
+	--kdna-events-btn-padding-x: 0.9em;
+	--kdna-events-btn-font-size: 0.875em;
+}
+.kdna-events-event-register-button--size-md {
+	--kdna-events-btn-padding-y: 0.6em;
+	--kdna-events-btn-padding-x: 1.2em;
+	--kdna-events-btn-font-size: 0.95em;
+}
+.kdna-events-event-register-button--size-lg {
+	--kdna-events-btn-padding-y: 0.75em;
+	--kdna-events-btn-padding-x: 1.5em;
+	--kdna-events-btn-font-size: 1em;
+}
+.kdna-events-event-register-button--size-xl {
+	--kdna-events-btn-padding-y: 1em;
+	--kdna-events-btn-padding-x: 2em;
+	--kdna-events-btn-font-size: 1.1em;
+}
+.kdna-events-event-register-button__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+.kdna-events-event-register-button__icon svg,
+.kdna-events-event-register-button__icon i {
+	width: 1em;
+	height: 1em;
+	font-size: 1em;
+}
+.kdna-events-event-register-button--icon-right {
+	flex-direction: row-reverse;
+}
+.kdna-events-event-register-button.is-active:hover {
+	background-color: #1e40af;
+	color: #ffffff;
+}
+.kdna-events-event-register-button.is-disabled {
+	background-color: #e5e7eb;
+	color: #6b7280;
+	cursor: not-allowed;
+	pointer-events: none;
+	opacity: 0.9;
+}
+.kdna-events-event-register-button-notice {
+	margin: 0;
+	padding: 0.5em 0.75em;
+	background-color: #fef3c7;
+	border: 1px solid #fcd34d;
+	border-radius: 4px;
+	color: #92400e;
+	font-size: 0.85em;
+}
+.kdna-events-event-register-button-notice a {
+	color: #92400e;
+	text-decoration: underline;
+}
+
+/* Checkout Summary. */
+.kdna-events-checkout-summary {
+	display: flex;
+	gap: 20px;
+	padding: 1em;
+	background-color: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+}
+.kdna-events-checkout-summary--stacked {
+	flex-direction: column;
+}
+.kdna-events-checkout-summary--side-by-side {
+	flex-direction: row;
+	align-items: flex-start;
+}
+@media (max-width: 600px) {
+	.kdna-events-checkout-summary--side-by-side {
+		flex-direction: column;
+	}
+}
+.kdna-events-checkout-summary__image {
+	flex: 0 0 auto;
+	width: 240px;
+	line-height: 0;
+	overflow: hidden;
+	border-radius: 6px;
+}
+.kdna-events-checkout-summary__image img {
+	width: 100%;
+	height: auto;
+	display: block;
+	border-radius: inherit;
+}
+.kdna-events-checkout-summary__body {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+}
+.kdna-events-checkout-summary__title {
+	margin: 0;
+	font-size: 1.35em;
+	line-height: 1.25;
+}
+.kdna-events-checkout-summary__subtitle {
+	margin: 0.25em 0 0;
+	color: #4b5563;
+}
+.kdna-events-checkout-summary__date,
+.kdna-events-checkout-summary__location {
+	color: #4b5563;
+	margin-top: 0.5em;
+	font-size: 0.95em;
+}
+
+/* Checkout Quantity. */
+.kdna-events-checkout-quantity {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4em;
+}
+.kdna-events-checkout-quantity__label {
+	font-size: 0.85em;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	color: #374151;
+}
+.kdna-events-checkout-quantity__controls {
+	display: inline-flex;
+	align-items: stretch;
+	gap: 8px;
+}
+.kdna-events-checkout-quantity__button {
+	appearance: none;
+	width: 2.5em;
+	min-width: 2.5em;
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+	background-color: #f3f4f6;
+	color: #1f2937;
+	font: inherit;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.kdna-events-checkout-quantity__button:hover {
+	background-color: #e5e7eb;
+}
+.kdna-events-checkout-quantity__button:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+.kdna-events-checkout-quantity__input {
+	appearance: textfield;
+	width: 72px;
+	padding: 0.5em 0.75em;
+	text-align: center;
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+	background-color: #ffffff;
+	color: #1f2937;
+	font: inherit;
+	font-weight: 600;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.kdna-events-checkout-quantity__input::-webkit-inner-spin-button,
+.kdna-events-checkout-quantity__input::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+.kdna-events-checkout-quantity__input:focus {
+	border-color: #1d4ed8;
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.2);
+}
+.kdna-events-checkout-quantity__price-per-ticket,
+.kdna-events-checkout-quantity__available,
+.kdna-events-checkout-quantity__min-max {
+	font-size: 0.85em;
+	color: #4b5563;
+}
+
+/* Checkout Attendees. */
+.kdna-events-checkout-attendees__list {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+.kdna-events-checkout-attendees__fieldset {
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+.kdna-events-checkout-attendees--divider-line .kdna-events-checkout-attendees__fieldset + .kdna-events-checkout-attendees__fieldset {
+	padding-top: 20px;
+	border-top: 1px solid #e5e7eb;
+}
+.kdna-events-checkout-attendees--divider-spacer .kdna-events-checkout-attendees__fieldset + .kdna-events-checkout-attendees__fieldset {
+	margin-top: 12px;
+}
+.kdna-events-checkout-attendees__heading {
+	margin: 0 0 0.75em;
+	padding: 0;
+	font-size: 1.05em;
+	font-weight: 700;
+	color: #111827;
+}
+.kdna-events-checkout-attendees__copy {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	margin-bottom: 0.5em;
+	font-size: 0.9em;
+}
+.kdna-events-checkout-attendees__copy input {
+	accent-color: #1d4ed8;
+}
+.kdna-events-checkout-attendees__field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25em;
+	margin-bottom: 0.75em;
+}
+.kdna-events-checkout-attendees__field.is-disabled input,
+.kdna-events-checkout-attendees__field.is-disabled select {
+	background-color: #f9fafb;
+	cursor: not-allowed;
+}
+.kdna-events-checkout-attendees__label {
+	font-size: 0.85em;
+	font-weight: 600;
+	color: #374151;
+}
+.kdna-events-checkout-attendees__required {
+	color: #dc2626;
+	margin-left: 0.2em;
+}
+.kdna-events-checkout-attendees__input {
+	appearance: none;
+	padding: 0.55em 0.75em;
+	font: inherit;
+	color: #1f2937;
+	background-color: #ffffff;
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.kdna-events-checkout-attendees__input:focus {
+	border-color: #1d4ed8;
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.2);
+}
+.kdna-events-checkout-attendees__field.has-error .kdna-events-checkout-attendees__input {
+	border-color: #dc2626;
+}
+.kdna-events-checkout-attendees__error {
+	display: none;
+	font-size: 0.8em;
+	color: #dc2626;
+}
+.kdna-events-checkout-attendees__field.has-error .kdna-events-checkout-attendees__error {
+	display: block;
+}
+.kdna-events-checkout-attendees__helper {
+	font-size: 0.8em;
+	color: #6b7280;
+}
+
+/* Checkout Order Summary. */
+.kdna-events-checkout-order-summary {
+	padding: 1em;
+	background-color: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+}
+.kdna-events-checkout-summary-rows {
+	display: flex;
+	flex-direction: column;
+}
+.kdna-events-checkout-summary-row {
+	display: flex;
+	justify-content: space-between;
+	padding: 8px 0;
+	color: #374151;
+	border-bottom: 1px solid #e5e7eb;
+	gap: 1em;
+}
+.kdna-events-checkout-summary-row:last-child {
+	border-bottom: 0;
+}
+.kdna-events-checkout-summary-row--total {
+	font-weight: 700;
+	font-size: 1.2em;
+	padding-top: 16px;
+}
+
+/* Checkout Pay Button. */
+.kdna-events-checkout-pay-button {
+	position: relative;
+	appearance: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5em;
+	padding: 0.85em 1.5em;
+	color: #ffffff;
+	background-color: #1d4ed8;
+	border: 1px solid #1d4ed8;
+	border-radius: 8px;
+	font: inherit;
+	font-weight: 700;
+	line-height: 1.2;
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.kdna-events-checkout-pay-button:hover {
+	background-color: #1e40af;
+	border-color: #1e40af;
+}
+.kdna-events-checkout-pay-button:disabled,
+.kdna-events-checkout-pay-button.is-loading {
+	cursor: wait;
+	opacity: 0.9;
+}
+.kdna-events-checkout-pay-button--icon-right {
+	flex-direction: row-reverse;
+}
+.kdna-events-checkout-pay-button__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+.kdna-events-checkout-pay-button__icon svg,
+.kdna-events-checkout-pay-button__icon i {
+	width: 1em;
+	height: 1em;
+	font-size: 1em;
+}
+.kdna-events-checkout-pay-button__spinner {
+	display: none;
+	width: 1em;
+	height: 1em;
+	border: 2px solid rgba(255, 255, 255, 0.35);
+	border-top-color: #ffffff;
+	border-radius: 50%;
+	animation: kdna-events-spin 0.7s linear infinite;
+}
+.kdna-events-checkout-pay-button.is-loading .kdna-events-checkout-pay-button__spinner {
+	display: inline-block;
+}
+@keyframes kdna-events-spin {
+	to { transform: rotate(360deg); }
+}
+.kdna-events-checkout-pay-button__error {
+	margin-top: 0.75em;
+	padding: 0.6em 0.8em;
+	background-color: #fef2f2;
+	color: #991b1b;
+	border: 1px solid #fecaca;
+	border-radius: 6px;
+	font-size: 0.9em;
+}
+.kdna-events-checkout-pay-button__error[hidden] {
+	display: none;
+}
+
+/* Success Confirmation. */
+.kdna-events-success-confirmation {
+	padding: 2em;
+	background-color: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	text-align: center;
+}
+.kdna-events-success-confirmation--not-found {
+	background-color: #fef9c3;
+	border-color: #fde68a;
+	color: #713f12;
+}
+.kdna-events-success-confirmation__icon {
+	margin-bottom: 0.5em;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+.kdna-events-success-confirmation__icon svg,
+.kdna-events-success-confirmation__icon i {
+	font-size: 64px;
+	width: 64px;
+	height: 64px;
+	color: #059669;
+	fill: #059669;
+}
+.kdna-events-success-confirmation__heading {
+	margin: 0 0 0.25em;
+	font-size: 1.75em;
+	line-height: 1.2;
+}
+.kdna-events-success-confirmation__subheading {
+	margin: 0;
+	color: #4b5563;
+}
+.kdna-events-success-confirmation__spinner {
+	display: inline-block;
+	margin-top: 1em;
+	width: 36px;
+	height: 36px;
+	border: 3px solid rgba(29, 78, 216, 0.2);
+	border-top-color: #1d4ed8;
+	border-radius: 50%;
+	animation: kdna-events-spin 0.7s linear infinite;
+}
+.kdna-events-success-confirmation.is-loading {
+	color: #4b5563;
+}
+
+/* Success Tickets. */
+.kdna-events-success-tickets__list {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+.kdna-events-success-ticket {
+	display: flex;
+	flex-direction: column;
+	background-color: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	overflow: hidden;
+}
+.kdna-events-success-ticket__header {
+	padding: 0.75em 1em;
+	background-color: #f9fafb;
+	border-bottom: 1px solid #e5e7eb;
+}
+.kdna-events-success-ticket__heading {
+	margin: 0;
+	font-size: 1em;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	color: #374151;
+}
+.kdna-events-success-ticket__body {
+	display: flex;
+	gap: 16px;
+	padding: 16px;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+}
+.kdna-events-success-ticket__details {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4em;
+	flex: 1 1 auto;
+	min-width: 200px;
+}
+.kdna-events-success-ticket__name {
+	font-weight: 600;
+	font-size: 1.05em;
+}
+.kdna-events-success-ticket__email {
+	font-size: 0.9em;
+	color: #4b5563;
+}
+.kdna-events-success-ticket__code {
+	align-self: flex-start;
+	display: inline-block;
+	padding: 0.5em 0.75em;
+	background-color: #f3f4f6;
+	color: #111827;
+	border: 1px solid #e5e7eb;
+	border-radius: 6px;
+	font-size: 1.15em;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+}
+.kdna-events-success-ticket__code--mono {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.kdna-events-success-ticket__download {
+	align-self: flex-start;
+	padding: 0.5em 0.9em;
+	background-color: #e5e7eb;
+	color: #374151;
+	border: 1px solid transparent;
+	border-radius: 6px;
+	cursor: not-allowed;
+	font: inherit;
+}
+.kdna-events-success-ticket__qr {
+	flex: 0 0 auto;
+	width: 140px;
+	height: 140px;
+}
+.kdna-events-success-ticket__qr img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border-radius: 6px;
+	background-color: #ffffff;
+}
+
+/* My Tickets. */
+.kdna-events-my-tickets__tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35em;
+	margin-bottom: 1em;
+}
+.kdna-events-my-tickets__tab {
+	appearance: none;
+	padding: 0.5em 1em;
+	background-color: #f3f4f6;
+	color: #1f2937;
+	border: 1px solid transparent;
+	border-radius: 999px;
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.kdna-events-my-tickets__tab:hover {
+	background-color: #e5e7eb;
+}
+.kdna-events-my-tickets__tab.is-active {
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border-color: #1d4ed8;
+}
+.kdna-events-my-tickets__tab-count {
+	margin-left: 0.4em;
+	font-weight: 500;
+	opacity: 0.8;
+}
+.kdna-events-my-tickets__panel {
+	display: none;
+}
+.kdna-events-my-tickets__panel.is-active {
+	display: block;
+}
+.kdna-events-my-tickets__group {
+	margin-bottom: 20px;
+}
+.kdna-events-my-tickets__group:last-child {
+	margin-bottom: 0;
+}
+.kdna-events-my-tickets__group-heading {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.75em;
+	margin: 0 0 0.75em;
+	font-size: 1.15em;
+}
+.kdna-events-my-tickets__group-date {
+	font-size: 0.8em;
+	color: #6b7280;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	font-weight: 500;
+}
+.kdna-events-my-tickets__list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+.kdna-events-my-ticket {
+	display: flex;
+	gap: 16px;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	background-color: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	padding: 16px;
+	overflow: hidden;
+}
+.kdna-events-my-ticket__details {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35em;
+	flex: 1 1 auto;
+	min-width: 200px;
+}
+.kdna-events-my-ticket__name {
+	font-weight: 600;
+}
+.kdna-events-my-ticket__code {
+	align-self: flex-start;
+	display: inline-block;
+	padding: 0.4em 0.7em;
+	background-color: #f3f4f6;
+	color: #111827;
+	border: 1px solid #e5e7eb;
+	border-radius: 6px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+}
+.kdna-events-my-ticket__code--mono {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.kdna-events-my-ticket__download {
+	align-self: flex-start;
+	padding: 0.45em 0.85em;
+	background-color: #e5e7eb;
+	color: #374151;
+	border: 1px solid transparent;
+	border-radius: 6px;
+	cursor: not-allowed;
+	font: inherit;
+	font-size: 0.9em;
+}
+.kdna-events-my-ticket__qr {
+	flex: 0 0 auto;
+	width: 108px;
+	height: 108px;
+}
+.kdna-events-my-ticket__qr img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background-color: #ffffff;
+	border-radius: 6px;
+}
+.kdna-events-my-tickets__empty {
+	margin: 0;
+	padding: 1.25em;
+	background-color: #f9fafb;
+	border: 1px dashed #e5e7eb;
+	border-radius: 8px;
+	text-align: center;
+	color: #6b7280;
+}
+.kdna-events-my-tickets__login {
+	padding: 24px;
+	background-color: #f9fafb;
+	border: 1px solid #e5e7eb;
+	border-radius: 10px;
+	text-align: center;
+}
+.kdna-events-my-tickets__login-message {
+	margin: 0 0 12px;
+	color: #374151;
+}
+.kdna-events-my-tickets__login-button {
+	display: inline-block;
+	padding: 0.6em 1.2em;
+	background-color: #1d4ed8;
+	color: #ffffff;
+	border: 1px solid #1d4ed8;
+	border-radius: 6px;
+	text-decoration: none;
+	font-weight: 600;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.kdna-events-my-tickets__login-button:hover {
+	background-color: #1e40af;
+	border-color: #1e40af;
+	color: #ffffff;
+}
