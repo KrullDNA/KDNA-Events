@@ -47,11 +47,66 @@ class KDNA_Events_Checkout {
 	/**
 	 * Return the parsed attendee fields config for an event.
 	 *
+	 * Applies append-with-override merging: the globally-configured
+	 * attendee fields in kdna_events_global_attendee_fields appear
+	 * first. Event-specific fields with the same key override globals
+	 * in place. Event-only fields are appended at the end. Events with
+	 * _kdna_event_ignore_global_attendee_fields set skip the globals
+	 * entirely.
+	 *
 	 * @param int $event_id Event post ID.
 	 * @return array<int,array{label:string,key:string,type:string,required:bool}>
 	 */
 	public static function get_attendee_fields( $event_id ) {
-		$raw = get_post_meta( (int) $event_id, '_kdna_event_attendee_fields', true );
+		$event_fields  = self::parse_attendee_fields_json( get_post_meta( (int) $event_id, '_kdna_event_attendee_fields', true ) );
+		$ignore_global = (bool) get_post_meta( (int) $event_id, '_kdna_event_ignore_global_attendee_fields', true );
+
+		if ( $ignore_global ) {
+			return $event_fields;
+		}
+
+		$global_fields = self::parse_attendee_fields_json( get_option( 'kdna_events_global_attendee_fields', '' ) );
+		if ( empty( $global_fields ) ) {
+			return $event_fields;
+		}
+
+		// Index the event fields by key so we can replace globals in place.
+		$event_by_key = array();
+		foreach ( $event_fields as $field ) {
+			$event_by_key[ $field['key'] ] = $field;
+		}
+
+		$merged    = array();
+		$used_keys = array();
+		foreach ( $global_fields as $field ) {
+			if ( isset( $event_by_key[ $field['key'] ] ) ) {
+				$merged[]    = $event_by_key[ $field['key'] ];
+				$used_keys[] = $field['key'];
+			} else {
+				$merged[] = $field;
+			}
+		}
+
+		// Append event-only fields that were not used as overrides.
+		foreach ( $event_fields as $field ) {
+			if ( ! in_array( $field['key'], $used_keys, true ) ) {
+				$merged[] = $field;
+			}
+		}
+
+		return $merged;
+	}
+
+	/**
+	 * Parse and sanitise an attendee-fields JSON blob into a clean list.
+	 *
+	 * Accepts either a JSON string or a pre-decoded array. Rows missing
+	 * a label are discarded; the type is whitelisted.
+	 *
+	 * @param mixed $raw JSON string or array.
+	 * @return array<int,array{label:string,key:string,type:string,required:bool}>
+	 */
+	protected static function parse_attendee_fields_json( $raw ) {
 		if ( empty( $raw ) ) {
 			return array();
 		}
@@ -59,15 +114,22 @@ class KDNA_Events_Checkout {
 		if ( ! is_array( $decoded ) ) {
 			return array();
 		}
-		$out = array();
+		$allowed = array( 'text', 'email', 'tel', 'select' );
+		$out     = array();
 		foreach ( $decoded as $row ) {
 			if ( ! is_array( $row ) || empty( $row['label'] ) ) {
 				continue;
 			}
+			$label = sanitize_text_field( (string) $row['label'] );
+			$key   = isset( $row['key'] ) && '' !== $row['key'] ? sanitize_key( (string) $row['key'] ) : sanitize_key( $label );
+			$type  = isset( $row['type'] ) ? sanitize_key( (string) $row['type'] ) : 'text';
+			if ( ! in_array( $type, $allowed, true ) ) {
+				$type = 'text';
+			}
 			$out[] = array(
-				'label'    => sanitize_text_field( (string) $row['label'] ),
-				'key'      => isset( $row['key'] ) ? sanitize_key( (string) $row['key'] ) : sanitize_key( (string) $row['label'] ),
-				'type'     => isset( $row['type'] ) ? sanitize_key( (string) $row['type'] ) : 'text',
+				'label'    => $label,
+				'key'      => $key,
+				'type'     => $type,
 				'required' => ! empty( $row['required'] ),
 			);
 		}

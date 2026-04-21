@@ -32,6 +32,7 @@ $option_keys = array(
 	'kdna_events_notify_organiser',
 	'kdna_events_booking_email_body',
 	'kdna_events_per_attendee_emails',
+	'kdna_events_global_attendee_fields',
 	'kdna_events_crm_master_enabled',
 	'kdna_events_crm_enabled',
 	'kdna_events_crm_settings',

@@ -124,6 +124,9 @@ class KDNA_Events_Admin {
 			}
 		}
 
+		$ignore_global_fields = (bool) get_post_meta( $post->ID, '_kdna_event_ignore_global_attendee_fields', true );
+		$has_globals          = '' !== trim( (string) get_option( 'kdna_events_global_attendee_fields', '' ) );
+
 		if ( '' === $type ) {
 			$type = 'in-person';
 		}
@@ -315,8 +318,26 @@ class KDNA_Events_Admin {
 			</table>
 
 			<h3 class="kdna-events-section-heading"><?php esc_html_e( 'Custom Attendee Fields', 'kdna-events' ); ?></h3>
-			<p class="description"><?php esc_html_e( 'Extra fields captured for every ticket at checkout. Name, email and phone are always collected.', 'kdna-events' ); ?></p>
-			<div class="kdna-events-attendee-fields" data-kdna-events-attendee-fields>
+			<p class="description">
+				<?php
+				if ( $has_globals ) {
+					esc_html_e( 'Extra fields captured for every ticket at checkout, on top of name, email and phone. Global fields from Settings, Attendees apply first; fields below extend the global list or override a global when they share the same key.', 'kdna-events' );
+				} else {
+					esc_html_e( 'Extra fields captured for every ticket at checkout, on top of name, email and phone.', 'kdna-events' );
+				}
+				?>
+			</p>
+
+			<?php if ( $has_globals ) : ?>
+				<p>
+					<label>
+						<input type="checkbox" name="kdna_event_ignore_global_attendee_fields" value="1" <?php checked( $ignore_global_fields ); ?> />
+						<?php esc_html_e( 'Ignore global attendee fields for this event', 'kdna-events' ); ?>
+					</label>
+				</p>
+			<?php endif; ?>
+
+			<div class="kdna-events-attendee-fields" data-kdna-events-attendee-fields data-kdna-events-attendee-fields-name="kdna_event_attendee_fields">
 				<div class="kdna-events-attendee-fields__list" data-kdna-events-attendee-fields-list>
 					<?php if ( ! empty( $attendee_fields ) ) : ?>
 						<?php foreach ( $attendee_fields as $index => $row ) : ?>
@@ -526,6 +547,9 @@ class KDNA_Events_Admin {
 			);
 		}
 		update_post_meta( $post_id, '_kdna_event_attendee_fields', wp_json_encode( $attendee_clean ) );
+
+		$ignore_global = isset( $_POST['kdna_event_ignore_global_attendee_fields'] ) ? 1 : 0;
+		update_post_meta( $post_id, '_kdna_event_ignore_global_attendee_fields', $ignore_global );
 
 		unset( $post );
 	}

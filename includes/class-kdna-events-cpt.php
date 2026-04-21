@@ -203,6 +203,19 @@ class KDNA_Events_CPT {
 			)
 		);
 
+		register_post_meta(
+			self::POST_TYPE,
+			'_kdna_event_ignore_global_attendee_fields',
+			array(
+				'type'              => 'boolean',
+				'single'            => true,
+				'show_in_rest'      => true,
+				'default'           => false,
+				'sanitize_callback' => 'rest_sanitize_boolean',
+				'auth_callback'     => $auth,
+			)
+		);
+
 		$int_fields = array(
 			'_kdna_event_capacity',
 			'_kdna_event_min_tickets_per_order',
