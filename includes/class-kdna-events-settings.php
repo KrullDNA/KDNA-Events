@@ -878,7 +878,7 @@ class KDNA_Events_Settings {
 						<?php
 						printf(
 							/* translators: %s: link to Google Cloud Console */
-							esc_html__( 'Create an API key in the %s. Enable the Maps JavaScript API and the Geocoding API, then restrict the key by HTTP referrer to this site.', 'kdna-events' ),
+							esc_html__( 'Create an API key in the %s. Enable the Maps JavaScript API, the Geocoding API and the Places API (New), then restrict the key by HTTP referrer to this site. The Places API powers address autocomplete on the event and location edit screens.', 'kdna-events' ),
 							'<a href="https://console.cloud.google.com/google/maps-apis/credentials" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Google Cloud Console', 'kdna-events' ) . '</a>'
 						);
 						?>

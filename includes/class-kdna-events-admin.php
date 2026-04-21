@@ -858,6 +858,40 @@ class KDNA_Events_Admin {
 			KDNA_EVENTS_VERSION,
 			true
 		);
+
+		// Lazy-load Google Maps JS with the Places library on any of
+		// our edit screens that carry an address input, so authors get
+		// autocomplete + lat/lng + venue name in one tap. Requires the
+		// Places API (New) enabled on the same key.
+		$maps_key = (string) get_option( 'kdna_events_google_maps_api_key', '' );
+		if ( '' !== $maps_key ) {
+			$src = add_query_arg(
+				array(
+					'key'       => rawurlencode( $maps_key ),
+					'libraries' => 'places',
+					'v'         => 'weekly',
+					'loading'   => 'async',
+					'callback'  => 'kdnaEventsAdminPlacesReady',
+				),
+				'https://maps.googleapis.com/maps/api/js'
+			);
+			wp_enqueue_script( 'kdna-events-admin-places', $src, array(), KDNA_EVENTS_VERSION, true );
+			wp_script_add_data( 'kdna-events-admin-places', 'strategy', 'async' );
+			wp_add_inline_script(
+				'kdna-events-admin',
+				'window.kdnaEventsAdminPlaces = ' . wp_json_encode(
+					array(
+						'hasKey'          => true,
+						'eventMetaBoxSel' => '.kdna-events-metabox',
+					)
+				) . ';'
+			);
+		} else {
+			wp_add_inline_script(
+				'kdna-events-admin',
+				'window.kdnaEventsAdminPlaces = ' . wp_json_encode( array( 'hasKey' => false ) ) . ';'
+			);
+		}
 	}
 
 	/**

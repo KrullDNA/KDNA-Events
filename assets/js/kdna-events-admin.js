@@ -49,6 +49,92 @@
 	});
 
 	/**
+	 * Google Maps lazy-loader callback.
+	 *
+	 * Maps JS is enqueued with `&callback=kdnaEventsAdminPlacesReady`
+	 * so we can wire autocomplete the moment the library is available.
+	 * The callback is exposed on window because Google's loader fires
+	 * it globally.
+	 */
+	window.kdnaEventsAdminPlacesReady = function () {
+		wirePlacesAutocomplete();
+	};
+
+	/**
+	 * Attach Places Autocomplete to the venue + location CPT address inputs.
+	 *
+	 * On place_changed we populate the address, venue name (only if
+	 * empty so we never stomp a deliberate override), and latitude /
+	 * longitude fields. Works on both the event meta box's inline
+	 * venue fieldset and the Location CPT edit screen's address row.
+	 */
+	function wirePlacesAutocomplete() {
+		if (!window.google || !window.google.maps || !window.google.maps.places) {
+			return;
+		}
+
+		var targets = [
+			// Event meta box, manual venue section.
+			{
+				address: document.getElementById('kdna_event_location_address'),
+				name:    document.getElementById('kdna_event_location_name'),
+				lat:     document.getElementById('kdna_event_location_lat'),
+				lng:     document.getElementById('kdna_event_location_lng')
+			},
+			// Location CPT meta box.
+			{
+				address: document.getElementById('kdna_event_loc_address'),
+				name:    null,
+				lat:     document.getElementById('kdna_event_loc_lat'),
+				lng:     document.getElementById('kdna_event_loc_lng')
+			}
+		];
+
+		targets.forEach(function (t) {
+			if (!t.address) {
+				return;
+			}
+			if (t.address.getAttribute('data-kdna-events-places-wired') === '1') {
+				return;
+			}
+			t.address.setAttribute('data-kdna-events-places-wired', '1');
+
+			var ac = new window.google.maps.places.Autocomplete(t.address, {
+				types: ['establishment', 'geocode'],
+				fields: ['name', 'formatted_address', 'geometry']
+			});
+
+			ac.addListener('place_changed', function () {
+				var place = ac.getPlace();
+				if (!place) {
+					return;
+				}
+				if (place.formatted_address) {
+					t.address.value = place.formatted_address;
+				}
+				if (t.name && place.name && '' === (t.name.value || '').trim()) {
+					t.name.value = place.name;
+				}
+				if (place.geometry && place.geometry.location) {
+					if (t.lat) { t.lat.value = place.geometry.location.lat().toFixed(7); }
+					if (t.lng) { t.lng.value = place.geometry.location.lng().toFixed(7); }
+				}
+			});
+
+			// Suppress the default 'Enter submits form' behaviour while the
+			// user is tabbing through Autocomplete suggestions.
+			t.address.addEventListener('keydown', function (e) {
+				if (e.key === 'Enter') {
+					var pac = document.querySelector('.pac-container');
+					if (pac && pac.offsetHeight > 0) {
+						e.preventDefault();
+					}
+				}
+			});
+		});
+	}
+
+	/**
 	 * Hide a manual-entry table whenever a reference dropdown picks a saved CPT row.
 	 *
 	 * Used for the Location and Organiser dropdowns on the event meta
