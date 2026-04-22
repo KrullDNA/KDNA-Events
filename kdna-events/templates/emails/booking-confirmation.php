@@ -2,21 +2,24 @@
 /**
  * Booking confirmation email template.
  *
- * Variables provided by KDNA_Events_Emails::load_template:
+ * Layout matches KDNA Events Email Template.pdf exactly:
+ *   - Logo sits above the card on the grey page background.
+ *   - Event image is the hero at the top of the white card.
+ *   - Large centred heading (per-event override with global default).
+ *   - Email content 1 paragraph (merge-tag enabled).
+ *   - Three-column detail row: date, time, type.
+ *   - Centred location row.
+ *   - Orange Virtual Event link pill, only on virtual/hybrid events
+ *     with a URL set.
+ *   - Email content 2 paragraph.
+ *   - Footer text BELOW the card on grey background.
  *
- * @var object             $order
- * @var array<int,object>  $tickets
- * @var array<string,mixed> $context
- * @var string             $body_html
- * @var string             $role          'purchaser' | 'attendee' | 'admin'
- * @var string             $site_name
- * @var string             $site_url
- * @var string             $support_email
- * @var string             $total_display
- * @var string             $currency
+ * Every block is conditional: if the data is missing, the block is
+ * skipped cleanly so there are no orphan table rows or broken image
+ * icons anywhere.
  *
- * All CSS is inline so mail clients that strip <style> still render the layout.
- * No external images or fonts; system font stack only.
+ * Variables in scope are set up by
+ * KDNA_Events_Emails::render_booking_confirmation_html().
  *
  * @package KDNA_Events
  */
@@ -24,133 +27,76 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+$content_max   = max( 480, min( 720, (int) ( $design['kdna_events_email_content_max_width'] ?? 600 ) ) );
+$page_bg       = (string) ( $design['kdna_events_email_color_page_bg'] ?? '#EFEFEF' );
+$card_bg       = (string) ( $design['kdna_events_email_color_content_bg'] ?? '#FFFFFF' );
+$heading_color = (string) ( $design['kdna_events_email_color_heading'] ?? '#1A1A1A' );
+$body_color    = (string) ( $design['kdna_events_email_color_body'] ?? '#555555' );
+$muted_color   = (string) ( $design['kdna_events_email_color_muted'] ?? '#888888' );
+$card_radius   = (int) ( $design['kdna_events_email_card_border_radius'] ?? 8 );
+$pad_y         = (int) ( $design['kdna_events_email_content_padding_y'] ?? 36 );
+$pad_x         = (int) ( $design['kdna_events_email_content_padding_x'] ?? 28 );
+
+$heading_font_size   = (int) ( $design['kdna_events_email_heading_font_size'] ?? 28 );
+$heading_font_weight = (int) ( $design['kdna_events_email_heading_font_weight'] ?? 700 );
+$body_font_size      = (int) ( $design['kdna_events_email_body_font_size'] ?? 16 );
+$body_line_height    = (string) ( $design['kdna_events_email_body_line_height'] ?? '1.55' );
+
+$content_1_lines = preg_split( '/\r\n|\n|\r/', (string) $content_1 );
+$content_2_lines = preg_split( '/\r\n|\n|\r/', (string) $content_2 );
+
+include __DIR__ . '/partials/doctype-head.php';
 ?>
-<!DOCTYPE html>
-<html lang="<?php echo esc_attr( get_locale() ); ?>">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title><?php echo esc_html( $context['event_title'] ); ?></title>
-</head>
-<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;color:#1f2937;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f4f6;">
-	<tr>
-		<td align="center" style="padding:24px;">
-			<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
-				<tr>
-					<td style="padding:28px 28px 16px 28px;background-color:#1d4ed8;color:#ffffff;">
-						<p style="margin:0;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.85;">
-							<?php esc_html_e( 'Booking confirmed', 'kdna-events' ); ?>
-						</p>
-						<h1 style="margin:8px 0 0 0;font-size:24px;line-height:1.25;">
-							<?php echo esc_html( $context['event_title'] ); ?>
-						</h1>
-						<p style="margin:8px 0 0 0;font-size:14px;opacity:0.9;">
-							<?php
-							printf(
-								/* translators: %s: order reference */
-								esc_html__( 'Reference: %s', 'kdna-events' ),
-								'<strong>' . esc_html( $context['order_ref'] ) . '</strong>'
-							);
-							?>
-						</p>
-					</td>
-				</tr>
-
-				<tr>
-					<td style="padding:28px;">
-						<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;">
-							<?php
-							printf(
-								/* translators: %s: attendee or purchaser name */
-								esc_html__( 'Hi %s,', 'kdna-events' ),
-								esc_html( $context['attendee_name'] )
-							);
-							?>
-						</p>
-						<div style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#374151;">
-							<?php
-							// Body is pre-merged and pre-escaped by the emails class.
-							echo $body_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-							?>
-						</div>
-
-						<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 24px 0;border:1px solid #e5e7eb;border-radius:8px;border-collapse:separate;">
-							<tr>
-								<td style="padding:12px 16px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;">
-									<?php esc_html_e( 'Event details', 'kdna-events' ); ?>
-								</td>
-							</tr>
-							<tr>
-								<td style="padding:12px 16px;">
-									<p style="margin:0 0 4px 0;font-weight:600;"><?php esc_html_e( 'When', 'kdna-events' ); ?></p>
-									<p style="margin:0 0 12px 0;color:#374151;">
-										<?php echo esc_html( '' !== $context['event_date'] ? $context['event_date'] : __( 'TBA', 'kdna-events' ) ); ?>
-									</p>
-									<?php if ( '' !== $context['event_location'] ) : ?>
-										<p style="margin:0 0 4px 0;font-weight:600;"><?php esc_html_e( 'Where', 'kdna-events' ); ?></p>
-										<p style="margin:0 0 12px 0;color:#374151;">
-											<?php echo esc_html( $context['event_location'] ); ?>
-										</p>
-									<?php endif; ?>
-									<?php if ( '' !== $context['organiser_name'] ) : ?>
-										<p style="margin:0 0 4px 0;font-weight:600;"><?php esc_html_e( 'Organiser', 'kdna-events' ); ?></p>
-										<p style="margin:0;color:#374151;"><?php echo esc_html( $context['organiser_name'] ); ?></p>
-									<?php endif; ?>
-								</td>
-							</tr>
-						</table>
-
-						<p style="margin:0 0 12px 0;font-size:13px;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;">
-							<?php echo esc_html( _n( 'Your ticket', 'Your tickets', count( $tickets ), 'kdna-events' ) ); ?>
-						</p>
-
-						<?php foreach ( $tickets as $ticket ) : ?>
-							<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 10px 0;border:1px solid #e5e7eb;border-radius:8px;border-collapse:separate;">
+<body class="kdna-events-email-body" style="margin:0;padding:0;background-color:<?php echo esc_attr( $page_bg ); ?>;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
+	<?php include __DIR__ . '/partials/preheader.php'; ?>
+	<table role="presentation" class="kdna-events-email-wrapper" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="<?php echo esc_attr( $page_bg ); ?>" style="width:100%;background-color:<?php echo esc_attr( $page_bg ); ?>;margin:0;padding:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" width="<?php echo esc_attr( (string) $content_max ); ?>" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:<?php echo esc_attr( (string) $content_max ); ?>px;margin:0 auto;">
+					<?php include __DIR__ . '/partials/logo.php'; ?>
+					<tr>
+						<td style="padding:0 12px 0;">
+							<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="kdna-events-email-card" bgcolor="<?php echo esc_attr( $card_bg ); ?>" style="background-color:<?php echo esc_attr( $card_bg ); ?>;border-radius:<?php echo esc_attr( (string) $card_radius ); ?>px;overflow:hidden;">
+								<?php include __DIR__ . '/partials/event-image.php'; ?>
 								<tr>
-									<td style="padding:14px 16px;">
-										<p style="margin:0 0 6px 0;font-weight:600;">
-											<?php echo esc_html( (string) $ticket->attendee_name ); ?>
-										</p>
-										<p style="margin:0;">
-											<span style="display:inline-block;padding:6px 10px;background-color:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;letter-spacing:0.08em;color:#111827;">
-												<?php echo esc_html( (string) $ticket->ticket_code ); ?>
-											</span>
-										</p>
+									<td class="kdna-events-email-content" align="center" style="padding:<?php echo esc_attr( (string) $pad_y ); ?>px <?php echo esc_attr( (string) $pad_x ); ?>px;text-align:center;">
+										<?php if ( '' !== (string) $email_heading ) : ?>
+											<h1 class="kdna-events-email-heading" style="margin:0 0 22px;font-family:<?php echo esc_attr( $heading_stack ); ?>;font-size:<?php echo esc_attr( (string) $heading_font_size ); ?>px;line-height:1.25;font-weight:<?php echo esc_attr( (string) $heading_font_weight ); ?>;color:<?php echo esc_attr( $heading_color ); ?>;text-align:center;mso-line-height-rule:exactly;">
+												<?php echo esc_html( (string) $email_heading ); ?>
+											</h1>
+										<?php endif; ?>
+
+										<?php foreach ( $content_1_lines as $line ) :
+											$line = trim( (string) $line );
+											if ( '' === $line ) { continue; }
+											?>
+											<p class="kdna-events-email-body-text" style="margin:0 0 12px;font-family:<?php echo esc_attr( $body_stack ); ?>;font-size:<?php echo esc_attr( (string) $body_font_size ); ?>px;line-height:<?php echo esc_attr( $body_line_height ); ?>;color:<?php echo esc_attr( $body_color ); ?>;text-align:left;mso-line-height-rule:exactly;">
+												<?php echo esc_html( $line ); ?>
+											</p>
+										<?php endforeach; ?>
+
+										<?php include __DIR__ . '/partials/event-details.php'; ?>
+
+										<?php include __DIR__ . '/partials/virtual-button.php'; ?>
+
+										<?php foreach ( $content_2_lines as $line ) :
+											$line = trim( (string) $line );
+											if ( '' === $line ) { continue; }
+											?>
+											<p class="kdna-events-email-body-text" style="margin:0 0 12px;font-family:<?php echo esc_attr( $body_stack ); ?>;font-size:<?php echo esc_attr( (string) $body_font_size ); ?>px;line-height:<?php echo esc_attr( $body_line_height ); ?>;color:<?php echo esc_attr( $body_color ); ?>;text-align:left;mso-line-height-rule:exactly;">
+												<?php echo esc_html( $line ); ?>
+											</p>
+										<?php endforeach; ?>
 									</td>
 								</tr>
 							</table>
-						<?php endforeach; ?>
-
-						<?php if ( 'admin' !== $role ) : ?>
-							<p style="margin:20px 0 0 0;font-size:14px;color:#6b7280;line-height:1.5;">
-								<?php
-								printf(
-									/* translators: %s: support email */
-									esc_html__( 'Need help? Reply to this email or contact us at %s.', 'kdna-events' ),
-									esc_html( $support_email )
-								);
-								?>
-							</p>
-						<?php endif; ?>
-					</td>
-				</tr>
-
-				<tr>
-					<td style="padding:20px 28px;background-color:#f9fafb;color:#6b7280;font-size:12px;text-align:center;">
-						<?php
-						printf(
-							/* translators: 1: year, 2: site name */
-							esc_html__( '&copy; %1$s %2$s. All rights reserved.', 'kdna-events' ),
-							esc_html( (string) current_time( 'Y' ) ),
-							esc_html( $site_name )
-						);
-						?>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-</table>
+						</td>
+					</tr>
+					<?php include __DIR__ . '/partials/footer.php'; ?>
+				</table>
+			</td>
+		</tr>
+	</table>
 </body>
 </html>

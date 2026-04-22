@@ -1,19 +1,14 @@
 <?php
 /**
- * Admin + organiser notification email.
+ * Admin / organiser notification email template.
  *
- * Variables provided by KDNA_Events_Emails::load_template:
+ * Leaner than the customer email. The logo still sits on the grey
+ * page background above the white card so branding stays consistent,
+ * but inside the card we show a compact summary table, an attendee
+ * table and a short footer, no hero image or decorative heading.
  *
- * @var object             $order
- * @var array<int,object>  $tickets
- * @var array<string,mixed> $context
- * @var string             $role
- * @var string             $site_name
- * @var string             $site_url
- * @var string             $total_display
- * @var string             $currency
- *
- * Compact, table-style summary sized for an email preview pane.
+ * Variables set up by
+ * KDNA_Events_Emails::render_admin_notification_html().
  *
  * @package KDNA_Events
  */
@@ -21,106 +16,77 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+$content_max   = max( 480, min( 720, (int) ( $design['kdna_events_email_content_max_width'] ?? 600 ) ) );
+$page_bg       = (string) ( $design['kdna_events_email_color_page_bg'] ?? '#EFEFEF' );
+$card_bg       = (string) ( $design['kdna_events_email_color_content_bg'] ?? '#FFFFFF' );
+$heading_color = (string) ( $design['kdna_events_email_color_heading'] ?? '#1A1A1A' );
+$body_color    = (string) ( $design['kdna_events_email_color_body'] ?? '#555555' );
+$muted_color   = (string) ( $design['kdna_events_email_color_muted'] ?? '#888888' );
+$card_radius   = (int) ( $design['kdna_events_email_card_border_radius'] ?? 8 );
+$pad_y         = (int) ( $design['kdna_events_email_content_padding_y'] ?? 32 );
+$pad_x         = (int) ( $design['kdna_events_email_content_padding_x'] ?? 28 );
+
+include __DIR__ . '/partials/doctype-head.php';
 ?>
-<!DOCTYPE html>
-<html lang="<?php echo esc_attr( get_locale() ); ?>">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title><?php echo esc_html( $context['event_title'] ); ?></title>
-</head>
-<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;color:#1f2937;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f4f6;">
-	<tr>
-		<td align="center" style="padding:24px;">
-			<table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;width:100%;background-color:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #e5e7eb;">
-				<tr>
-					<td style="padding:18px 22px;background-color:#111827;color:#ffffff;font-size:14px;letter-spacing:0.05em;text-transform:uppercase;">
-						<?php esc_html_e( 'New booking received', 'kdna-events' ); ?>
-					</td>
-				</tr>
-				<tr>
-					<td style="padding:22px;">
-						<h2 style="margin:0 0 10px 0;font-size:18px;color:#111827;">
-							<?php echo esc_html( $context['event_title'] ); ?>
-						</h2>
-						<p style="margin:0 0 14px 0;font-size:14px;color:#4b5563;">
-							<?php echo esc_html( '' !== $context['event_date'] ? $context['event_date'] : __( 'Date TBA', 'kdna-events' ) ); ?>
-						</p>
-
-						<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px 0;border-collapse:collapse;">
-							<tr>
-								<td style="padding:6px 0;width:40%;font-size:13px;color:#6b7280;"><?php esc_html_e( 'Reference', 'kdna-events' ); ?></td>
-								<td style="padding:6px 0;font-size:14px;color:#111827;font-weight:600;"><?php echo esc_html( $context['order_ref'] ); ?></td>
-							</tr>
-							<tr>
-								<td style="padding:6px 0;width:40%;font-size:13px;color:#6b7280;"><?php esc_html_e( 'Purchaser', 'kdna-events' ); ?></td>
-								<td style="padding:6px 0;font-size:14px;color:#111827;">
-									<?php echo esc_html( (string) $order->purchaser_name ); ?>
-									&middot;
-									<a href="mailto:<?php echo esc_attr( (string) $order->purchaser_email ); ?>" style="color:#1d4ed8;text-decoration:none;">
-										<?php echo esc_html( (string) $order->purchaser_email ); ?>
-									</a>
-								</td>
-							</tr>
-							<?php if ( ! empty( $order->purchaser_phone ) ) : ?>
+<body class="kdna-events-email-body" style="margin:0;padding:0;background-color:<?php echo esc_attr( $page_bg ); ?>;">
+	<?php include __DIR__ . '/partials/preheader.php'; ?>
+	<table role="presentation" class="kdna-events-email-wrapper" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="<?php echo esc_attr( $page_bg ); ?>" style="width:100%;background-color:<?php echo esc_attr( $page_bg ); ?>;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" width="<?php echo esc_attr( (string) $content_max ); ?>" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:<?php echo esc_attr( (string) $content_max ); ?>px;margin:0 auto;">
+					<?php include __DIR__ . '/partials/logo.php'; ?>
+					<tr>
+						<td style="padding:0 12px 0;">
+							<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="<?php echo esc_attr( $card_bg ); ?>" style="background-color:<?php echo esc_attr( $card_bg ); ?>;border-radius:<?php echo esc_attr( (string) $card_radius ); ?>px;overflow:hidden;">
 								<tr>
-									<td style="padding:6px 0;width:40%;font-size:13px;color:#6b7280;"><?php esc_html_e( 'Phone', 'kdna-events' ); ?></td>
-									<td style="padding:6px 0;font-size:14px;color:#111827;"><?php echo esc_html( (string) $order->purchaser_phone ); ?></td>
-								</tr>
-							<?php endif; ?>
-							<tr>
-								<td style="padding:6px 0;width:40%;font-size:13px;color:#6b7280;"><?php esc_html_e( 'Quantity', 'kdna-events' ); ?></td>
-								<td style="padding:6px 0;font-size:14px;color:#111827;"><?php echo esc_html( (string) (int) $order->quantity ); ?></td>
-							</tr>
-							<tr>
-								<td style="padding:6px 0;width:40%;font-size:13px;color:#6b7280;"><?php esc_html_e( 'Total', 'kdna-events' ); ?></td>
-								<td style="padding:6px 0;font-size:14px;color:#111827;font-weight:600;"><?php echo esc_html( $total_display ); ?></td>
-							</tr>
-							<tr>
-								<td style="padding:6px 0;width:40%;font-size:13px;color:#6b7280;"><?php esc_html_e( 'Status', 'kdna-events' ); ?></td>
-								<td style="padding:6px 0;font-size:14px;color:#111827;"><?php echo esc_html( ucfirst( (string) $order->status ) ); ?></td>
-							</tr>
-						</table>
+									<td style="padding:<?php echo esc_attr( (string) $pad_y ); ?>px <?php echo esc_attr( (string) $pad_x ); ?>px;">
+										<h1 style="margin:0 0 8px;font-family:<?php echo esc_attr( $heading_stack ); ?>;font-size:22px;line-height:1.3;font-weight:700;color:<?php echo esc_attr( $heading_color ); ?>;">
+											<?php echo esc_html( (string) $admin_heading ); ?>
+										</h1>
+										<p style="margin:0 0 18px;font-family:<?php echo esc_attr( $body_stack ); ?>;font-size:15px;line-height:1.55;color:<?php echo esc_attr( $body_color ); ?>;">
+											<?php echo esc_html( (string) $admin_intro ); ?>
+										</p>
 
-						<?php if ( ! empty( $tickets ) ) : ?>
-							<p style="margin:14px 0 6px 0;font-size:13px;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;">
-								<?php esc_html_e( 'Attendees', 'kdna-events' ); ?>
-							</p>
-							<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #e5e7eb;border-radius:6px;">
-								<?php foreach ( $tickets as $ticket ) : ?>
-									<tr>
-										<td style="padding:8px 12px;border-bottom:1px solid #f3f4f6;font-size:13px;color:#111827;">
-											<?php echo esc_html( (string) $ticket->attendee_name ); ?>
-											<?php if ( ! empty( $ticket->attendee_email ) ) : ?>
-												<span style="color:#6b7280;">&middot; <?php echo esc_html( (string) $ticket->attendee_email ); ?></span>
-											<?php endif; ?>
-										</td>
-										<td style="padding:8px 12px;border-bottom:1px solid #f3f4f6;text-align:right;">
-											<span style="display:inline-block;padding:3px 8px;background-color:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;letter-spacing:0.04em;color:#111827;">
-												<?php echo esc_html( (string) $ticket->ticket_code ); ?>
-											</span>
-										</td>
-									</tr>
-								<?php endforeach; ?>
+										<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="kdna-events-email-table-admin" style="width:100%;border-collapse:collapse;font-family:<?php echo esc_attr( $body_stack ); ?>;font-size:14px;color:<?php echo esc_attr( $heading_color ); ?>;">
+											<?php foreach ( $summary_rows as $label => $value ) :
+												if ( '' === (string) $value ) { continue; }
+												?>
+												<tr>
+													<th scope="row" align="left" style="padding:10px 12px;border-bottom:1px solid #E5E5E5;background:#F8F8F8;font-weight:600;color:<?php echo esc_attr( $body_color ); ?>;width:35%;text-align:left;vertical-align:top;"><?php echo esc_html( (string) $label ); ?></th>
+													<td style="padding:10px 12px;border-bottom:1px solid #E5E5E5;text-align:left;vertical-align:top;"><?php echo esc_html( (string) $value ); ?></td>
+												</tr>
+											<?php endforeach; ?>
+										</table>
+
+										<?php if ( ! empty( $attendee_rows ) ) : ?>
+											<h2 style="margin:24px 0 8px;font-family:<?php echo esc_attr( $heading_stack ); ?>;font-size:16px;font-weight:600;color:<?php echo esc_attr( $heading_color ); ?>;">
+												<?php esc_html_e( 'Attendees', 'kdna-events' ); ?>
+											</h2>
+											<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;font-family:<?php echo esc_attr( $body_stack ); ?>;font-size:14px;color:<?php echo esc_attr( $heading_color ); ?>;">
+												<tr>
+													<th align="left" style="padding:10px 12px;border-bottom:1px solid #E5E5E5;background:#F8F8F8;font-weight:600;color:<?php echo esc_attr( $body_color ); ?>;text-align:left;"><?php esc_html_e( 'Name', 'kdna-events' ); ?></th>
+													<th align="left" style="padding:10px 12px;border-bottom:1px solid #E5E5E5;background:#F8F8F8;font-weight:600;color:<?php echo esc_attr( $body_color ); ?>;text-align:left;"><?php esc_html_e( 'Email', 'kdna-events' ); ?></th>
+													<th align="left" style="padding:10px 12px;border-bottom:1px solid #E5E5E5;background:#F8F8F8;font-weight:600;color:<?php echo esc_attr( $body_color ); ?>;text-align:left;"><?php esc_html_e( 'Ticket code', 'kdna-events' ); ?></th>
+												</tr>
+												<?php foreach ( $attendee_rows as $row ) : ?>
+													<tr>
+														<td style="padding:10px 12px;border-bottom:1px solid #E5E5E5;text-align:left;vertical-align:top;"><?php echo esc_html( (string) ( $row['name'] ?? '' ) ); ?></td>
+														<td style="padding:10px 12px;border-bottom:1px solid #E5E5E5;text-align:left;vertical-align:top;"><?php echo esc_html( (string) ( $row['email'] ?? '' ) ); ?></td>
+														<td style="padding:10px 12px;border-bottom:1px solid #E5E5E5;text-align:left;vertical-align:top;font-family:<?php echo esc_attr( (string) ( $design['kdna_events_email_monospace_font'] ?? 'monospace' ) ); ?>;"><?php echo esc_html( (string) ( $row['ticket_code'] ?? '' ) ); ?></td>
+													</tr>
+												<?php endforeach; ?>
+											</table>
+										<?php endif; ?>
+									</td>
+								</tr>
 							</table>
-						<?php endif; ?>
-					</td>
-				</tr>
-				<tr>
-					<td style="padding:14px 22px;background-color:#f9fafb;color:#6b7280;font-size:12px;">
-						<?php
-						printf(
-							/* translators: %s: site name */
-							esc_html__( 'Sent by %s', 'kdna-events' ),
-							esc_html( $site_name )
-						);
-						?>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-</table>
+						</td>
+					</tr>
+					<?php include __DIR__ . '/partials/footer.php'; ?>
+				</table>
+			</td>
+		</tr>
+	</table>
 </body>
 </html>

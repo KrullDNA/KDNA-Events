@@ -104,6 +104,13 @@ class KDNA_Events_Admin {
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME );
 
 		$subtitle             = (string) get_post_meta( $post->ID, '_kdna_event_subtitle', true );
+		$email_image_id       = (int) get_post_meta( $post->ID, '_kdna_event_image', true );
+		$email_image_url      = $email_image_id ? (string) wp_get_attachment_image_url( $email_image_id, 'medium' ) : '';
+		$email_heading_ov     = (string) get_post_meta( $post->ID, '_kdna_event_email_heading', true );
+		$email_subject_ov     = (string) get_post_meta( $post->ID, '_kdna_event_email_subject', true );
+		$email_content_1_ov   = (string) get_post_meta( $post->ID, '_kdna_event_email_content_1', true );
+		$email_content_2_ov   = (string) get_post_meta( $post->ID, '_kdna_event_email_content_2', true );
+		$email_footer_ov      = (string) get_post_meta( $post->ID, '_kdna_event_email_footer_text', true );
 		$start                = (string) get_post_meta( $post->ID, '_kdna_event_start', true );
 		$end                  = (string) get_post_meta( $post->ID, '_kdna_event_end', true );
 		$timezone             = (string) get_post_meta( $post->ID, '_kdna_event_timezone', true );
@@ -182,6 +189,30 @@ class KDNA_Events_Admin {
 							<?php echo wp_timezone_choice( $timezone, get_user_locale() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</select>
 						<p class="description"><?php esc_html_e( 'Defaults to the site timezone.', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_event_image_button"><?php esc_html_e( 'Email Header Image', 'kdna-events' ); ?></label></th>
+					<td>
+						<div class="kdna-events-email-image-field" data-kdna-events-email-image>
+							<input type="hidden" id="kdna_event_image" name="kdna_event_image" value="<?php echo esc_attr( (string) $email_image_id ); ?>" data-kdna-events-email-image-input />
+							<div class="kdna-events-email-image-field__preview" data-kdna-events-email-image-preview>
+								<?php if ( '' !== $email_image_url ) : ?>
+									<img src="<?php echo esc_url( $email_image_url ); ?>" alt="" />
+								<?php endif; ?>
+							</div>
+							<p>
+								<button type="button" class="button" id="kdna_event_image_button" data-kdna-events-email-image-select>
+									<?php echo '' !== $email_image_url ? esc_html__( 'Change image', 'kdna-events' ) : esc_html__( 'Select image', 'kdna-events' ); ?>
+								</button>
+								<button type="button" class="button-link-delete" data-kdna-events-email-image-remove <?php echo '' === $email_image_url ? 'hidden' : ''; ?>>
+									<?php esc_html_e( 'Remove', 'kdna-events' ); ?>
+								</button>
+							</p>
+							<p class="description">
+								<?php esc_html_e( 'Shown at the top of the booking confirmation email. Recommended size 1200x600px (2x for retina), minimum 600x300px. JPG or PNG.', 'kdna-events' ); ?>
+							</p>
+						</div>
 					</td>
 				</tr>
 				</tbody>
@@ -365,6 +396,50 @@ class KDNA_Events_Admin {
 				</tbody>
 			</table>
 
+			<h3 class="kdna-events-section-heading"><?php esc_html_e( 'Email Overrides', 'kdna-events' ); ?></h3>
+			<p class="description" style="max-width:64em;">
+				<?php esc_html_e( 'Leave any field blank to fall back to the global default set under KDNA Events, Settings, Email Design. Merge tags like {event_title}, {attendee_name}, {order_ref}, {event_date}, {event_time}, {event_type}, {event_location}, {organiser_name} are all available.', 'kdna-events' ); ?>
+			</p>
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><label for="kdna_event_email_subject"><?php esc_html_e( 'Email subject line', 'kdna-events' ); ?></label></th>
+					<td>
+						<input type="text" class="regular-text" id="kdna_event_email_subject" name="kdna_event_email_subject" value="<?php echo esc_attr( $email_subject_ov ); ?>" />
+						<p class="description"><?php esc_html_e( 'Subject line used when the booking confirmation for this event is sent. Leave blank to use the global default.', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_event_email_heading"><?php esc_html_e( 'Email heading', 'kdna-events' ); ?></label></th>
+					<td>
+						<input type="text" class="regular-text" id="kdna_event_email_heading" name="kdna_event_email_heading" value="<?php echo esc_attr( $email_heading_ov ); ?>" />
+						<p class="description"><?php esc_html_e( 'Large heading at the top of the email body. Leave blank to use the global default.', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_event_email_content_1"><?php esc_html_e( 'Email content 1', 'kdna-events' ); ?></label></th>
+					<td>
+						<textarea class="large-text" rows="3" id="kdna_event_email_content_1" name="kdna_event_email_content_1"><?php echo esc_textarea( $email_content_1_ov ); ?></textarea>
+						<p class="description"><?php esc_html_e( 'Intro paragraph shown under the heading, above the event details row.', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_event_email_content_2"><?php esc_html_e( 'Email content 2', 'kdna-events' ); ?></label></th>
+					<td>
+						<textarea class="large-text" rows="3" id="kdna_event_email_content_2" name="kdna_event_email_content_2"><?php echo esc_textarea( $email_content_2_ov ); ?></textarea>
+						<p class="description"><?php esc_html_e( 'Closing paragraph shown below the Virtual Event button.', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_event_email_footer_text"><?php esc_html_e( 'Email footer text', 'kdna-events' ); ?></label></th>
+					<td>
+						<textarea class="large-text" rows="3" id="kdna_event_email_footer_text" name="kdna_event_email_footer_text"><?php echo esc_textarea( $email_footer_ov ); ?></textarea>
+						<p class="description"><?php esc_html_e( 'Fine print shown below the white content card. Leave blank to use the global footer text from Email Design settings.', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+
 			<h3 class="kdna-events-section-heading"><?php esc_html_e( 'Custom Attendee Fields', 'kdna-events' ); ?></h3>
 			<p class="description">
 				<?php
@@ -493,6 +568,32 @@ class KDNA_Events_Admin {
 		// Subtitle.
 		$subtitle = isset( $_POST['kdna_event_subtitle'] ) ? sanitize_text_field( wp_unslash( $_POST['kdna_event_subtitle'] ) ) : '';
 		update_post_meta( $post_id, '_kdna_event_subtitle', $subtitle );
+
+		// Email Header Image (attachment ID).
+		$email_image_id = isset( $_POST['kdna_event_image'] ) ? absint( wp_unslash( $_POST['kdna_event_image'] ) ) : 0;
+		if ( $email_image_id && 'attachment' !== get_post_type( $email_image_id ) ) {
+			$email_image_id = 0;
+		}
+		update_post_meta( $post_id, '_kdna_event_image', $email_image_id );
+
+		// Per-event email overrides (single line fields).
+		foreach ( array(
+			'kdna_event_email_subject' => '_kdna_event_email_subject',
+			'kdna_event_email_heading' => '_kdna_event_email_heading',
+		) as $post_key => $meta_key ) {
+			$value = isset( $_POST[ $post_key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $post_key ] ) ) : '';
+			update_post_meta( $post_id, $meta_key, $value );
+		}
+
+		// Per-event email overrides (multi-line fields).
+		foreach ( array(
+			'kdna_event_email_content_1'    => '_kdna_event_email_content_1',
+			'kdna_event_email_content_2'    => '_kdna_event_email_content_2',
+			'kdna_event_email_footer_text'  => '_kdna_event_email_footer_text',
+		) as $post_key => $meta_key ) {
+			$value = isset( $_POST[ $post_key ] ) ? sanitize_textarea_field( wp_unslash( $_POST[ $post_key ] ) ) : '';
+			update_post_meta( $post_id, $meta_key, $value );
+		}
 
 		// Start / End / Registration window, stored as Y-m-d\TH:i.
 		foreach ( array(
@@ -850,6 +951,9 @@ class KDNA_Events_Admin {
 			array(),
 			KDNA_EVENTS_VERSION
 		);
+
+		// The Email Header Image field on the event meta box uses wp.media.
+		wp_enqueue_media();
 
 		wp_enqueue_script(
 			'kdna-events-admin',

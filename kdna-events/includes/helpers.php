@@ -45,6 +45,215 @@ function kdna_events_get_event_meta( $post_id, $key, $default = '' ) {
 }
 
 /**
+ * Resolve the URL of the email header image for an event.
+ *
+ * Implements the fallback cascade from Brief A, Section 3:
+ *   1. The event's own _kdna_event_image attachment, cropped to
+ *      'kdna-events-email-header'.
+ *   2. The plugin-wide default attachment configured in the Email
+ *      Design settings tab, cropped to the same size.
+ *   3. Empty string, meaning the caller should hide the header block.
+ *
+ * If the 'kdna-events-email-header' crop has not been generated yet
+ * (for example the image was uploaded before the plugin registered
+ * the size) the helper falls back to the built-in 'large' size so the
+ * email still has an image, and schedules a background regeneration
+ * for the attachment via wp_schedule_single_event.
+ *
+ * @param int $event_id Event post ID.
+ * @return string Absolute URL, or empty string.
+ */
+function kdna_events_get_email_header_image_url( $event_id ) {
+	$event_id = absint( $event_id );
+
+	$candidates = array();
+
+	$event_attachment_id = $event_id ? (int) get_post_meta( $event_id, '_kdna_event_image', true ) : 0;
+	if ( $event_attachment_id ) {
+		$candidates[] = $event_attachment_id;
+	}
+
+	$default_attachment_id = (int) get_option( 'kdna_events_email_default_header_image', 0 );
+	if ( $default_attachment_id && $default_attachment_id !== $event_attachment_id ) {
+		$candidates[] = $default_attachment_id;
+	}
+
+	foreach ( $candidates as $attachment_id ) {
+		if ( 'attachment' !== get_post_type( $attachment_id ) ) {
+			continue;
+		}
+
+		$url = wp_get_attachment_image_url( $attachment_id, 'kdna-events-email-header' );
+		if ( $url ) {
+			return $url;
+		}
+
+		// Cropped size missing. Queue a regeneration and fall back to 'large'.
+		if ( ! wp_next_scheduled( 'kdna_events_regenerate_email_image_crops', array( $attachment_id ) ) ) {
+			wp_schedule_single_event( time() + 10, 'kdna_events_regenerate_email_image_crops', array( $attachment_id ) );
+		}
+
+		$fallback = wp_get_attachment_image_url( $attachment_id, 'large' );
+		if ( $fallback ) {
+			return $fallback;
+		}
+
+		$full = wp_get_attachment_url( $attachment_id );
+		if ( $full ) {
+			return (string) $full;
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Regenerate the 'kdna-events-email-header' crop for one or many attachments.
+ *
+ * Invoked by the wp_schedule_single_event queued on plugin activation,
+ * by the v1.1 upgrade hook, and on demand when
+ * kdna_events_get_email_header_image_url finds a missing crop.
+ *
+ * Called with no argument it sweeps every event that has an
+ * _kdna_event_image set plus the plugin-wide default and regenerates
+ * their metadata. Called with an explicit attachment ID it limits the
+ * work to that one image.
+ *
+ * @param int $attachment_id Optional. Attachment to regenerate.
+ * @return void
+ */
+function kdna_events_regenerate_email_image_crops( $attachment_id = 0 ) {
+	$attachment_id = absint( $attachment_id );
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+
+	$ids = array();
+
+	if ( $attachment_id ) {
+		$ids[] = $attachment_id;
+	} else {
+		$posts = get_posts(
+			array(
+				'post_type'      => 'kdna_event',
+				'post_status'    => 'any',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					array(
+						'key'     => '_kdna_event_image',
+						'value'   => '0',
+						'compare' => '!=',
+					),
+				),
+			)
+		);
+		foreach ( $posts as $post_id ) {
+			$id = (int) get_post_meta( $post_id, '_kdna_event_image', true );
+			if ( $id ) {
+				$ids[] = $id;
+			}
+		}
+		$default_id = (int) get_option( 'kdna_events_email_default_header_image', 0 );
+		if ( $default_id ) {
+			$ids[] = $default_id;
+		}
+	}
+
+	$ids = array_unique( array_filter( $ids ) );
+
+	foreach ( $ids as $id ) {
+		$file = get_attached_file( $id );
+		if ( ! $file || ! file_exists( $file ) ) {
+			continue;
+		}
+		$meta = wp_generate_attachment_metadata( $id, $file );
+		if ( is_array( $meta ) ) {
+			wp_update_attachment_metadata( $id, $meta );
+		}
+	}
+}
+add_action( 'kdna_events_regenerate_email_image_crops', 'kdna_events_regenerate_email_image_crops' );
+
+/**
+ * Pre-compute a solid hex colour that approximates a tint of $hex at
+ * $alpha (0.0-1.0) composited over a solid $background hex.
+ *
+ * Email clients like Outlook do not support rgba or hsla, so semi-
+ * transparent accents must be flattened to a solid hex at render time.
+ *
+ * @param string $hex        Foreground hex colour, e.g. #2E75B6.
+ * @param float  $alpha      Opacity 0..1.
+ * @param string $background Background hex colour to composite against.
+ * @return string Solid hex colour including leading '#'.
+ */
+function kdna_events_mix_hex( $hex, $alpha, $background = '#FFFFFF' ) {
+	$parse = static function ( $candidate ) {
+		$candidate = trim( (string) $candidate );
+		if ( '' === $candidate ) {
+			return array( 255, 255, 255 );
+		}
+		if ( '#' === $candidate[0] ) {
+			$candidate = substr( $candidate, 1 );
+		}
+		if ( 3 === strlen( $candidate ) ) {
+			$candidate = $candidate[0] . $candidate[0] . $candidate[1] . $candidate[1] . $candidate[2] . $candidate[2];
+		}
+		if ( 6 !== strlen( $candidate ) || ! ctype_xdigit( $candidate ) ) {
+			return array( 255, 255, 255 );
+		}
+		return array(
+			hexdec( substr( $candidate, 0, 2 ) ),
+			hexdec( substr( $candidate, 2, 2 ) ),
+			hexdec( substr( $candidate, 4, 2 ) ),
+		);
+	};
+
+	$alpha = max( 0.0, min( 1.0, (float) $alpha ) );
+	$fg    = $parse( $hex );
+	$bg    = $parse( $background );
+
+	$r = (int) round( $fg[0] * $alpha + $bg[0] * ( 1 - $alpha ) );
+	$g = (int) round( $fg[1] * $alpha + $bg[1] * ( 1 - $alpha ) );
+	$b = (int) round( $fg[2] * $alpha + $bg[2] * ( 1 - $alpha ) );
+
+	return '#' . strtoupper( sprintf( '%02X%02X%02X', $r, $g, $b ) );
+}
+
+/**
+ * Apply merge tags to a string using the KDNA Events email context.
+ *
+ * Any {key} token in $string that matches a key in $context is
+ * replaced with the context value. Tokens for keys that do not exist
+ * or are empty render as empty so emails never show '{foo}' literals.
+ *
+ * @param string $string  Raw string containing {tag} tokens.
+ * @param array  $context Key/value map of merge tags.
+ * @return string
+ */
+function kdna_events_render_merge_tags( $string, $context ) {
+	$string  = (string) $string;
+	$context = is_array( $context ) ? $context : array();
+
+	if ( '' === $string || false === strpos( $string, '{' ) ) {
+		return $string;
+	}
+
+	return preg_replace_callback(
+		'/\{([a-z0-9_]+)\}/i',
+		static function ( $matches ) use ( $context ) {
+			$key = strtolower( $matches[1] );
+			if ( array_key_exists( $key, $context ) ) {
+				$value = $context[ $key ];
+				if ( is_scalar( $value ) ) {
+					return (string) $value;
+				}
+			}
+			return '';
+		},
+		$string
+	);
+}
+
+/**
  * Return the parsed location array for an event.
  *
  * If the event links to a shared Location CPT via

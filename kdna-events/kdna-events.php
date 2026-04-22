@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       KDNA Events
  * Plugin URI:        https://krulldna.com/
- * Description:       Events management and ticketing for WordPress, delivered entirely as Elementor widgets. Paid events via Stripe, free events supported, pluggable CRM framework.
- * Version:           1.0.0
+ * Description:       Events management and ticketing for WordPress, delivered entirely as Elementor widgets. Paid events via Stripe, free events supported, pluggable CRM framework, fully branded HTML emails.
+ * Version:           1.1.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            KDNA
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Plugin constants.
  */
-define( 'KDNA_EVENTS_VERSION', '1.0.0' );
+define( 'KDNA_EVENTS_VERSION', '1.1.0' );
 define( 'KDNA_EVENTS_FILE', __FILE__ );
 define( 'KDNA_EVENTS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KDNA_EVENTS_URL', plugin_dir_url( __FILE__ ) );
@@ -64,6 +64,16 @@ function kdna_events_activate() {
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-db.php';
 	KDNA_Events_DB::install();
 	flush_rewrite_rules();
+
+	// Register the email header image size now so cropped versions of any
+	// freshly uploaded image are generated. Also schedule a one-time
+	// backfill so existing uploads get their new crop.
+	if ( function_exists( 'add_image_size' ) ) {
+		add_image_size( 'kdna-events-email-header', 1200, 600, array( 'center', 'center' ) );
+	}
+	if ( ! wp_next_scheduled( 'kdna_events_regenerate_email_image_crops' ) ) {
+		wp_schedule_single_event( time() + 30, 'kdna_events_regenerate_email_image_crops' );
+	}
 }
 register_activation_hook( __FILE__, 'kdna_events_activate' );
 
@@ -89,6 +99,21 @@ function kdna_events_load_textdomain() {
 	load_plugin_textdomain( 'kdna-events', false, dirname( KDNA_EVENTS_BASENAME ) . '/languages' );
 }
 add_action( 'plugins_loaded', 'kdna_events_load_textdomain' );
+
+/**
+ * Register the custom image size used for branded email headers.
+ *
+ * 1200x600 is the 2:1 banner ratio rendered at 2x so it looks sharp on
+ * retina displays. Registering on plugins_loaded (not only on activation)
+ * keeps the crop available on every request so WordPress generates the
+ * cropped version whenever an image is uploaded.
+ *
+ * @return void
+ */
+function kdna_events_register_email_image_size() {
+	add_image_size( 'kdna-events-email-header', 1200, 600, array( 'center', 'center' ) );
+}
+add_action( 'plugins_loaded', 'kdna_events_register_email_image_size', 5 );
 
 /**
  * Bootstrap the plugin after all other plugins are loaded.
