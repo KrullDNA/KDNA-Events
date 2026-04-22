@@ -965,7 +965,7 @@ class KDNA_Events_Invoices {
 		// at render time.
 		$margin = max( 5, min( 40, (int) get_option( 'kdna_events_invoice_design_page_margin', 20 ) ) );
 		$padding_css = sprintf(
-			'<style>@media screen { html, body { margin: 0; padding: 0; background: #eee; } body { padding: %1$dmm !important; box-sizing: border-box; background: #ffffff !important; min-height: 297mm; } }</style>',
+			'<style>@media screen { html, body { margin: 0; padding: 0; background: #eee; } body { padding: %1$dmm !important; box-sizing: border-box; background: #ffffff !important; min-height: 297mm; position: relative; } .inv-footer { position: absolute !important; left: 0; right: 0; bottom: %1$dmm !important; padding: 0 %1$dmm !important; } .inv-paid-stamp { position: absolute !important; } }</style>',
 			$margin
 		);
 		$html = str_replace( '</head>', $padding_css . '</head>', $html );
