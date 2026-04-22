@@ -178,12 +178,54 @@
 	color: #fff;
 }
 
+.kdna-events-email-design-preview__viewport {
+	transition: max-width 0.25s ease;
+	background: #e8e8e8;
+	padding: 4px;
+	border-radius: 4px;
+}
+
 .kdna-events-email-design-preview__frame {
 	width: 100%;
 	height: 720px;
 	border: 1px solid #dcdcde;
 	border-radius: 4px;
 	background: #f4f4f4;
+	color-scheme: light;
+}
+
+.kdna-events-email-design-preview__toggles {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	margin: 6px 0 10px;
+	flex-wrap: wrap;
+}
+
+.kdna-events-email-design-preview__toggles-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: #1d2327;
+	margin-right: 4px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.kdna-events-email-design-preview__toggle {
+	cursor: pointer;
+	padding: 4px 12px;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 999px;
+	font-size: 12px;
+	color: #1d2327;
+	line-height: 1.4;
+}
+
+.kdna-events-email-design-preview__toggle.is-active {
+	background: #1d4ed8;
+	border-color: #1d4ed8;
+	color: #fff;
 }
 
 .kdna-events-email-design-preview__send {

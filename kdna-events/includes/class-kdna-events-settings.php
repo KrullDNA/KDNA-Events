@@ -146,6 +146,10 @@ class KDNA_Events_Settings {
 			),
 
 			// Admin notification strings.
+			'kdna_events_email_admin_subject'          => array(
+				'type'    => 'string',
+				'default' => 'New booking: {event_title} ({quantity} tickets)',
+			),
 			'kdna_events_email_admin_heading'          => array(
 				'type'    => 'string',
 				'default' => 'New booking received',
@@ -153,6 +157,26 @@ class KDNA_Events_Settings {
 			'kdna_events_email_admin_intro'            => array(
 				'type'    => 'string',
 				'default' => 'A new booking has been placed for {event_title}.',
+			),
+			'kdna_events_email_admin_summary_heading'  => array(
+				'type'    => 'string',
+				'default' => 'Booking Summary',
+			),
+			'kdna_events_email_admin_event_heading'    => array(
+				'type'    => 'string',
+				'default' => 'Event Details',
+			),
+			'kdna_events_email_admin_attendees_heading' => array(
+				'type'    => 'string',
+				'default' => 'Attendees',
+			),
+			'kdna_events_email_admin_footer_note'      => array(
+				'type'    => 'string',
+				'default' => '',
+			),
+			'kdna_events_email_admin_header_compact'   => array(
+				'type'    => 'integer',
+				'default' => 1,
 			),
 		);
 	}
@@ -366,6 +390,62 @@ class KDNA_Events_Settings {
 				'type'              => 'integer',
 				'sanitize_callback' => array( __CLASS__, 'sanitize_positive_int' ),
 				'default'           => 10,
+			)
+		);
+
+		// Booking References.
+		register_setting(
+			'kdna_events_general',
+			'kdna_events_reference_prefix',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_reference_token' ),
+				'default'           => '',
+			)
+		);
+		register_setting(
+			'kdna_events_general',
+			'kdna_events_reference_suffix',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_reference_token' ),
+				'default'           => '',
+			)
+		);
+		register_setting(
+			'kdna_events_general',
+			'kdna_events_reference_include_year',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ),
+				'default'           => true,
+			)
+		);
+		register_setting(
+			'kdna_events_general',
+			'kdna_events_reference_pad_width',
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_pad_width' ),
+				'default'           => 6,
+			)
+		);
+		register_setting(
+			'kdna_events_general',
+			'kdna_events_reference_format',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_reference_format' ),
+				'default'           => 'sequential',
+			)
+		);
+		register_setting(
+			'kdna_events_general',
+			'kdna_events_reference_next',
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_reference_next' ),
+				'default'           => 1,
 			)
 		);
 		// Send-related settings moved from the v1.0 General tab to the
@@ -585,6 +665,135 @@ class KDNA_Events_Settings {
 		if ( $int < 1 ) {
 			$int = 1;
 		}
+		return $int;
+	}
+
+	/**
+	 * Sanitise the prefix / suffix tokens for the booking reference.
+	 *
+	 * Allowed characters are ASCII letters, digits, and the safe
+	 * punctuation used in reference strings (dash, underscore, dot,
+	 * slash, hash, space). Anything else is dropped.
+	 *
+	 * @param mixed $value Raw input.
+	 * @return string
+	 */
+	public static function sanitize_reference_token( $value ) {
+		$value = trim( (string) $value );
+		$value = preg_replace( '/[^A-Za-z0-9_\-\.\/# ]/', '', $value );
+		return substr( (string) $value, 0, 24 );
+	}
+
+	/**
+	 * Clamp the padding width to 1..12.
+	 *
+	 * @param mixed $value Raw input.
+	 * @return int
+	 */
+	public static function sanitize_pad_width( $value ) {
+		$int = absint( $value );
+		if ( $int < 1 ) {
+			$int = 1;
+		}
+		if ( $int > 12 ) {
+			$int = 12;
+		}
+		return $int;
+	}
+
+	/**
+	 * Guard the booking reference format selector.
+	 *
+	 * @param mixed $value Raw input.
+	 * @return string
+	 */
+	public static function sanitize_reference_format( $value ) {
+		$value = (string) $value;
+		if ( 'random' === $value ) {
+			return 'random';
+		}
+		return 'sequential';
+	}
+
+	/**
+	 * Sanitise the 'Next reference number' counter with a collision guard.
+	 *
+	 * Admins can jump the counter forwards freely, but jumping backwards
+	 * onto a number that already exists in the orders table would
+	 * produce duplicate references. When that would happen we clamp the
+	 * value to the highest used number + 1 and flash an admin notice.
+	 *
+	 * @param mixed $value Raw input.
+	 * @return int
+	 */
+	public static function sanitize_reference_next( $value ) {
+		global $wpdb;
+
+		$int = absint( $value );
+		if ( $int < 1 ) {
+			$int = 1;
+		}
+
+		if ( ! class_exists( 'KDNA_Events_DB' ) ) {
+			return $int;
+		}
+
+		$table  = KDNA_Events_DB::orders_table();
+		$prefix = (string) get_option( 'kdna_events_reference_prefix', '' );
+		$suffix = (string) get_option( 'kdna_events_reference_suffix', '' );
+		$width  = max( 1, min( 12, (int) get_option( 'kdna_events_reference_pad_width', 6 ) ) );
+		$year   = (int) current_time( 'Y' );
+		$inc_y  = (bool) get_option( 'kdna_events_reference_include_year', true );
+
+		$candidate_body = str_pad( (string) $int, $width, '0', STR_PAD_LEFT );
+		$parts = array();
+		if ( '' !== $prefix ) {
+			$parts[] = $prefix;
+		}
+		if ( $inc_y ) {
+			$parts[] = (string) $year;
+		}
+		$parts[] = $candidate_body;
+		$candidate = implode( '-', $parts ) . $suffix;
+
+		$exists = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$table} WHERE order_reference = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$candidate
+			)
+		);
+
+		if ( $exists > 0 ) {
+			add_settings_error(
+				'kdna_events_reference_next',
+				'kdna_events_reference_collision',
+				__( 'The starting number you chose is already in use. KDNA Events advanced it to the next free number.', 'kdna-events' ),
+				'warning'
+			);
+			// Advance until we find a free slot.
+			$guard = 0;
+			do {
+				$int++;
+				$guard++;
+				$candidate_body = str_pad( (string) $int, $width, '0', STR_PAD_LEFT );
+				$parts          = array();
+				if ( '' !== $prefix ) {
+					$parts[] = $prefix;
+				}
+				if ( $inc_y ) {
+					$parts[] = (string) $year;
+				}
+				$parts[]   = $candidate_body;
+				$candidate = implode( '-', $parts ) . $suffix;
+				$exists    = (int) $wpdb->get_var(
+					$wpdb->prepare(
+						"SELECT COUNT(*) FROM {$table} WHERE order_reference = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+						$candidate
+					)
+				);
+			} while ( $exists > 0 && $guard < 1000 );
+		}
+
 		return $int;
 	}
 
@@ -925,6 +1134,104 @@ class KDNA_Events_Settings {
 				<td>
 					<input type="number" min="1" step="1" id="kdna_events_default_max_per_order" name="kdna_events_default_max_per_order" value="<?php echo esc_attr( (string) $max_per ); ?>" />
 					<p class="description"><?php esc_html_e( 'Fallback cap applied when an event does not set its own maximum per order.', 'kdna-events' ); ?></p>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+
+		<?php self::render_reference_settings(); ?>
+		<?php
+	}
+
+	/**
+	 * Render the Booking References settings block.
+	 *
+	 * Lives on the General tab so admins can set the prefix, suffix,
+	 * padding, starting number and sequential / random mode. A live
+	 * example string shows exactly what the next booking reference
+	 * will look like, which saves a lot of confused back-and-forth.
+	 *
+	 * @return void
+	 */
+	protected static function render_reference_settings() {
+		$prefix       = (string) get_option( 'kdna_events_reference_prefix', '' );
+		$suffix       = (string) get_option( 'kdna_events_reference_suffix', '' );
+		$include_year = (bool) get_option( 'kdna_events_reference_include_year', true );
+		$pad_width    = max( 1, min( 12, (int) get_option( 'kdna_events_reference_pad_width', 6 ) ) );
+		$format       = (string) get_option( 'kdna_events_reference_format', 'sequential' );
+		$next         = max( 1, (int) get_option( 'kdna_events_reference_next', 1 ) );
+
+		$year = (int) current_time( 'Y' );
+		$example_body = 'sequential' === $format
+			? str_pad( (string) $next, $pad_width, '0', STR_PAD_LEFT )
+			: strtoupper( wp_generate_password( 6, false, false ) );
+		$example_parts = array();
+		if ( '' !== $prefix ) {
+			$example_parts[] = $prefix;
+		}
+		if ( $include_year ) {
+			$example_parts[] = (string) $year;
+		}
+		$example_parts[] = $example_body;
+		$example = implode( '-', $example_parts ) . $suffix;
+		?>
+		<h2 class="title" style="margin-top:1.5em;"><?php esc_html_e( 'Booking References', 'kdna-events' ); ?></h2>
+		<p class="description" style="max-width:64em;">
+			<?php esc_html_e( 'Controls the booking reference shown on confirmation emails, Stripe Checkout and every admin screen. Existing references never change, only new bookings follow the new format.', 'kdna-events' ); ?>
+		</p>
+		<table class="form-table" role="presentation">
+			<tbody>
+			<tr>
+				<th scope="row"><label for="kdna_events_reference_prefix"><?php esc_html_e( 'Prefix', 'kdna-events' ); ?></label></th>
+				<td>
+					<input type="text" class="regular-text" id="kdna_events_reference_prefix" name="kdna_events_reference_prefix" value="<?php echo esc_attr( $prefix ); ?>" maxlength="24" />
+					<p class="description"><?php esc_html_e( 'Optional. Letters, digits, dash, underscore, dot, slash, hash, space. Leave blank for none.', 'kdna-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="kdna_events_reference_suffix"><?php esc_html_e( 'Suffix', 'kdna-events' ); ?></label></th>
+				<td>
+					<input type="text" class="regular-text" id="kdna_events_reference_suffix" name="kdna_events_reference_suffix" value="<?php echo esc_attr( $suffix ); ?>" maxlength="24" />
+					<p class="description"><?php esc_html_e( 'Optional. Appended after the number.', 'kdna-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Include year', 'kdna-events' ); ?></th>
+				<td>
+					<label>
+						<input type="checkbox" name="kdna_events_reference_include_year" value="1" <?php checked( $include_year ); ?> />
+						<?php esc_html_e( 'Insert the current 4-digit year between prefix and number.', 'kdna-events' ); ?>
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="kdna_events_reference_pad_width"><?php esc_html_e( 'Number padding width', 'kdna-events' ); ?></label></th>
+				<td>
+					<input type="number" min="1" max="12" step="1" id="kdna_events_reference_pad_width" name="kdna_events_reference_pad_width" value="<?php echo esc_attr( (string) $pad_width ); ?>" />
+					<p class="description"><?php esc_html_e( 'Zero-pads the sequential counter. 6 renders 1 as 000001.', 'kdna-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="kdna_events_reference_format"><?php esc_html_e( 'Format', 'kdna-events' ); ?></label></th>
+				<td>
+					<select id="kdna_events_reference_format" name="kdna_events_reference_format">
+						<option value="sequential" <?php selected( $format, 'sequential' ); ?>><?php esc_html_e( 'Sequential (000001, 000002, ...)', 'kdna-events' ); ?></option>
+						<option value="random" <?php selected( $format, 'random' ); ?>><?php esc_html_e( 'Random (6-char alphanumeric)', 'kdna-events' ); ?></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="kdna_events_reference_next"><?php esc_html_e( 'Next reference number', 'kdna-events' ); ?></label></th>
+				<td>
+					<input type="number" min="1" step="1" id="kdna_events_reference_next" name="kdna_events_reference_next" value="<?php echo esc_attr( (string) $next ); ?>" />
+					<p class="description"><?php esc_html_e( 'Used in Sequential mode. Set to 1000 and the next booking gets that number, then auto-increments from there. Jumping backwards onto an already-used number is auto-corrected forward.', 'kdna-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Example', 'kdna-events' ); ?></th>
+				<td>
+					<code style="font-size:14px;padding:6px 10px;background:#f6f7f7;border:1px solid #dcdcde;border-radius:4px;"><?php echo esc_html( $example ); ?></code>
+					<p class="description"><?php esc_html_e( 'Exact preview of the next generated reference. Save changes to update.', 'kdna-events' ); ?></p>
 				</td>
 			</tr>
 			</tbody>
@@ -2002,35 +2309,78 @@ class KDNA_Events_Settings {
 	protected static function render_email_design_controls_content( $d ) {
 		?>
 		<div class="kdna-events-email-design-section">
-			<h2><?php esc_html_e( 'Content', 'kdna-events' ); ?></h2>
+			<h2><?php esc_html_e( 'Customer Email Content', 'kdna-events' ); ?></h2>
 			<p class="description" style="max-width:64em;">
-				<?php esc_html_e( 'Defaults used when an event does not set its own override. Supports merge tags: {event_title}, {attendee_name}, {order_ref}, {event_date}, {event_time}, {event_type}, {event_location}, {organiser_name}, {purchaser_name}, {ticket_code}.', 'kdna-events' ); ?>
+				<?php esc_html_e( 'Defaults used when an event does not set its own override. Supports merge tags: {event_title}, {attendee_name}, {order_ref}, {event_date}, {event_time}, {event_type}, {event_location}, {organiser_name}, {purchaser_name}, {ticket_code}, {quantity}, {total}.', 'kdna-events' ); ?>
 			</p>
 			<table class="form-table" role="presentation">
 				<tbody>
 				<tr>
-					<th scope="row"><label for="kdna_events_email_subject_default"><?php esc_html_e( 'Email subject', 'kdna-events' ); ?></label></th>
+					<th scope="row"><label for="kdna_events_email_subject_default"><?php esc_html_e( 'Subject line', 'kdna-events' ); ?></label></th>
 					<td><input type="text" class="large-text" id="kdna_events_email_subject_default" name="kdna_events_email_subject_default" value="<?php echo esc_attr( (string) $d['kdna_events_email_subject_default'] ); ?>" data-kdna-preview-key="subject_default" /></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="kdna_events_email_heading_default"><?php esc_html_e( 'Email heading', 'kdna-events' ); ?></label></th>
+					<th scope="row"><label for="kdna_events_email_heading_default"><?php esc_html_e( 'Heading', 'kdna-events' ); ?></label></th>
 					<td><input type="text" class="large-text" id="kdna_events_email_heading_default" name="kdna_events_email_heading_default" value="<?php echo esc_attr( (string) $d['kdna_events_email_heading_default'] ); ?>" data-kdna-preview-key="heading_default" /></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="kdna_events_email_content_1_default"><?php esc_html_e( 'Email content 1', 'kdna-events' ); ?></label></th>
+					<th scope="row"><label for="kdna_events_email_content_1_default"><?php esc_html_e( 'Content 1', 'kdna-events' ); ?></label></th>
 					<td><textarea class="large-text" rows="3" id="kdna_events_email_content_1_default" name="kdna_events_email_content_1_default" data-kdna-preview-key="content_1_default"><?php echo esc_textarea( (string) $d['kdna_events_email_content_1_default'] ); ?></textarea></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="kdna_events_email_content_2_default"><?php esc_html_e( 'Email content 2', 'kdna-events' ); ?></label></th>
+					<th scope="row"><label for="kdna_events_email_content_2_default"><?php esc_html_e( 'Content 2', 'kdna-events' ); ?></label></th>
 					<td><textarea class="large-text" rows="3" id="kdna_events_email_content_2_default" name="kdna_events_email_content_2_default" data-kdna-preview-key="content_2_default"><?php echo esc_textarea( (string) $d['kdna_events_email_content_2_default'] ); ?></textarea></td>
 				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Admin Email Content', 'kdna-events' ); ?></h2>
+			<p class="description" style="max-width:64em;">
+				<?php esc_html_e( 'Internal notifications to the admin and optional organiser. Share the same branding as the customer email, differ only in layout and content structure.', 'kdna-events' ); ?>
+			</p>
+			<table class="form-table" role="presentation">
+				<tbody>
 				<tr>
-					<th scope="row"><label for="kdna_events_email_admin_heading"><?php esc_html_e( 'Admin notification heading', 'kdna-events' ); ?></label></th>
+					<th scope="row"><label for="kdna_events_email_admin_subject"><?php esc_html_e( 'Subject line', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="large-text" id="kdna_events_email_admin_subject" name="kdna_events_email_admin_subject" value="<?php echo esc_attr( (string) $d['kdna_events_email_admin_subject'] ); ?>" data-kdna-preview-key="admin_subject" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_admin_heading"><?php esc_html_e( 'Heading', 'kdna-events' ); ?></label></th>
 					<td><input type="text" class="large-text" id="kdna_events_email_admin_heading" name="kdna_events_email_admin_heading" value="<?php echo esc_attr( (string) $d['kdna_events_email_admin_heading'] ); ?>" data-kdna-preview-key="admin_heading" /></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="kdna_events_email_admin_intro"><?php esc_html_e( 'Admin notification intro', 'kdna-events' ); ?></label></th>
+					<th scope="row"><label for="kdna_events_email_admin_intro"><?php esc_html_e( 'Intro paragraph', 'kdna-events' ); ?></label></th>
 					<td><textarea class="large-text" rows="2" id="kdna_events_email_admin_intro" name="kdna_events_email_admin_intro" data-kdna-preview-key="admin_intro"><?php echo esc_textarea( (string) $d['kdna_events_email_admin_intro'] ); ?></textarea></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_admin_summary_heading"><?php esc_html_e( 'Booking summary section heading', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="large-text" id="kdna_events_email_admin_summary_heading" name="kdna_events_email_admin_summary_heading" value="<?php echo esc_attr( (string) $d['kdna_events_email_admin_summary_heading'] ); ?>" data-kdna-preview-key="admin_summary_heading" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_admin_event_heading"><?php esc_html_e( 'Event section heading', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="large-text" id="kdna_events_email_admin_event_heading" name="kdna_events_email_admin_event_heading" value="<?php echo esc_attr( (string) $d['kdna_events_email_admin_event_heading'] ); ?>" data-kdna-preview-key="admin_event_heading" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_admin_attendees_heading"><?php esc_html_e( 'Attendees section heading', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="large-text" id="kdna_events_email_admin_attendees_heading" name="kdna_events_email_admin_attendees_heading" value="<?php echo esc_attr( (string) $d['kdna_events_email_admin_attendees_heading'] ); ?>" data-kdna-preview-key="admin_attendees_heading" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_admin_footer_note"><?php esc_html_e( 'Footer note', 'kdna-events' ); ?></label></th>
+					<td>
+						<textarea class="large-text" rows="2" id="kdna_events_email_admin_footer_note" name="kdna_events_email_admin_footer_note" data-kdna-preview-key="admin_footer_note"><?php echo esc_textarea( (string) $d['kdna_events_email_admin_footer_note'] ); ?></textarea>
+						<p class="description"><?php esc_html_e( 'Optional. Shown ABOVE the shared footer. Useful for per-client internal instructions (e.g. check the dashboard).', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Compact header', 'kdna-events' ); ?></th>
+					<td>
+						<label>
+							<input type="checkbox" name="kdna_events_email_admin_header_compact" value="1" <?php checked( ! empty( $d['kdna_events_email_admin_header_compact'] ) ); ?> data-kdna-preview-key="admin_header_compact" />
+							<?php esc_html_e( 'Render the admin email with a tighter logo block and less top padding.', 'kdna-events' ); ?>
+						</label>
+					</td>
 				</tr>
 				</tbody>
 			</table>
@@ -2069,7 +2419,17 @@ class KDNA_Events_Settings {
 				<button type="button" class="kdna-events-email-design-preview__tab" data-target="admin_notification"><?php esc_html_e( 'Admin Notification', 'kdna-events' ); ?></button>
 				<button type="button" class="button button-secondary" style="margin-left:auto;" data-kdna-events-email-preview-refresh><?php esc_html_e( 'Refresh preview', 'kdna-events' ); ?></button>
 			</div>
-			<iframe class="kdna-events-email-design-preview__frame" data-kdna-events-email-preview-frame title="<?php esc_attr_e( 'Email preview', 'kdna-events' ); ?>" srcdoc="&lt;p style=&quot;font:14px sans-serif;color:#555;padding:2em;&quot;&gt;<?php echo esc_attr__( 'Loading preview...', 'kdna-events' ); ?>&lt;/p&gt;"></iframe>
+			<div class="kdna-events-email-design-preview__toggles" role="group">
+				<span class="kdna-events-email-design-preview__toggles-label"><?php esc_html_e( 'Mode:', 'kdna-events' ); ?></span>
+				<button type="button" class="kdna-events-email-design-preview__toggle is-active" data-preview-mode="light"><?php esc_html_e( 'Light', 'kdna-events' ); ?></button>
+				<button type="button" class="kdna-events-email-design-preview__toggle" data-preview-mode="dark"><?php esc_html_e( 'Dark', 'kdna-events' ); ?></button>
+				<span class="kdna-events-email-design-preview__toggles-label" style="margin-left:14px;"><?php esc_html_e( 'Device:', 'kdna-events' ); ?></span>
+				<button type="button" class="kdna-events-email-design-preview__toggle is-active" data-preview-device="desktop"><?php esc_html_e( 'Desktop', 'kdna-events' ); ?></button>
+				<button type="button" class="kdna-events-email-design-preview__toggle" data-preview-device="mobile"><?php esc_html_e( 'Mobile', 'kdna-events' ); ?></button>
+			</div>
+			<div class="kdna-events-email-design-preview__viewport" data-kdna-events-email-preview-viewport>
+				<iframe class="kdna-events-email-design-preview__frame" data-kdna-events-email-preview-frame title="<?php esc_attr_e( 'Email preview', 'kdna-events' ); ?>" srcdoc="&lt;p style=&quot;font:14px sans-serif;color:#555;padding:2em;&quot;&gt;<?php echo esc_attr__( 'Loading preview...', 'kdna-events' ); ?>&lt;/p&gt;"></iframe>
+			</div>
 			<div class="kdna-events-email-design-preview__send">
 				<label for="kdna-events-email-preview-test-to" class="screen-reader-text"><?php esc_html_e( 'Send test to email address', 'kdna-events' ); ?></label>
 				<input type="email" id="kdna-events-email-preview-test-to" placeholder="<?php esc_attr_e( 'you@example.com', 'kdna-events' ); ?>" />
@@ -2105,21 +2465,38 @@ class KDNA_Events_Settings {
 			if (!root) { return; }
 
 			var frame = root.querySelector('[data-kdna-events-email-preview-frame]');
+			var viewport = root.querySelector('[data-kdna-events-email-preview-viewport]');
 			var status = root.querySelector('.kdna-events-email-design-preview__status');
 			var refresh = root.querySelector('[data-kdna-events-email-preview-refresh]');
 			var sendBtn = root.querySelector('[data-kdna-events-email-preview-send]');
 			var toInput = root.querySelector('#kdna-events-email-preview-test-to');
 			var tabs = root.querySelectorAll('.kdna-events-email-design-preview__tab');
+			var modeToggles = root.querySelectorAll('[data-preview-mode]');
+			var deviceToggles = root.querySelectorAll('[data-preview-device]');
 			var form = root.closest('form');
 
 			var currentTemplate = 'booking_confirmation';
+			var currentMode = 'light';
+			var currentDevice = 'desktop';
 			var debounceTimer = null;
+
+			function applyDevice() {
+				if (!viewport) { return; }
+				if ('mobile' === currentDevice) {
+					viewport.style.maxWidth = '400px';
+					viewport.style.margin = '0 auto';
+				} else {
+					viewport.style.maxWidth = '';
+					viewport.style.margin = '';
+				}
+			}
 
 			function collectPayload() {
 				var fd = new FormData();
 				fd.append('action', 'kdna_events_preview_email');
 				fd.append('nonce', cfg.previewNonce);
 				fd.append('template', currentTemplate);
+				fd.append('preview_mode', currentMode);
 				if (form) {
 					var controls = form.querySelectorAll('[name^="kdna_events_email_"], [name="kdna_events_email_logo_id"], [name="kdna_events_email_default_header_image"]');
 					controls.forEach(function (el) {
@@ -2175,7 +2552,26 @@ class KDNA_Events_Settings {
 				});
 			});
 
+			modeToggles.forEach(function (btn) {
+				btn.addEventListener('click', function () {
+					modeToggles.forEach(function (b) { b.classList.remove('is-active'); });
+					btn.classList.add('is-active');
+					currentMode = btn.getAttribute('data-preview-mode') || 'light';
+					renderPreview();
+				});
+			});
+
+			deviceToggles.forEach(function (btn) {
+				btn.addEventListener('click', function () {
+					deviceToggles.forEach(function (b) { b.classList.remove('is-active'); });
+					btn.classList.add('is-active');
+					currentDevice = btn.getAttribute('data-preview-device') || 'desktop';
+					applyDevice();
+				});
+			});
+
 			// Initial render.
+			applyDevice();
 			renderPreview();
 
 			if (sendBtn) {
@@ -2189,6 +2585,7 @@ class KDNA_Events_Settings {
 					body.append('nonce', cfg.testNonce);
 					body.append('to', to);
 					body.append('template', currentTemplate);
+					body.append('preview_mode', currentMode);
 					fetch(cfg.ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body })
 						.then(function (r) { return r.json(); })
 						.then(function (res) {

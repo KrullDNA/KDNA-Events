@@ -422,31 +422,80 @@ function kdna_events_format_price( $amount, $currency = '' ) {
 }
 
 /**
- * Generate a unique order reference in the form KDNA-EV-YYYY-XXXXXX.
+ * Generate a unique order reference.
  *
- * Uses wp_generate_password to create the random suffix and retries on
- * the rare chance of a collision with an existing order reference.
+ * Format is driven by the Booking References section of the General
+ * settings tab so each installation can set its own prefix, suffix,
+ * year inclusion, padding width, starting number and sequential /
+ * random mode.
+ *
+ * Output shape:
+ *   {prefix}[-{year}]-{NUMBER}{suffix}
+ *
+ * Sequential mode reads kdna_events_reference_next, assembles the
+ * reference, checks for collisions in the orders table and retries up
+ * to 10 times (advancing the counter each try) before falling back to
+ * a random tail. Random mode keeps the v1.0 behaviour.
  *
  * @return string
  */
 function kdna_events_generate_order_reference() {
 	global $wpdb;
 
-	$year  = (int) current_time( 'Y' );
-	$table = '';
+	$prefix       = (string) get_option( 'kdna_events_reference_prefix', '' );
+	$suffix       = (string) get_option( 'kdna_events_reference_suffix', '' );
+	$include_year = (bool) get_option( 'kdna_events_reference_include_year', true );
+	$pad_width    = max( 1, min( 12, (int) get_option( 'kdna_events_reference_pad_width', 6 ) ) );
+	$format       = (string) get_option( 'kdna_events_reference_format', 'sequential' );
 
-	if ( class_exists( 'KDNA_Events_DB' ) ) {
-		$table = KDNA_Events_DB::orders_table();
+	$year  = (int) current_time( 'Y' );
+	$table = class_exists( 'KDNA_Events_DB' ) ? KDNA_Events_DB::orders_table() : '';
+
+	$assemble = static function ( $body ) use ( $prefix, $suffix, $include_year, $year ) {
+		$parts = array();
+		if ( '' !== $prefix ) {
+			$parts[] = $prefix;
+		}
+		if ( $include_year ) {
+			$parts[] = (string) $year;
+		}
+		$parts[] = $body;
+		return implode( '-', $parts ) . $suffix;
+	};
+
+	if ( 'random' === $format ) {
+		$attempts = 0;
+		do {
+			$body      = strtoupper( wp_generate_password( 6, false, false ) );
+			$reference = $assemble( $body );
+			$attempts++;
+			if ( '' === $table ) {
+				return $reference;
+			}
+			$exists = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$table} WHERE order_reference = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$reference
+				)
+			);
+		} while ( $exists > 0 && $attempts < 10 );
+		return $reference;
 	}
 
-	$attempts = 0;
+	// Sequential mode.
+	$next      = (int) get_option( 'kdna_events_reference_next', 1 );
+	if ( $next < 1 ) {
+		$next = 1;
+	}
+	$attempts  = 0;
 
 	do {
-		$suffix    = strtoupper( wp_generate_password( 6, false, false ) );
-		$reference = sprintf( 'KDNA-EV-%d-%s', $year, $suffix );
+		$body      = str_pad( (string) $next, $pad_width, '0', STR_PAD_LEFT );
+		$reference = $assemble( $body );
 		$attempts++;
 
 		if ( '' === $table ) {
+			update_option( 'kdna_events_reference_next', $next + 1, false );
 			return $reference;
 		}
 
@@ -456,9 +505,21 @@ function kdna_events_generate_order_reference() {
 				$reference
 			)
 		);
-	} while ( $exists > 0 && $attempts < 10 );
 
-	return $reference;
+		if ( $exists > 0 ) {
+			$next++;
+			continue;
+		}
+
+		update_option( 'kdna_events_reference_next', $next + 1, false );
+		return $reference;
+	} while ( $attempts < 20 );
+
+	// Fallback, never expected. Assemble a random tail so we still return
+	// something unique rather than duplicating an existing reference.
+	$fallback = strtoupper( wp_generate_password( 6, false, false ) );
+	update_option( 'kdna_events_reference_next', $next + 1, false );
+	return $assemble( $fallback );
 }
 
 /**
