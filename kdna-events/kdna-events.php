@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       KDNA Events
  * Plugin URI:        https://krulldna.com/
- * Description:       Events management and ticketing for WordPress, delivered entirely as Elementor widgets. Paid events via Stripe, free events supported, pluggable CRM framework, fully branded HTML emails.
- * Version:           1.1.0
+ * Description:       Events management and ticketing for WordPress, delivered entirely as Elementor widgets. Paid events via Stripe, free events supported, pluggable CRM framework, fully branded HTML emails, ATO-compliant tax invoices.
+ * Version:           1.2.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            KDNA
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Plugin constants.
  */
-define( 'KDNA_EVENTS_VERSION', '1.1.0' );
+define( 'KDNA_EVENTS_VERSION', '1.2.0' );
 define( 'KDNA_EVENTS_FILE', __FILE__ );
 define( 'KDNA_EVENTS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KDNA_EVENTS_URL', plugin_dir_url( __FILE__ ) );
@@ -62,7 +62,9 @@ function kdna_events_missing_elementor_notice() {
  */
 function kdna_events_activate() {
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-db.php';
+	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-invoices-db.php';
 	KDNA_Events_DB::install();
+	KDNA_Events_Invoices_DB::install();
 	flush_rewrite_rules();
 
 	// Register the email header image size now so cropped versions of any
@@ -144,7 +146,13 @@ function kdna_events_bootstrap() {
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-emails.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-crm.php';
 	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-checkout.php';
-	if ( file_exists( KDNA_EVENTS_PATH . 'vendor/autoload.php' ) ) {
+	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-invoices-db.php';
+	require_once KDNA_EVENTS_PATH . 'includes/class-kdna-events-invoices.php';
+	// Load Composer autoload once. The Dompdf\Dompdf guard keeps us
+	// friendly with any other plugin that has already loaded Dompdf.
+	if ( file_exists( KDNA_EVENTS_PATH . 'vendor/autoload.php' ) && ! class_exists( '\\Dompdf\\Dompdf' ) ) {
+		require_once KDNA_EVENTS_PATH . 'vendor/autoload.php';
+	} elseif ( file_exists( KDNA_EVENTS_PATH . 'vendor/autoload.php' ) ) {
 		require_once KDNA_EVENTS_PATH . 'vendor/autoload.php';
 	}
 	require_once KDNA_EVENTS_PATH . 'widgets/class-widget-base.php';
@@ -175,12 +183,14 @@ function kdna_events_bootstrap() {
 	KDNA_Events_Checkout::init();
 	KDNA_Events_Stripe::init();
 	KDNA_Events_Emails::init();
+	KDNA_Events_Invoices::init();
 	KDNA_Events_CRM::bootstrap();
 
 	if ( is_admin() ) {
 		KDNA_Events_Admin::init();
 		KDNA_Events_Settings::init();
 		add_action( 'admin_init', array( 'KDNA_Events_DB', 'maybe_upgrade' ) );
+		add_action( 'admin_init', array( 'KDNA_Events_Invoices_DB', 'maybe_upgrade' ) );
 	}
 }
 

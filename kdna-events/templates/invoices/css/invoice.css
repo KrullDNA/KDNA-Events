@@ -1,0 +1,231 @@
+/**
+ * KDNA Events invoice stylesheet.
+ *
+ * Dompdf 2.x supports a useful subset of CSS. This sheet sticks to
+ * properties Dompdf actually renders: absolute/fixed dims, tables,
+ * padding, borders, backgrounds, font-size/weight/family, text-align,
+ * colour. It avoids CSS grid, flexbox, clip-path, modern units and
+ * anything that requires HarfBuzz.
+ */
+
+@page {
+	margin: 20mm;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	font-family: helvetica, Arial, sans-serif;
+	font-size: 10pt;
+	line-height: 1.45;
+	color: #1A1A1A;
+}
+
+.inv-header {
+	width: 100%;
+	margin: 0 0 18mm;
+}
+
+.inv-header__logo {
+	display: block;
+}
+
+.inv-header__title {
+	font-size: 22pt;
+	font-weight: 300;
+	color: #1A1A1A;
+	text-align: right;
+}
+
+.inv-meta-grid {
+	width: 100%;
+	margin: 0 0 10mm;
+}
+
+.inv-meta-grid td {
+	vertical-align: top;
+}
+
+.inv-to__label {
+	font-weight: 700;
+	font-size: 10pt;
+	margin: 0 0 4pt;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.inv-to table {
+	border-collapse: collapse;
+}
+
+.inv-to td {
+	padding: 0 0 2pt;
+	vertical-align: top;
+	font-size: 10pt;
+	color: #1A1A1A;
+}
+
+.inv-to__key {
+	font-weight: 700;
+	padding-right: 10pt;
+	white-space: nowrap;
+}
+
+.inv-meta {
+	text-align: right;
+}
+
+.inv-meta p {
+	margin: 0 0 3pt;
+	font-size: 10pt;
+	color: #1A1A1A;
+}
+
+.inv-meta strong {
+	font-weight: 700;
+}
+
+.inv-items {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 0 0 6mm;
+}
+
+.inv-items thead th {
+	background: #1A1A1A;
+	color: #FFFFFF;
+	padding: 8pt 10pt;
+	font-size: 8.5pt;
+	font-weight: 400;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	text-align: left;
+}
+
+.inv-items thead th.num {
+	text-align: right;
+}
+
+.inv-items tbody td {
+	padding: 8pt 10pt;
+	border-bottom: 1px solid #E5E5E5;
+	vertical-align: top;
+	font-size: 9.5pt;
+	color: #1A1A1A;
+}
+
+.inv-items tbody td.num {
+	text-align: right;
+	white-space: nowrap;
+}
+
+.inv-totals {
+	width: 50%;
+	margin: 0 0 0 50%;
+	border-collapse: collapse;
+}
+
+.inv-totals td {
+	padding: 7pt 10pt;
+	border-bottom: 1px solid #E5E5E5;
+	font-size: 10pt;
+}
+
+.inv-totals td.label {
+	text-align: right;
+	color: #555555;
+	width: 60%;
+}
+
+.inv-totals td.value {
+	text-align: right;
+	color: #1A1A1A;
+	white-space: nowrap;
+	width: 40%;
+}
+
+.inv-totals tr.grand td {
+	font-weight: 700;
+	border-top: 2px solid #1A1A1A;
+	border-bottom: 2px solid #1A1A1A;
+	background: #F8F8F8;
+}
+
+.inv-paid-stamp {
+	position: absolute;
+	right: 24mm;
+	top: 140mm;
+	font-family: helvetica, Arial, sans-serif;
+	font-size: 48pt;
+	font-weight: 700;
+	color: #F07759;
+	opacity: 0.3;
+	transform: rotate(-15deg);
+	-webkit-transform: rotate(-15deg);
+	letter-spacing: 0.08em;
+}
+
+.inv-notes {
+	margin: 10mm 0 6mm;
+	padding: 0;
+	color: #555555;
+	font-size: 9pt;
+	line-height: 1.5;
+}
+
+.inv-payment {
+	margin: 6mm 0;
+	color: #555555;
+	font-size: 9pt;
+}
+
+.inv-payment strong {
+	color: #1A1A1A;
+}
+
+.inv-tax-statement {
+	margin: 2mm 0 0;
+	color: #888888;
+	font-size: 8.5pt;
+	font-style: italic;
+}
+
+.inv-footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	text-align: center;
+	font-size: 9pt;
+	color: #555555;
+	padding: 0 20mm;
+}
+
+.inv-footer p {
+	margin: 0 0 2pt;
+}
+
+.inv-footer strong {
+	color: #1A1A1A;
+	font-weight: 700;
+}
+
+.inv-status-chip {
+	display: inline-block;
+	padding: 4pt 10pt;
+	background: #1A1A1A;
+	color: #FFFFFF;
+	font-size: 8.5pt;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	margin-left: 6pt;
+}
+
+.inv-status-chip--pending {
+	background: #B45309;
+}

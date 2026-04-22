@@ -57,6 +57,7 @@ class KDNA_Events_Settings {
 			'pages'        => __( 'Pages', 'kdna-events' ),
 			'emails'       => __( 'Emails', 'kdna-events' ),
 			'email_design' => __( 'Email Design', 'kdna-events' ),
+			'tax_invoices' => __( 'Tax Invoices', 'kdna-events' ),
 			'crm'          => __( 'CRM', 'kdna-events' ),
 		);
 	}
@@ -598,6 +599,21 @@ class KDNA_Events_Settings {
 			);
 		}
 
+		// Tax Invoices (core feature, v1.2 Brief C).
+		if ( class_exists( 'KDNA_Events_Invoices' ) ) {
+			foreach ( KDNA_Events_Invoices::options_schema() as $name => $def ) {
+				register_setting(
+					'kdna_events_tax_invoices',
+					$name,
+					array(
+						'type'              => 'string' === $def['type'] ? 'string' : $def['type'],
+						'sanitize_callback' => array( __CLASS__, 'sanitize_invoice_value' ),
+						'default'           => $def['default'],
+					)
+				);
+			}
+		}
+
 		// Attendees.
 		register_setting(
 			'kdna_events_attendees',
@@ -1022,6 +1038,17 @@ class KDNA_Events_Settings {
 				) . ';'
 			);
 		}
+		if ( 'tax_invoices' === $current_tab ) {
+			wp_add_inline_script(
+				'kdna-events-admin',
+				'window.kdnaEventsInvoices = ' . wp_json_encode(
+					array(
+						'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
+						'previewNonce' => wp_create_nonce( 'kdna_events_preview_invoice' ),
+					)
+				) . ';'
+			);
+		}
 	}
 
 	/**
@@ -1089,6 +1116,10 @@ class KDNA_Events_Settings {
 					case 'email_design':
 						settings_fields( 'kdna_events_email_design' );
 						self::render_email_design_tab();
+						break;
+					case 'tax_invoices':
+						settings_fields( 'kdna_events_tax_invoices' );
+						self::render_tax_invoices_tab();
 						break;
 					case 'crm':
 						settings_fields( 'kdna_events_crm' );
@@ -2598,6 +2629,509 @@ class KDNA_Events_Settings {
 						.catch(function () { setStatus('Network error sending test.', true); });
 				});
 			}
+		})();
+		</script>
+		<?php
+	}
+
+	/**
+	 * Sanitise a Tax Invoices option by looking up its type in the
+	 * schema and applying the matching cast or text sanitiser.
+	 *
+	 * @param mixed $value Raw input.
+	 * @return mixed
+	 */
+	public static function sanitize_invoice_value( $value ) {
+		$option = '';
+		if ( isset( $GLOBALS['wp_current_filter'] ) && is_array( $GLOBALS['wp_current_filter'] ) ) {
+			foreach ( $GLOBALS['wp_current_filter'] as $filter ) {
+				if ( 0 === strpos( (string) $filter, 'sanitize_option_' ) ) {
+					$option = substr( (string) $filter, strlen( 'sanitize_option_' ) );
+					break;
+				}
+			}
+		}
+		if ( ! class_exists( 'KDNA_Events_Invoices' ) ) {
+			return is_scalar( $value ) ? sanitize_text_field( (string) $value ) : '';
+		}
+		$schema = KDNA_Events_Invoices::options_schema();
+		if ( '' === $option || ! isset( $schema[ $option ] ) ) {
+			return is_scalar( $value ) ? sanitize_text_field( (string) $value ) : '';
+		}
+
+		// Starting number lock: once the first invoice has been issued,
+		// the 'starting invoice number' field is read-only and the
+		// stored value must not be overwritten except via the explicit
+		// 'Reset numbering' action in ajax_reset_invoice_sequence.
+		if ( 'kdna_events_invoice_number_start' === $option ) {
+			$locked = (int) get_option( 'kdna_events_invoice_current_sequence', 0 ) > 0;
+			if ( $locked ) {
+				return (int) get_option( 'kdna_events_invoice_number_start', 1 );
+			}
+			return max( 1, absint( $value ) );
+		}
+
+		$type = $schema[ $option ]['type'];
+		switch ( $type ) {
+			case 'boolean':
+				return ! empty( $value );
+			case 'integer':
+				return max( 0, absint( $value ) );
+			case 'string':
+			default:
+				$value = (string) $value;
+				if ( 0 === strpos( $option, 'kdna_events_invoice_design_color_' ) ) {
+					$value = trim( $value );
+					if ( preg_match( '/^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/', $value ) ) {
+						return strtoupper( $value );
+					}
+					return $schema[ $option ]['default'];
+				}
+				if ( in_array( $option, array(
+					'kdna_events_invoice_business_address',
+					'kdna_events_invoice_notes',
+					'kdna_events_invoice_payment_terms',
+					'kdna_events_invoice_tax_inclusive_statement',
+				), true ) ) {
+					return sanitize_textarea_field( $value );
+				}
+				if ( 'kdna_events_invoice_business_email' === $option ) {
+					return sanitize_email( $value );
+				}
+				if ( 'kdna_events_invoice_business_website' === $option ) {
+					return esc_url_raw( $value );
+				}
+				if ( 'kdna_events_invoice_tax_rate' === $option ) {
+					$numeric = preg_match( '/^\d{1,3}(\.\d{1,2})?$/', $value ) ? $value : '0.00';
+					return (string) $numeric;
+				}
+				return sanitize_text_field( $value );
+		}
+	}
+
+	/**
+	 * Render the Tax Invoices tab on the Settings page.
+	 *
+	 * @return void
+	 */
+	protected static function render_tax_invoices_tab() {
+		if ( ! class_exists( 'KDNA_Events_Invoices' ) ) {
+			echo '<p>' . esc_html__( 'Invoices module is not available.', 'kdna-events' ) . '</p>';
+			return;
+		}
+
+		$o               = KDNA_Events_Invoices::get_options();
+		$jurisdictions   = KDNA_Events_Invoices::jurisdictions();
+		$sequence_locked = (int) get_option( 'kdna_events_invoice_current_sequence', 0 ) > 0;
+		$latest          = KDNA_Events_Invoices::get_latest( 10 );
+		$preview_number  = KDNA_Events_Invoices::format_invoice_number( max( 1, (int) $o['kdna_events_invoice_number_start'] ) );
+		?>
+		<div class="kdna-events-email-design-grid">
+			<div class="kdna-events-email-design-controls">
+				<?php self::render_tax_invoices_controls( $o, $jurisdictions, $sequence_locked, $preview_number ); ?>
+			</div>
+			<div class="kdna-events-email-design-preview" data-kdna-events-invoice-preview>
+				<div class="kdna-events-email-design-preview__tabs">
+					<strong style="flex:1;padding:6px 2px;font-size:13px;color:#1d2327;"><?php esc_html_e( 'Live invoice preview', 'kdna-events' ); ?></strong>
+					<button type="button" class="button button-secondary" data-kdna-events-invoice-preview-refresh><?php esc_html_e( 'Refresh preview', 'kdna-events' ); ?></button>
+				</div>
+				<iframe class="kdna-events-email-design-preview__frame" data-kdna-events-invoice-preview-frame title="<?php esc_attr_e( 'Invoice preview', 'kdna-events' ); ?>" srcdoc="&lt;p style=&quot;font:14px sans-serif;color:#555;padding:2em;&quot;&gt;<?php echo esc_attr__( 'Loading preview...', 'kdna-events' ); ?>&lt;/p&gt;"></iframe>
+				<p class="description" style="margin-top:8px;"><?php esc_html_e( 'Preview uses dummy sample data. Save settings before going live.', 'kdna-events' ); ?></p>
+			</div>
+		</div>
+
+		<?php self::render_invoice_latest_panel( $latest ); ?>
+		<?php self::render_invoice_preview_script(); ?>
+		<?php
+	}
+
+	/**
+	 * Render the control sections for the Tax Invoices tab.
+	 *
+	 * @param array $o               Resolved options.
+	 * @param array $jurisdictions   Jurisdiction presets map.
+	 * @param bool  $sequence_locked True once the first invoice issued.
+	 * @param string $preview_number Example next number.
+	 * @return void
+	 */
+	protected static function render_tax_invoices_controls( $o, $jurisdictions, $sequence_locked, $preview_number ) {
+		$inherit_tip = __( 'Inherit from Email Design', 'kdna-events' );
+		?>
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Business Details', 'kdna-events' ); ?></h2>
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Tax invoices enabled', 'kdna-events' ); ?></th>
+					<td><label><input type="checkbox" name="kdna_events_invoices_enabled" value="1" <?php checked( ! empty( $o['kdna_events_invoices_enabled'] ) ); ?> data-kdna-invoice-preview-key="enabled" /> <?php esc_html_e( 'Generate invoices for paid bookings.', 'kdna-events' ); ?></label></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_business_legal_name"><?php esc_html_e( 'Business legal name', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="regular-text" id="kdna_events_invoice_business_legal_name" name="kdna_events_invoice_business_legal_name" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_business_legal_name'] ); ?>" data-kdna-invoice-preview-key="legal_name" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_business_trading_name"><?php esc_html_e( 'Trading name', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="regular-text" id="kdna_events_invoice_business_trading_name" name="kdna_events_invoice_business_trading_name" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_business_trading_name'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_tax_id"><?php echo esc_html( KDNA_Events_Invoices::tax_id_label() ); ?></label></th>
+					<td><input type="text" class="regular-text" id="kdna_events_invoice_tax_id" name="kdna_events_invoice_tax_id" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_tax_id'] ); ?>" data-kdna-invoice-preview-key="tax_id" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_business_address"><?php esc_html_e( 'Registered address', 'kdna-events' ); ?></label></th>
+					<td><textarea class="large-text" rows="3" id="kdna_events_invoice_business_address" name="kdna_events_invoice_business_address" data-kdna-invoice-preview-key="address"><?php echo esc_textarea( (string) $o['kdna_events_invoice_business_address'] ); ?></textarea></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_business_email"><?php esc_html_e( 'Business email', 'kdna-events' ); ?></label></th>
+					<td><input type="email" class="regular-text" id="kdna_events_invoice_business_email" name="kdna_events_invoice_business_email" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_business_email'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_business_phone"><?php esc_html_e( 'Business phone', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="regular-text" id="kdna_events_invoice_business_phone" name="kdna_events_invoice_business_phone" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_business_phone'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_business_website"><?php esc_html_e( 'Business website', 'kdna-events' ); ?></label></th>
+					<td><input type="url" class="regular-text" id="kdna_events_invoice_business_website" name="kdna_events_invoice_business_website" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_business_website'] ); ?>" /></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Tax Configuration', 'kdna-events' ); ?></h2>
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Tax registered', 'kdna-events' ); ?></th>
+					<td><label><input type="checkbox" name="kdna_events_invoice_tax_registered" value="1" <?php checked( ! empty( $o['kdna_events_invoice_tax_registered'] ) ); ?> data-kdna-invoice-preview-key="tax_registered" /> <?php esc_html_e( 'Include tax breakdown on invoices.', 'kdna-events' ); ?></label></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_jurisdiction"><?php esc_html_e( 'Jurisdiction', 'kdna-events' ); ?></label></th>
+					<td>
+						<select id="kdna_events_invoice_jurisdiction" name="kdna_events_invoice_jurisdiction" data-kdna-invoice-preview-key="jurisdiction">
+							<?php foreach ( $jurisdictions as $key => $def ) : ?>
+								<option value="<?php echo esc_attr( $key ); ?>" data-tax-label="<?php echo esc_attr( $def['tax_label'] ); ?>" data-rate="<?php echo esc_attr( $def['rate'] ); ?>" data-heading="<?php echo esc_attr( $def['heading'] ); ?>" <?php selected( $o['kdna_events_invoice_jurisdiction'], $key ); ?>><?php echo esc_html( $def['label'] ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<p class="description"><?php esc_html_e( 'Changing the jurisdiction auto-fills tax label, rate and document heading. Override any field below after selecting.', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_tax_label"><?php esc_html_e( 'Tax label', 'kdna-events' ); ?></label></th>
+					<td><input type="text" id="kdna_events_invoice_tax_label" name="kdna_events_invoice_tax_label" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_tax_label'] ); ?>" data-kdna-invoice-preview-key="tax_label" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_tax_rate"><?php esc_html_e( 'Tax rate (%)', 'kdna-events' ); ?></label></th>
+					<td><input type="text" id="kdna_events_invoice_tax_rate" name="kdna_events_invoice_tax_rate" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_tax_rate'] ); ?>" placeholder="10.00" data-kdna-invoice-preview-key="tax_rate" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_document_heading"><?php esc_html_e( 'Document heading', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="regular-text" id="kdna_events_invoice_document_heading" name="kdna_events_invoice_document_heading" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_document_heading'] ); ?>" data-kdna-invoice-preview-key="heading" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_tax_inclusive_statement"><?php esc_html_e( 'Tax-inclusive statement', 'kdna-events' ); ?></label></th>
+					<td><textarea class="large-text" rows="2" id="kdna_events_invoice_tax_inclusive_statement" name="kdna_events_invoice_tax_inclusive_statement"><?php echo esc_textarea( (string) $o['kdna_events_invoice_tax_inclusive_statement'] ); ?></textarea></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Invoice Numbering', 'kdna-events' ); ?></h2>
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_number_prefix"><?php esc_html_e( 'Prefix', 'kdna-events' ); ?></label></th>
+					<td><input type="text" id="kdna_events_invoice_number_prefix" name="kdna_events_invoice_number_prefix" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_number_prefix'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_number_suffix"><?php esc_html_e( 'Suffix', 'kdna-events' ); ?></label></th>
+					<td><input type="text" id="kdna_events_invoice_number_suffix" name="kdna_events_invoice_number_suffix" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_number_suffix'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_number_start"><?php esc_html_e( 'Starting invoice number', 'kdna-events' ); ?></label></th>
+					<td>
+						<input type="number" min="1" id="kdna_events_invoice_number_start" name="kdna_events_invoice_number_start" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_number_start'] ); ?>" <?php disabled( $sequence_locked ); ?> />
+						<?php if ( $sequence_locked ) : ?>
+							<p class="description" style="color:#b45309;"><strong><?php esc_html_e( 'Locked.', 'kdna-events' ); ?></strong> <?php esc_html_e( 'Starting number locks after the first invoice is issued so accountants never see duplicate numbers. Use the Reset numbering button only if you understand the legal and accounting consequences.', 'kdna-events' ); ?></p>
+						<?php else : ?>
+							<p class="description"><?php esc_html_e( 'Locks after the first invoice is issued.', 'kdna-events' ); ?></p>
+						<?php endif; ?>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_number_padding"><?php esc_html_e( 'Zero-padding', 'kdna-events' ); ?></label></th>
+					<td><input type="number" min="0" max="12" id="kdna_events_invoice_number_padding" name="kdna_events_invoice_number_padding" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_number_padding'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Next number preview', 'kdna-events' ); ?></th>
+					<td><code style="font-size:14px;padding:6px 10px;background:#f6f7f7;border:1px solid #dcdcde;border-radius:4px;"><?php echo esc_html( $preview_number ); ?></code></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Invoice Content', 'kdna-events' ); ?></h2>
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_line_item_template"><?php esc_html_e( 'Line item template', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="large-text" id="kdna_events_invoice_line_item_template" name="kdna_events_invoice_line_item_template" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_line_item_template'] ); ?>" data-kdna-invoice-preview-key="line_item_template" />
+						<p class="description"><?php esc_html_e( 'Supports {quantity}, {event_title}, {event_subtitle}, {event_date}.', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_paid_label"><?php esc_html_e( 'Paid label', 'kdna-events' ); ?></label></th>
+					<td><input type="text" id="kdna_events_invoice_paid_label" name="kdna_events_invoice_paid_label" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_paid_label'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_pending_label"><?php esc_html_e( 'Pending label', 'kdna-events' ); ?></label></th>
+					<td><input type="text" id="kdna_events_invoice_pending_label" name="kdna_events_invoice_pending_label" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_pending_label'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_payment_method_label"><?php esc_html_e( 'Payment method label', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="regular-text" id="kdna_events_invoice_payment_method_label" name="kdna_events_invoice_payment_method_label" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_payment_method_label'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_payment_terms"><?php esc_html_e( 'Payment terms', 'kdna-events' ); ?></label></th>
+					<td><textarea class="large-text" rows="2" id="kdna_events_invoice_payment_terms" name="kdna_events_invoice_payment_terms"><?php echo esc_textarea( (string) $o['kdna_events_invoice_payment_terms'] ); ?></textarea></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_notes"><?php esc_html_e( 'Notes / fine print', 'kdna-events' ); ?></label></th>
+					<td><textarea class="large-text" rows="3" id="kdna_events_invoice_notes" name="kdna_events_invoice_notes"><?php echo esc_textarea( (string) $o['kdna_events_invoice_notes'] ); ?></textarea></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_date_source"><?php esc_html_e( 'Invoice date source', 'kdna-events' ); ?></label></th>
+					<td>
+						<select id="kdna_events_invoice_date_source" name="kdna_events_invoice_date_source">
+							<option value="booking" <?php selected( $o['kdna_events_invoice_date_source'], 'booking' ); ?>><?php esc_html_e( 'Booking date', 'kdna-events' ); ?></option>
+							<option value="payment" <?php selected( $o['kdna_events_invoice_date_source'], 'payment' ); ?>><?php esc_html_e( 'Payment date', 'kdna-events' ); ?></option>
+						</select>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Design', 'kdna-events' ); ?></h2>
+			<p class="description" style="max-width:64em;"><?php esc_html_e( 'Most tokens inherit from the Email Design tab to keep branding consistent. Turn an Inherit toggle off to override for invoices only.', 'kdna-events' ); ?></p>
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Logo', 'kdna-events' ); ?></th>
+					<td>
+						<label><input type="checkbox" name="kdna_events_invoice_design_inherit_logo" value="1" <?php checked( ! empty( $o['kdna_events_invoice_design_inherit_logo'] ) ); ?> /> <?php echo esc_html( $inherit_tip ); ?></label>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_design_logo_width"><?php esc_html_e( 'Logo width (px)', 'kdna-events' ); ?></label></th>
+					<td><input type="number" min="40" max="400" id="kdna_events_invoice_design_logo_width" name="kdna_events_invoice_design_logo_width" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_design_logo_width'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Colours', 'kdna-events' ); ?></th>
+					<td>
+						<label><input type="checkbox" name="kdna_events_invoice_design_inherit_colours" value="1" <?php checked( ! empty( $o['kdna_events_invoice_design_inherit_colours'] ) ); ?> /> <?php echo esc_html( $inherit_tip ); ?></label>
+						<br /><br />
+						<label for="kdna_events_invoice_design_color_primary"><?php esc_html_e( 'Primary:', 'kdna-events' ); ?></label>
+						<input type="text" class="kdna-events-color-picker" id="kdna_events_invoice_design_color_primary" name="kdna_events_invoice_design_color_primary" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_design_color_primary'] ); ?>" data-default-color="<?php echo esc_attr( (string) $o['kdna_events_invoice_design_color_primary'] ); ?>" />
+						&nbsp;
+						<label for="kdna_events_invoice_design_color_accent"><?php esc_html_e( 'Accent:', 'kdna-events' ); ?></label>
+						<input type="text" class="kdna-events-color-picker" id="kdna_events_invoice_design_color_accent" name="kdna_events_invoice_design_color_accent" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_design_color_accent'] ); ?>" data-default-color="<?php echo esc_attr( (string) $o['kdna_events_invoice_design_color_accent'] ); ?>" />
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Fonts', 'kdna-events' ); ?></th>
+					<td>
+						<label><input type="checkbox" name="kdna_events_invoice_design_inherit_fonts" value="1" <?php checked( ! empty( $o['kdna_events_invoice_design_inherit_fonts'] ) ); ?> /> <?php echo esc_html( $inherit_tip ); ?></label>
+						<br /><br />
+						<select name="kdna_events_invoice_design_heading_font">
+							<?php foreach ( array( 'helvetica', 'times', 'courier' ) as $f ) : ?>
+								<option value="<?php echo esc_attr( $f ); ?>" <?php selected( $o['kdna_events_invoice_design_heading_font'], $f ); ?>><?php echo esc_html( ucfirst( $f ) ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<select name="kdna_events_invoice_design_body_font">
+							<?php foreach ( array( 'helvetica', 'times', 'courier' ) as $f ) : ?>
+								<option value="<?php echo esc_attr( $f ); ?>" <?php selected( $o['kdna_events_invoice_design_body_font'], $f ); ?>><?php echo esc_html( ucfirst( $f ) ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_design_page_size"><?php esc_html_e( 'Page size', 'kdna-events' ); ?></label></th>
+					<td>
+						<select id="kdna_events_invoice_design_page_size" name="kdna_events_invoice_design_page_size">
+							<option value="A4" <?php selected( $o['kdna_events_invoice_design_page_size'], 'A4' ); ?>>A4</option>
+							<option value="Letter" <?php selected( $o['kdna_events_invoice_design_page_size'], 'Letter' ); ?>>Letter</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_invoice_design_page_margin"><?php esc_html_e( 'Page margin (mm)', 'kdna-events' ); ?></label></th>
+					<td><input type="number" min="5" max="40" id="kdna_events_invoice_design_page_margin" name="kdna_events_invoice_design_page_margin" value="<?php echo esc_attr( (string) $o['kdna_events_invoice_design_page_margin'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Show PAID stamp', 'kdna-events' ); ?></th>
+					<td><label><input type="checkbox" name="kdna_events_invoice_design_show_paid_stamp" value="1" <?php checked( ! empty( $o['kdna_events_invoice_design_show_paid_stamp'] ) ); ?> /> <?php esc_html_e( 'Overlay a rotated PAID stamp on paid invoices.', 'kdna-events' ); ?></label></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render the 'Latest invoices' panel.
+	 *
+	 * @param array $latest List of invoice rows.
+	 * @return void
+	 */
+	protected static function render_invoice_latest_panel( $latest ) {
+		?>
+		<h2 style="margin-top:2em;"><?php esc_html_e( 'Latest invoices', 'kdna-events' ); ?></h2>
+		<table class="widefat striped">
+			<thead>
+				<tr>
+					<th><?php esc_html_e( 'Number', 'kdna-events' ); ?></th>
+					<th><?php esc_html_e( 'Order ref', 'kdna-events' ); ?></th>
+					<th><?php esc_html_e( 'Issued', 'kdna-events' ); ?></th>
+					<th><?php esc_html_e( 'Total', 'kdna-events' ); ?></th>
+					<th><?php esc_html_e( 'Status', 'kdna-events' ); ?></th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php if ( empty( $latest ) ) : ?>
+					<tr><td colspan="6"><?php esc_html_e( 'No invoices issued yet.', 'kdna-events' ); ?></td></tr>
+				<?php else : ?>
+					<?php foreach ( $latest as $row ) :
+						$order = KDNA_Events_Orders::get_order( (int) $row->order_id );
+						?>
+						<tr>
+							<td><code><?php echo esc_html( (string) $row->invoice_number ); ?></code></td>
+							<td><?php echo esc_html( $order && isset( $order->order_reference ) ? (string) $order->order_reference : '#' . (int) $row->order_id ); ?></td>
+							<td><?php echo esc_html( mysql2date( 'j M Y', (string) $row->issued_at, true ) ); ?></td>
+							<td><?php echo esc_html( kdna_events_format_price( (float) $row->total_inc_tax, (string) $row->currency ) ); ?></td>
+							<td><?php echo esc_html( (string) $row->status ); ?></td>
+							<td>
+								<a class="button button-secondary" href="<?php echo esc_url( kdna_events_invoice_download_url( $row->invoice_number ) ); ?>"><?php esc_html_e( 'Download', 'kdna-events' ); ?></a>
+								<button type="button" class="button button-secondary" data-kdna-regen-invoice data-order-id="<?php echo esc_attr( (string) $row->order_id ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( KDNA_Events_Invoices::REGEN_ACTION ) ); ?>"><?php esc_html_e( 'Regenerate', 'kdna-events' ); ?></button>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</tbody>
+		</table>
+		<script>
+		(function () {
+			var ajaxUrl = <?php echo wp_json_encode( admin_url( 'admin-ajax.php' ) ); ?>;
+			document.querySelectorAll('[data-kdna-regen-invoice]').forEach(function (btn) {
+				btn.addEventListener('click', function () {
+					var body = new FormData();
+					body.append('action', '<?php echo esc_js( KDNA_Events_Invoices::REGEN_ACTION ); ?>');
+					body.append('nonce', btn.getAttribute('data-nonce'));
+					body.append('order_id', btn.getAttribute('data-order-id'));
+					btn.disabled = true;
+					btn.textContent = <?php echo wp_json_encode( __( 'Regenerating...', 'kdna-events' ) ); ?>;
+					fetch(ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body })
+						.then(function (r) { return r.json(); })
+						.then(function (res) {
+							btn.disabled = false;
+							btn.textContent = res && res.success
+								? <?php echo wp_json_encode( __( 'Regenerated', 'kdna-events' ) ); ?>
+								: <?php echo wp_json_encode( __( 'Failed', 'kdna-events' ) ); ?>;
+						})
+						.catch(function () {
+							btn.disabled = false;
+							btn.textContent = <?php echo wp_json_encode( __( 'Network error', 'kdna-events' ) ); ?>;
+						});
+				});
+			});
+		})();
+		</script>
+		<?php
+	}
+
+	/**
+	 * Inline JS powering the Tax Invoices live preview iframe.
+	 *
+	 * @return void
+	 */
+	protected static function render_invoice_preview_script() {
+		$cfg = array(
+			'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
+			'previewNonce' => wp_create_nonce( 'kdna_events_preview_invoice' ),
+		);
+		?>
+		<script>
+		window.kdnaEventsInvoices = <?php echo wp_json_encode( $cfg ); ?>;
+		(function () {
+			var cfg = window.kdnaEventsInvoices || {};
+			if (!cfg.ajaxUrl) { return; }
+			var root = document.querySelector('[data-kdna-events-invoice-preview]');
+			if (!root) { return; }
+			var frame = root.querySelector('[data-kdna-events-invoice-preview-frame]');
+			var refresh = root.querySelector('[data-kdna-events-invoice-preview-refresh]');
+			var form = root.closest('form');
+			var timer = null;
+
+			function build() {
+				var fd = new FormData();
+				fd.append('action', 'kdna_events_preview_invoice');
+				fd.append('nonce', cfg.previewNonce);
+				if (form) {
+					var controls = form.querySelectorAll('[name^="kdna_events_invoice"], [name="kdna_events_invoices_enabled"]');
+					controls.forEach(function (el) {
+						if (el.type === 'checkbox') {
+							if (el.checked) { fd.append(el.name, el.value || '1'); }
+						} else {
+							fd.append(el.name, el.value);
+						}
+					});
+				}
+				return fd;
+			}
+
+			function render() {
+				fetch(cfg.ajaxUrl, { method: 'POST', credentials: 'same-origin', body: build() })
+					.then(function (r) { return r.json(); })
+					.then(function (res) {
+						if (res && res.success && res.data && res.data.html) {
+							frame.setAttribute('srcdoc', res.data.html);
+						}
+					})
+					.catch(function () {});
+			}
+
+			function schedule() {
+				if (timer) { clearTimeout(timer); }
+				timer = setTimeout(render, 350);
+			}
+
+			// Auto-fill jurisdiction defaults when the dropdown changes.
+			var jur = form ? form.querySelector('#kdna_events_invoice_jurisdiction') : null;
+			if (jur) {
+				jur.addEventListener('change', function () {
+					var opt = jur.options[jur.selectedIndex];
+					if (!opt) { return; }
+					var label = form.querySelector('#kdna_events_invoice_tax_label');
+					var rate = form.querySelector('#kdna_events_invoice_tax_rate');
+					var heading = form.querySelector('#kdna_events_invoice_document_heading');
+					if (label) { label.value = opt.getAttribute('data-tax-label') || label.value; }
+					if (rate) { rate.value = opt.getAttribute('data-rate') || rate.value; }
+					if (heading) { heading.value = opt.getAttribute('data-heading') || heading.value; }
+					schedule();
+				});
+			}
+
+			if (form) {
+				form.addEventListener('input', schedule);
+				form.addEventListener('change', schedule);
+			}
+			if (refresh) { refresh.addEventListener('click', render); }
+
+			render();
 		})();
 		</script>
 		<?php

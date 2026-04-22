@@ -119,6 +119,27 @@ class KDNA_Events_Widget_My_Tickets extends KDNA_Events_Widget_Base {
 		);
 
 		$this->add_control(
+			'show_download_invoice',
+			array(
+				'label'        => __( 'Show download invoice button', 'kdna-events' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'description'  => __( 'Shows a Download Invoice button on paid orders when a tax invoice exists.', 'kdna-events' ),
+			)
+		);
+
+		$this->add_control(
+			'download_invoice_label',
+			array(
+				'label'     => __( 'Download invoice label', 'kdna-events' ),
+				'type'      => \Elementor\Controls_Manager::TEXT,
+				'default'   => __( 'Download invoice', 'kdna-events' ),
+				'condition' => array( 'show_download_invoice' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
 			'empty_message',
 			array(
 				'label'   => __( 'Empty tab message', 'kdna-events' ),
@@ -668,7 +689,8 @@ class KDNA_Events_Widget_My_Tickets extends KDNA_Events_Widget_Base {
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT t.ticket_id, t.ticket_code, t.attendee_name, t.attendee_email, t.status, t.event_id, t.created_at,
-				        o.order_reference, o.user_id, o.purchaser_email
+				        t.order_id,
+				        o.order_reference, o.user_id, o.purchaser_email, o.total, o.status AS order_status
 				   FROM {$tickets_table} t
 				   INNER JOIN {$orders_table} o ON t.order_id = o.order_id
 				   WHERE t.status = %s
@@ -756,6 +778,8 @@ class KDNA_Events_Widget_My_Tickets extends KDNA_Events_Widget_Base {
 		$empty_msg     = (string) ( $settings['empty_message'] ?? __( 'No tickets here yet.', 'kdna-events' ) );
 		$show_qr       = 'yes' === ( $settings['show_qr'] ?? 'yes' );
 		$show_download = 'yes' === ( $settings['show_download'] ?? '' );
+		$show_invoice  = 'yes' === ( $settings['show_download_invoice'] ?? 'yes' );
+		$invoice_label = (string) ( $settings['download_invoice_label'] ?? __( 'Download invoice', 'kdna-events' ) );
 		$monospace     = 'yes' === ( $settings['monospace_code'] ?? 'yes' );
 		?>
 		<div class="kdna-events-my-tickets" data-kdna-events-my-tickets="1">
@@ -773,7 +797,7 @@ class KDNA_Events_Widget_My_Tickets extends KDNA_Events_Widget_Base {
 			<?php endif; ?>
 
 			<div class="kdna-events-my-tickets__panel is-active" data-panel="upcoming">
-				<?php $this->render_groups( $groups['upcoming'], $empty_msg, $show_qr, $show_download, $monospace ); ?>
+				<?php $this->render_groups( $groups['upcoming'], $empty_msg, $show_qr, $show_download, $monospace, $show_invoice, $invoice_label ); ?>
 			</div>
 			<div class="kdna-events-my-tickets__panel" data-panel="past">
 				<?php $this->render_groups( $groups['past'], $empty_msg, $show_qr, $show_download, $monospace ); ?>
@@ -792,7 +816,7 @@ class KDNA_Events_Widget_My_Tickets extends KDNA_Events_Widget_Base {
 	 * @param bool             $monospace     Whether to use monospace code.
 	 * @return void
 	 */
-	protected function render_groups( $groups, $empty_msg, $show_qr, $show_download, $monospace ) {
+	protected function render_groups( $groups, $empty_msg, $show_qr, $show_download, $monospace, $show_invoice = false, $invoice_label = '' ) {
 		if ( empty( $groups ) ) {
 			echo '<p class="kdna-events-my-tickets__empty">' . esc_html( $empty_msg ) . '</p>';
 			return;
@@ -823,6 +847,15 @@ class KDNA_Events_Widget_My_Tickets extends KDNA_Events_Widget_Base {
 										<?php esc_html_e( 'Download PDF (coming soon)', 'kdna-events' ); ?>
 									</button>
 								<?php endif; ?>
+								<?php
+								if ( $show_invoice && ! empty( $ticket->order_id ) && class_exists( 'KDNA_Events_Invoices' ) ) {
+									$invoice_row = KDNA_Events_Invoices::get_by_order( (int) $ticket->order_id );
+									if ( $invoice_row ) {
+										$url = kdna_events_invoice_download_url( $invoice_row->invoice_number, true );
+										echo '<a class="kdna-events-my-ticket__download kdna-events-my-ticket__download-invoice" target="_blank" rel="noopener" href="' . esc_url( $url ) . '">' . esc_html( $invoice_label ) . '</a>';
+									}
+								}
+								?>
 								<?php
 								/**
 								 * Fires after each ticket's body has rendered on the My Tickets
