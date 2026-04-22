@@ -2089,8 +2089,14 @@ class KDNA_Events_Settings {
 	 * @return void
 	 */
 	protected static function render_email_design_preview_script() {
+		$cfg = array(
+			'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
+			'previewNonce' => wp_create_nonce( 'kdna_events_preview_email' ),
+			'testNonce'    => wp_create_nonce( 'kdna_events_preview_test_send' ),
+		);
 		?>
 		<script>
+		window.kdnaEventsEmailDesign = <?php echo wp_json_encode( $cfg ); ?>;
 		(function () {
 			var cfg = window.kdnaEventsEmailDesign || {};
 			if (!cfg.ajaxUrl) { return; }

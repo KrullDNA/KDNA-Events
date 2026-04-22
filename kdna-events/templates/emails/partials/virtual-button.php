@@ -31,26 +31,28 @@ $arcsize  = $arcsize . '%';
 $width_px = 240;
 $height   = 48;
 ?>
-<tr>
-	<td class="kdna-events-email-button-row" align="center" style="padding:8px 0 24px;text-align:center;">
-		<!--[if mso]>
-		<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
-			href="<?php echo esc_url( $virtual_url ); ?>"
-			style="height:<?php echo esc_attr( (string) $height ); ?>px;v-text-anchor:middle;width:<?php echo esc_attr( (string) $width_px ); ?>px;"
-			arcsize="<?php echo esc_attr( $arcsize ); ?>"
-			stroke="f" fillcolor="<?php echo esc_attr( $button_bg ); ?>">
-			<w:anchorlock/>
-			<center style="color:<?php echo esc_attr( $button_text ); ?>;font-family:<?php echo esc_attr( $body_stack ); ?>;font-size:16px;font-weight:600;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;margin:8px 0 24px;">
+	<tr>
+		<td class="kdna-events-email-button-row" align="center" style="padding:8px 0 24px;text-align:center;">
+			<!--[if mso]>
+			<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+				href="<?php echo esc_url( $virtual_url ); ?>"
+				style="height:<?php echo esc_attr( (string) $height ); ?>px;v-text-anchor:middle;width:<?php echo esc_attr( (string) $width_px ); ?>px;"
+				arcsize="<?php echo esc_attr( $arcsize ); ?>"
+				stroke="f" fillcolor="<?php echo esc_attr( $button_bg ); ?>">
+				<w:anchorlock/>
+				<center style="color:<?php echo esc_attr( $button_text ); ?>;font-family:<?php echo esc_attr( $body_stack ); ?>;font-size:16px;font-weight:600;">
+					<?php echo esc_html( $button_label ); ?>
+				</center>
+			</v:roundrect>
+			<![endif]-->
+			<!--[if !mso]><!-- -->
+			<a class="kdna-events-email-virtual-button"
+				href="<?php echo esc_url( $virtual_url ); ?>"
+				style="background:<?php echo esc_attr( $button_bg ); ?>;border-radius:<?php echo esc_attr( (string) $radius ); ?>px;color:<?php echo esc_attr( $button_text ); ?>;display:inline-block;font-family:<?php echo esc_attr( $body_stack ); ?>;font-size:16px;font-weight:600;line-height:<?php echo esc_attr( (string) $height ); ?>px;padding:0 36px;text-align:center;text-decoration:none;-webkit-text-size-adjust:none;">
 				<?php echo esc_html( $button_label ); ?>
-			</center>
-		</v:roundrect>
-		<![endif]-->
-		<!--[if !mso]><!-- -->
-		<a class="kdna-events-email-virtual-button"
-			href="<?php echo esc_url( $virtual_url ); ?>"
-			style="background:<?php echo esc_attr( $button_bg ); ?>;border-radius:<?php echo esc_attr( (string) $radius ); ?>px;color:<?php echo esc_attr( $button_text ); ?>;display:inline-block;font-family:<?php echo esc_attr( $body_stack ); ?>;font-size:16px;font-weight:600;line-height:<?php echo esc_attr( (string) $height ); ?>px;padding:0 36px;text-align:center;text-decoration:none;-webkit-text-size-adjust:none;">
-			<?php echo esc_html( $button_label ); ?>
-		</a>
-		<!--<![endif]-->
-	</td>
-</tr>
+			</a>
+			<!--<![endif]-->
+		</td>
+	</tr>
+</table>
