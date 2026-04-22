@@ -1,0 +1,185 @@
+/**
+ * KDNA Events ticket PDF stylesheet.
+ *
+ * Dompdf 2.x supports most of CSS 2.1 plus parts of CSS 3. No flex,
+ * no grid, no clip-path. Tables, padding, borders, backgrounds and
+ * absolute-positioned bars are the building blocks.
+ */
+
+@page {
+	margin: 15mm;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	font-family: helvetica, Arial, sans-serif;
+	font-size: 11pt;
+	line-height: 1.5;
+	color: #333333;
+}
+
+.tkt-page {
+	page-break-after: always;
+}
+
+.tkt-page:last-child {
+	page-break-after: auto;
+}
+
+.tkt-header {
+	display: block;
+	background: #2E75B6;
+	padding: 10mm 12mm;
+	text-align: center;
+	margin: -15mm -15mm 8mm;
+}
+
+.tkt-header img {
+	display: inline-block;
+	max-width: 160px;
+	height: auto;
+}
+
+.tkt-hero {
+	margin: 0 0 8mm;
+	text-align: center;
+}
+
+.tkt-hero img {
+	display: block;
+	width: 100%;
+	max-height: 70mm;
+	object-fit: cover;
+}
+
+.tkt-details {
+	margin: 0 0 8mm;
+}
+
+.tkt-details__title {
+	font-size: 20pt;
+	font-weight: 700;
+	color: #1A1A1A;
+	margin: 0 0 2mm;
+	line-height: 1.2;
+}
+
+.tkt-details__subtitle {
+	font-size: 13pt;
+	color: #555555;
+	margin: 0 0 4mm;
+}
+
+.tkt-details__meta {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.tkt-details__meta td {
+	padding: 2mm 0;
+	font-size: 10.5pt;
+	vertical-align: top;
+}
+
+.tkt-details__meta td.label {
+	color: #888888;
+	width: 30mm;
+}
+
+.tkt-details__meta td.value {
+	color: #1A1A1A;
+	font-weight: 600;
+}
+
+.tkt-attendee {
+	margin: 6mm 0 8mm;
+	padding: 6mm 8mm;
+	background: #FBFBFB;
+	border: 1px solid #E5E5E5;
+	text-align: center;
+}
+
+.tkt-attendee__name {
+	font-size: 14pt;
+	font-weight: 700;
+	color: #1A1A1A;
+	margin: 0 0 2mm;
+}
+
+.tkt-attendee__code {
+	display: inline-block;
+	padding: 4mm 6mm;
+	background: #FCEAE3;
+	color: #1A1A1A;
+	font-family: courier, monospace;
+	font-size: 36pt;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	line-height: 1;
+	margin: 2mm 0;
+}
+
+.tkt-attendee__order-ref {
+	margin: 2mm 0 0;
+	font-size: 9.5pt;
+	color: #888888;
+}
+
+.tkt-attendee__custom {
+	margin: 3mm 0 0;
+	font-size: 9.5pt;
+	color: #888888;
+}
+
+.tkt-barcode {
+	text-align: center;
+	margin: 8mm 0;
+}
+
+.tkt-barcode img {
+	display: inline-block;
+	max-width: 80mm;
+	height: 20mm;
+}
+
+.tkt-barcode__code {
+	font-family: courier, monospace;
+	font-size: 11pt;
+	letter-spacing: 0.1em;
+	margin: 2mm 0 0;
+	color: #1A1A1A;
+}
+
+.tkt-terms {
+	margin: 8mm 0;
+	padding: 4mm 5mm;
+	border-top: 1px solid #E5E5E5;
+	border-bottom: 1px solid #E5E5E5;
+	font-size: 9pt;
+	color: #666666;
+	line-height: 1.5;
+}
+
+.tkt-footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	text-align: center;
+	font-size: 9pt;
+	color: #888888;
+	padding: 0 15mm;
+}
+
+.tkt-footer p {
+	margin: 0 0 1mm;
+}
+
+.tkt-footer strong {
+	color: #1A1A1A;
+}
