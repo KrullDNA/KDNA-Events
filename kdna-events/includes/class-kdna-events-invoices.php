@@ -959,6 +959,17 @@ class KDNA_Events_Invoices {
 		include KDNA_EVENTS_PATH . 'templates/invoices/invoice.php';
 		$html = (string) ob_get_clean();
 
+		// Inject screen-only padding so the iframe preview visually
+		// matches the page margin that Dompdf will apply in the real
+		// PDF. @media screen is ignored by Dompdf so this is a no-op
+		// at render time.
+		$margin = max( 5, min( 40, (int) get_option( 'kdna_events_invoice_design_page_margin', 20 ) ) );
+		$padding_css = sprintf(
+			'<style>@media screen { html, body { margin: 0; padding: 0; background: #eee; } body { padding: %1$dmm !important; box-sizing: border-box; background: #ffffff !important; min-height: 297mm; } }</style>',
+			$margin
+		);
+		$html = str_replace( '</head>', $padding_css . '</head>', $html );
+
 		wp_send_json_success( array( 'html' => $html ) );
 	}
 
