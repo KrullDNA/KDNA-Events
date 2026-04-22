@@ -4,3 +4,8 @@ Thumbs.db
 .idea/
 .vscode/
 node_modules/
+
+# Vendor README files that GitHub Secret Scanning flags for test-API-key
+# examples (Stripe, etc.). composer install regenerates them locally,
+# they are not needed at runtime.
+kdna-events/vendor/stripe/stripe-php/README.md
