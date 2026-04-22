@@ -146,6 +146,10 @@ class KDNA_Events_Settings {
 			),
 
 			// Admin notification strings.
+			'kdna_events_email_admin_subject'          => array(
+				'type'    => 'string',
+				'default' => 'New booking: {event_title} ({quantity} tickets)',
+			),
 			'kdna_events_email_admin_heading'          => array(
 				'type'    => 'string',
 				'default' => 'New booking received',
@@ -153,6 +157,26 @@ class KDNA_Events_Settings {
 			'kdna_events_email_admin_intro'            => array(
 				'type'    => 'string',
 				'default' => 'A new booking has been placed for {event_title}.',
+			),
+			'kdna_events_email_admin_summary_heading'  => array(
+				'type'    => 'string',
+				'default' => 'Booking Summary',
+			),
+			'kdna_events_email_admin_event_heading'    => array(
+				'type'    => 'string',
+				'default' => 'Event Details',
+			),
+			'kdna_events_email_admin_attendees_heading' => array(
+				'type'    => 'string',
+				'default' => 'Attendees',
+			),
+			'kdna_events_email_admin_footer_note'      => array(
+				'type'    => 'string',
+				'default' => '',
+			),
+			'kdna_events_email_admin_header_compact'   => array(
+				'type'    => 'integer',
+				'default' => 1,
 			),
 		);
 	}
@@ -2002,35 +2026,78 @@ class KDNA_Events_Settings {
 	protected static function render_email_design_controls_content( $d ) {
 		?>
 		<div class="kdna-events-email-design-section">
-			<h2><?php esc_html_e( 'Content', 'kdna-events' ); ?></h2>
+			<h2><?php esc_html_e( 'Customer Email Content', 'kdna-events' ); ?></h2>
 			<p class="description" style="max-width:64em;">
-				<?php esc_html_e( 'Defaults used when an event does not set its own override. Supports merge tags: {event_title}, {attendee_name}, {order_ref}, {event_date}, {event_time}, {event_type}, {event_location}, {organiser_name}, {purchaser_name}, {ticket_code}.', 'kdna-events' ); ?>
+				<?php esc_html_e( 'Defaults used when an event does not set its own override. Supports merge tags: {event_title}, {attendee_name}, {order_ref}, {event_date}, {event_time}, {event_type}, {event_location}, {organiser_name}, {purchaser_name}, {ticket_code}, {quantity}, {total}.', 'kdna-events' ); ?>
 			</p>
 			<table class="form-table" role="presentation">
 				<tbody>
 				<tr>
-					<th scope="row"><label for="kdna_events_email_subject_default"><?php esc_html_e( 'Email subject', 'kdna-events' ); ?></label></th>
+					<th scope="row"><label for="kdna_events_email_subject_default"><?php esc_html_e( 'Subject line', 'kdna-events' ); ?></label></th>
 					<td><input type="text" class="large-text" id="kdna_events_email_subject_default" name="kdna_events_email_subject_default" value="<?php echo esc_attr( (string) $d['kdna_events_email_subject_default'] ); ?>" data-kdna-preview-key="subject_default" /></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="kdna_events_email_heading_default"><?php esc_html_e( 'Email heading', 'kdna-events' ); ?></label></th>
+					<th scope="row"><label for="kdna_events_email_heading_default"><?php esc_html_e( 'Heading', 'kdna-events' ); ?></label></th>
 					<td><input type="text" class="large-text" id="kdna_events_email_heading_default" name="kdna_events_email_heading_default" value="<?php echo esc_attr( (string) $d['kdna_events_email_heading_default'] ); ?>" data-kdna-preview-key="heading_default" /></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="kdna_events_email_content_1_default"><?php esc_html_e( 'Email content 1', 'kdna-events' ); ?></label></th>
+					<th scope="row"><label for="kdna_events_email_content_1_default"><?php esc_html_e( 'Content 1', 'kdna-events' ); ?></label></th>
 					<td><textarea class="large-text" rows="3" id="kdna_events_email_content_1_default" name="kdna_events_email_content_1_default" data-kdna-preview-key="content_1_default"><?php echo esc_textarea( (string) $d['kdna_events_email_content_1_default'] ); ?></textarea></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="kdna_events_email_content_2_default"><?php esc_html_e( 'Email content 2', 'kdna-events' ); ?></label></th>
+					<th scope="row"><label for="kdna_events_email_content_2_default"><?php esc_html_e( 'Content 2', 'kdna-events' ); ?></label></th>
 					<td><textarea class="large-text" rows="3" id="kdna_events_email_content_2_default" name="kdna_events_email_content_2_default" data-kdna-preview-key="content_2_default"><?php echo esc_textarea( (string) $d['kdna_events_email_content_2_default'] ); ?></textarea></td>
 				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Admin Email Content', 'kdna-events' ); ?></h2>
+			<p class="description" style="max-width:64em;">
+				<?php esc_html_e( 'Internal notifications to the admin and optional organiser. Share the same branding as the customer email, differ only in layout and content structure.', 'kdna-events' ); ?>
+			</p>
+			<table class="form-table" role="presentation">
+				<tbody>
 				<tr>
-					<th scope="row"><label for="kdna_events_email_admin_heading"><?php esc_html_e( 'Admin notification heading', 'kdna-events' ); ?></label></th>
+					<th scope="row"><label for="kdna_events_email_admin_subject"><?php esc_html_e( 'Subject line', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="large-text" id="kdna_events_email_admin_subject" name="kdna_events_email_admin_subject" value="<?php echo esc_attr( (string) $d['kdna_events_email_admin_subject'] ); ?>" data-kdna-preview-key="admin_subject" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_admin_heading"><?php esc_html_e( 'Heading', 'kdna-events' ); ?></label></th>
 					<td><input type="text" class="large-text" id="kdna_events_email_admin_heading" name="kdna_events_email_admin_heading" value="<?php echo esc_attr( (string) $d['kdna_events_email_admin_heading'] ); ?>" data-kdna-preview-key="admin_heading" /></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="kdna_events_email_admin_intro"><?php esc_html_e( 'Admin notification intro', 'kdna-events' ); ?></label></th>
+					<th scope="row"><label for="kdna_events_email_admin_intro"><?php esc_html_e( 'Intro paragraph', 'kdna-events' ); ?></label></th>
 					<td><textarea class="large-text" rows="2" id="kdna_events_email_admin_intro" name="kdna_events_email_admin_intro" data-kdna-preview-key="admin_intro"><?php echo esc_textarea( (string) $d['kdna_events_email_admin_intro'] ); ?></textarea></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_admin_summary_heading"><?php esc_html_e( 'Booking summary section heading', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="large-text" id="kdna_events_email_admin_summary_heading" name="kdna_events_email_admin_summary_heading" value="<?php echo esc_attr( (string) $d['kdna_events_email_admin_summary_heading'] ); ?>" data-kdna-preview-key="admin_summary_heading" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_admin_event_heading"><?php esc_html_e( 'Event section heading', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="large-text" id="kdna_events_email_admin_event_heading" name="kdna_events_email_admin_event_heading" value="<?php echo esc_attr( (string) $d['kdna_events_email_admin_event_heading'] ); ?>" data-kdna-preview-key="admin_event_heading" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_admin_attendees_heading"><?php esc_html_e( 'Attendees section heading', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="large-text" id="kdna_events_email_admin_attendees_heading" name="kdna_events_email_admin_attendees_heading" value="<?php echo esc_attr( (string) $d['kdna_events_email_admin_attendees_heading'] ); ?>" data-kdna-preview-key="admin_attendees_heading" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_admin_footer_note"><?php esc_html_e( 'Footer note', 'kdna-events' ); ?></label></th>
+					<td>
+						<textarea class="large-text" rows="2" id="kdna_events_email_admin_footer_note" name="kdna_events_email_admin_footer_note" data-kdna-preview-key="admin_footer_note"><?php echo esc_textarea( (string) $d['kdna_events_email_admin_footer_note'] ); ?></textarea>
+						<p class="description"><?php esc_html_e( 'Optional. Shown ABOVE the shared footer. Useful for per-client internal instructions (e.g. check the dashboard).', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Compact header', 'kdna-events' ); ?></th>
+					<td>
+						<label>
+							<input type="checkbox" name="kdna_events_email_admin_header_compact" value="1" <?php checked( ! empty( $d['kdna_events_email_admin_header_compact'] ) ); ?> data-kdna-preview-key="admin_header_compact" />
+							<?php esc_html_e( 'Render the admin email with a tighter logo block and less top padding.', 'kdna-events' ); ?>
+						</label>
+					</td>
 				</tr>
 				</tbody>
 			</table>
@@ -2069,7 +2136,17 @@ class KDNA_Events_Settings {
 				<button type="button" class="kdna-events-email-design-preview__tab" data-target="admin_notification"><?php esc_html_e( 'Admin Notification', 'kdna-events' ); ?></button>
 				<button type="button" class="button button-secondary" style="margin-left:auto;" data-kdna-events-email-preview-refresh><?php esc_html_e( 'Refresh preview', 'kdna-events' ); ?></button>
 			</div>
-			<iframe class="kdna-events-email-design-preview__frame" data-kdna-events-email-preview-frame title="<?php esc_attr_e( 'Email preview', 'kdna-events' ); ?>" srcdoc="&lt;p style=&quot;font:14px sans-serif;color:#555;padding:2em;&quot;&gt;<?php echo esc_attr__( 'Loading preview...', 'kdna-events' ); ?>&lt;/p&gt;"></iframe>
+			<div class="kdna-events-email-design-preview__toggles" role="group">
+				<span class="kdna-events-email-design-preview__toggles-label"><?php esc_html_e( 'Mode:', 'kdna-events' ); ?></span>
+				<button type="button" class="kdna-events-email-design-preview__toggle is-active" data-preview-mode="light"><?php esc_html_e( 'Light', 'kdna-events' ); ?></button>
+				<button type="button" class="kdna-events-email-design-preview__toggle" data-preview-mode="dark"><?php esc_html_e( 'Dark', 'kdna-events' ); ?></button>
+				<span class="kdna-events-email-design-preview__toggles-label" style="margin-left:14px;"><?php esc_html_e( 'Device:', 'kdna-events' ); ?></span>
+				<button type="button" class="kdna-events-email-design-preview__toggle is-active" data-preview-device="desktop"><?php esc_html_e( 'Desktop', 'kdna-events' ); ?></button>
+				<button type="button" class="kdna-events-email-design-preview__toggle" data-preview-device="mobile"><?php esc_html_e( 'Mobile', 'kdna-events' ); ?></button>
+			</div>
+			<div class="kdna-events-email-design-preview__viewport" data-kdna-events-email-preview-viewport>
+				<iframe class="kdna-events-email-design-preview__frame" data-kdna-events-email-preview-frame title="<?php esc_attr_e( 'Email preview', 'kdna-events' ); ?>" srcdoc="&lt;p style=&quot;font:14px sans-serif;color:#555;padding:2em;&quot;&gt;<?php echo esc_attr__( 'Loading preview...', 'kdna-events' ); ?>&lt;/p&gt;"></iframe>
+			</div>
 			<div class="kdna-events-email-design-preview__send">
 				<label for="kdna-events-email-preview-test-to" class="screen-reader-text"><?php esc_html_e( 'Send test to email address', 'kdna-events' ); ?></label>
 				<input type="email" id="kdna-events-email-preview-test-to" placeholder="<?php esc_attr_e( 'you@example.com', 'kdna-events' ); ?>" />
@@ -2105,21 +2182,38 @@ class KDNA_Events_Settings {
 			if (!root) { return; }
 
 			var frame = root.querySelector('[data-kdna-events-email-preview-frame]');
+			var viewport = root.querySelector('[data-kdna-events-email-preview-viewport]');
 			var status = root.querySelector('.kdna-events-email-design-preview__status');
 			var refresh = root.querySelector('[data-kdna-events-email-preview-refresh]');
 			var sendBtn = root.querySelector('[data-kdna-events-email-preview-send]');
 			var toInput = root.querySelector('#kdna-events-email-preview-test-to');
 			var tabs = root.querySelectorAll('.kdna-events-email-design-preview__tab');
+			var modeToggles = root.querySelectorAll('[data-preview-mode]');
+			var deviceToggles = root.querySelectorAll('[data-preview-device]');
 			var form = root.closest('form');
 
 			var currentTemplate = 'booking_confirmation';
+			var currentMode = 'light';
+			var currentDevice = 'desktop';
 			var debounceTimer = null;
+
+			function applyDevice() {
+				if (!viewport) { return; }
+				if ('mobile' === currentDevice) {
+					viewport.style.maxWidth = '400px';
+					viewport.style.margin = '0 auto';
+				} else {
+					viewport.style.maxWidth = '';
+					viewport.style.margin = '';
+				}
+			}
 
 			function collectPayload() {
 				var fd = new FormData();
 				fd.append('action', 'kdna_events_preview_email');
 				fd.append('nonce', cfg.previewNonce);
 				fd.append('template', currentTemplate);
+				fd.append('preview_mode', currentMode);
 				if (form) {
 					var controls = form.querySelectorAll('[name^="kdna_events_email_"], [name="kdna_events_email_logo_id"], [name="kdna_events_email_default_header_image"]');
 					controls.forEach(function (el) {
@@ -2175,7 +2269,26 @@ class KDNA_Events_Settings {
 				});
 			});
 
+			modeToggles.forEach(function (btn) {
+				btn.addEventListener('click', function () {
+					modeToggles.forEach(function (b) { b.classList.remove('is-active'); });
+					btn.classList.add('is-active');
+					currentMode = btn.getAttribute('data-preview-mode') || 'light';
+					renderPreview();
+				});
+			});
+
+			deviceToggles.forEach(function (btn) {
+				btn.addEventListener('click', function () {
+					deviceToggles.forEach(function (b) { b.classList.remove('is-active'); });
+					btn.classList.add('is-active');
+					currentDevice = btn.getAttribute('data-preview-device') || 'desktop';
+					applyDevice();
+				});
+			});
+
 			// Initial render.
+			applyDevice();
 			renderPreview();
 
 			if (sendBtn) {
@@ -2189,6 +2302,7 @@ class KDNA_Events_Settings {
 					body.append('nonce', cfg.testNonce);
 					body.append('to', to);
 					body.append('template', currentTemplate);
+					body.append('preview_mode', currentMode);
 					fetch(cfg.ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body })
 						.then(function (r) { return r.json(); })
 						.then(function (res) {

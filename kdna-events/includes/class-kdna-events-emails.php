@@ -116,12 +116,16 @@ class KDNA_Events_Emails {
 		$design  = KDNA_Events_Settings::get_email_design();
 		$html    = self::render_admin_notification_html( $context, $design, $order, $tickets );
 
-		$subject = sprintf(
-			/* translators: 1: order reference, 2: event title */
-			__( 'New KDNA Events booking: %1$s for %2$s', 'kdna-events' ),
-			$order->order_reference,
-			$context['event_title']
-		);
+		$subject_tpl = (string) ( $design['kdna_events_email_admin_subject'] ?? 'New booking: {event_title} ({quantity} tickets)' );
+		$subject     = kdna_events_render_merge_tags( $subject_tpl, $context );
+		if ( '' === trim( $subject ) ) {
+			$subject = sprintf(
+				/* translators: 1: order reference, 2: event title */
+				__( 'New KDNA Events booking: %1$s for %2$s', 'kdna-events' ),
+				$order->order_reference,
+				$context['event_title']
+			);
+		}
 
 		$attachments = apply_filters( 'kdna_events_email_attachments', array(), (int) $order->order_id, 'admin_notification' );
 
@@ -261,7 +265,7 @@ class KDNA_Events_Emails {
 		$body_stack      = KDNA_Events_Settings::email_resolve_font_stack( (string) ( $design['kdna_events_email_body_font'] ?? 'google:Inter' ), (string) ( $design['kdna_events_email_body_font_custom'] ?? '' ) );
 		$heading_google  = KDNA_Events_Settings::email_resolve_google_font_url( (string) ( $design['kdna_events_email_heading_font'] ?? '' ) );
 		$body_google     = KDNA_Events_Settings::email_resolve_google_font_url( (string) ( $design['kdna_events_email_body_font'] ?? '' ) );
-		$inline_style    = self::load_email_css();
+		$inline_style    = self::load_email_css( (string) ( $design['_preview_mode'] ?? '' ) );
 
 		$event_title = (string) ( $context['event_title'] ?? '' );
 		$card_radius = (int) ( $design['kdna_events_email_card_border_radius'] ?? 8 );
@@ -316,38 +320,69 @@ class KDNA_Events_Emails {
 		$body_google    = KDNA_Events_Settings::email_resolve_google_font_url( (string) ( $design['kdna_events_email_body_font'] ?? '' ) );
 		$inline_style   = self::load_email_css();
 
-		$admin_heading = kdna_events_render_merge_tags( (string) ( $design['kdna_events_email_admin_heading'] ?? '' ), $context );
-		$admin_intro   = kdna_events_render_merge_tags( (string) ( $design['kdna_events_email_admin_intro'] ?? '' ), $context );
-		$subject       = sprintf(
-			/* translators: 1: order reference, 2: event title */
-			__( 'New booking: %1$s for %2$s', 'kdna-events' ),
-			(string) ( $context['order_ref'] ?? '' ),
-			(string) ( $context['event_title'] ?? '' )
+		$admin_heading  = kdna_events_render_merge_tags( (string) ( $design['kdna_events_email_admin_heading'] ?? '' ), $context );
+		$admin_intro    = kdna_events_render_merge_tags( (string) ( $design['kdna_events_email_admin_intro'] ?? '' ), $context );
+		$summary_heading   = kdna_events_render_merge_tags( (string) ( $design['kdna_events_email_admin_summary_heading'] ?? '' ), $context );
+		$event_heading     = kdna_events_render_merge_tags( (string) ( $design['kdna_events_email_admin_event_heading'] ?? '' ), $context );
+		$attendees_heading = kdna_events_render_merge_tags( (string) ( $design['kdna_events_email_admin_attendees_heading'] ?? '' ), $context );
+		$admin_footer_note = kdna_events_render_merge_tags( (string) ( $design['kdna_events_email_admin_footer_note'] ?? '' ), $context );
+		$compact           = ! empty( $design['kdna_events_email_admin_header_compact'] );
+
+		$subject_tpl = (string) ( $design['kdna_events_email_admin_subject'] ?? 'New booking: {event_title} ({quantity} tickets)' );
+		$subject     = kdna_events_render_merge_tags( $subject_tpl, $context );
+
+		$event_id_int = (int) ( $context['_event_id_int'] ?? 0 );
+		$event_edit_url = $event_id_int ? admin_url( 'post.php?post=' . $event_id_int . '&action=edit' ) : '';
+
+		$preheader_text = sprintf(
+			/* translators: 1: event title, 2: quantity, 3: total */
+			__( 'New booking received for %1$s, %2$s tickets, %3$s', 'kdna-events' ),
+			(string) ( $context['event_title'] ?? '' ),
+			(string) ( $context['quantity'] ?? '' ),
+			(string) ( $context['total'] ?? '' )
 		);
-		$preheader_text = self::build_preheader( $context );
+
+		$booked_at = '';
+		if ( $order && isset( $order->created_at ) ) {
+			$booked_at = (string) $order->created_at;
+		}
+		$purchaser_phone = $order && isset( $order->purchaser_phone ) ? (string) $order->purchaser_phone : '';
+		$stripe_ref      = $order && isset( $order->stripe_payment_intent ) ? (string) $order->stripe_payment_intent : '';
+		$status_label    = $order && isset( $order->status ) ? (string) $order->status : '';
+		$total_display   = (string) ( $context['total'] ?? '' );
 
 		$summary_rows = array(
 			__( 'Order reference', 'kdna-events' ) => (string) ( $context['order_ref'] ?? '' ),
-			__( 'Event', 'kdna-events' )           => (string) ( $context['event_title'] ?? '' ),
-			__( 'Event date', 'kdna-events' )      => trim( (string) ( $context['event_date'] ?? '' ) . ' ' . (string) ( $context['event_time'] ?? '' ) ),
-			__( 'Event type', 'kdna-events' )      => (string) ( $context['event_type'] ?? '' ),
-			__( 'Location', 'kdna-events' )        => (string) ( $context['event_location'] ?? '' ),
+			__( 'Booked at', 'kdna-events' )       => $booked_at,
 			__( 'Purchaser', 'kdna-events' )       => (string) ( $context['purchaser_name'] ?? '' ),
 			__( 'Purchaser email', 'kdna-events' ) => (string) ( $context['purchaser_email'] ?? '' ),
-			__( 'Quantity', 'kdna-events' )        => (string) ( $context['quantity'] ?? '' ),
-			__( 'Total', 'kdna-events' )           => (string) ( $context['total'] ?? '' ),
+			__( 'Purchaser phone', 'kdna-events' ) => $purchaser_phone,
+			__( 'Tickets purchased', 'kdna-events' ) => (string) ( $context['quantity'] ?? '' ),
+			__( 'Total amount', 'kdna-events' )    => $total_display,
+			__( 'Payment status', 'kdna-events' )  => $status_label,
+			__( 'Payment reference', 'kdna-events' ) => '' !== $stripe_ref ? $stripe_ref : ( __( 'Free', 'kdna-events' ) === $total_display ? __( 'Free', 'kdna-events' ) : '' ),
 		);
-		if ( $order && isset( $order->status ) ) {
-			$summary_rows[ __( 'Status', 'kdna-events' ) ] = (string) $order->status;
-		}
 
 		$attendee_rows = array();
 		if ( is_array( $tickets ) ) {
 			foreach ( $tickets as $t ) {
+				$custom = array();
+				if ( isset( $t->custom_fields ) ) {
+					if ( is_array( $t->custom_fields ) ) {
+						$custom = $t->custom_fields;
+					} elseif ( is_string( $t->custom_fields ) ) {
+						$decoded = json_decode( $t->custom_fields, true );
+						if ( is_array( $decoded ) ) {
+							$custom = $decoded;
+						}
+					}
+				}
 				$attendee_rows[] = array(
-					'name'        => (string) ( $t->attendee_name ?? '' ),
-					'email'       => (string) ( $t->attendee_email ?? '' ),
-					'ticket_code' => (string) ( $t->ticket_code ?? '' ),
+					'name'          => (string) ( $t->attendee_name ?? '' ),
+					'email'         => (string) ( $t->attendee_email ?? '' ),
+					'phone'         => (string) ( $t->attendee_phone ?? '' ),
+					'ticket_code'   => (string) ( $t->ticket_code ?? '' ),
+					'custom_fields' => $custom,
 				);
 			}
 		}
@@ -433,13 +468,23 @@ class KDNA_Events_Emails {
 	 *
 	 * @return string
 	 */
-	protected static function load_email_css() {
+	protected static function load_email_css( $preview_mode = '' ) {
 		$path = KDNA_EVENTS_PATH . 'templates/emails/css/email.css';
-		if ( file_exists( $path ) ) {
-			$css = (string) file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-			return $css;
+		if ( ! file_exists( $path ) ) {
+			return '';
 		}
-		return '';
+		$css = (string) file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		if ( 'light' === $preview_mode ) {
+			// Strip the prefers-color-scheme:dark media query so the preview
+			// always renders light regardless of the admin's OS setting.
+			$css = preg_replace( '/@media\s*\(prefers-color-scheme:\s*dark\)\s*\{(?:[^{}]|\{[^{}]*\})*\}/i', '', $css );
+		} elseif ( 'dark' === $preview_mode ) {
+			// Drop the media-query gate so the dark rules apply unconditionally.
+			$css = preg_replace( '/@media\s*\(prefers-color-scheme:\s*dark\)\s*\{\s*((?:[^{}]|\{[^{}]*\})*)\s*\}/i', '$1', $css );
+		}
+
+		return (string) $css;
 	}
 
 	/**
@@ -642,7 +687,7 @@ class KDNA_Events_Emails {
 	 * @param array  $overlay  Option overlay.
 	 * @return string Rendered HTML.
 	 */
-	public static function render_preview( $template, $overlay = array() ) {
+	public static function render_preview( $template, $overlay = array(), $mode = 'light' ) {
 		$design = KDNA_Events_Settings::get_email_design();
 		foreach ( (array) $overlay as $key => $value ) {
 			if ( array_key_exists( $key, $design ) ) {
@@ -650,23 +695,40 @@ class KDNA_Events_Emails {
 			}
 		}
 
+		$design['_preview_mode'] = in_array( $mode, array( 'light', 'dark' ), true ) ? $mode : 'light';
+
 		$context = self::get_sample_context();
 
 		if ( 'admin_notification' === $template ) {
 			$sample_order   = (object) array(
-				'order_id'        => 0,
-				'order_reference' => $context['order_ref'],
-				'event_id'        => 0,
-				'purchaser_name'  => $context['purchaser_name'],
-				'purchaser_email' => $context['purchaser_email'],
-				'quantity'        => 2,
-				'total'           => 199,
-				'currency'        => (string) get_option( 'kdna_events_default_currency', 'AUD' ),
-				'status'          => 'paid',
+				'order_id'              => 0,
+				'order_reference'       => $context['order_ref'],
+				'event_id'              => 0,
+				'purchaser_name'        => $context['purchaser_name'],
+				'purchaser_email'       => $context['purchaser_email'],
+				'purchaser_phone'       => '+61 400 123 456',
+				'quantity'              => 2,
+				'total'                 => 199,
+				'currency'              => (string) get_option( 'kdna_events_default_currency', 'AUD' ),
+				'status'                => 'paid',
+				'created_at'            => current_time( 'mysql' ),
+				'stripe_payment_intent' => 'pi_3PreviewExample',
 			);
 			$sample_tickets = array(
-				(object) array( 'attendee_name' => __( 'Jane Doe', 'kdna-events' ),   'attendee_email' => 'jane@example.com', 'ticket_code' => 'ABCD1234' ),
-				(object) array( 'attendee_name' => __( 'John Smith', 'kdna-events' ), 'attendee_email' => 'john@example.com', 'ticket_code' => 'EFGH5678' ),
+				(object) array(
+					'attendee_name'  => __( 'Jane Doe', 'kdna-events' ),
+					'attendee_email' => 'jane@example.com',
+					'attendee_phone' => '+61 400 555 001',
+					'ticket_code'    => 'ABCD1234',
+					'custom_fields'  => array( 'Dietary' => 'Vegetarian', 'T-shirt size' => 'M' ),
+				),
+				(object) array(
+					'attendee_name'  => __( 'John Smith', 'kdna-events' ),
+					'attendee_email' => 'john@example.com',
+					'attendee_phone' => '+61 400 555 002',
+					'ticket_code'    => 'EFGH5678',
+					'custom_fields'  => array( 'Dietary' => 'None', 'T-shirt size' => 'L' ),
+				),
 			);
 			return self::render_admin_notification_html( $context, $design, $sample_order, $sample_tickets );
 		}
@@ -727,6 +789,11 @@ class KDNA_Events_Emails {
 			$template = 'booking_confirmation';
 		}
 
+		$mode = isset( $_POST['preview_mode'] ) ? sanitize_key( wp_unslash( $_POST['preview_mode'] ) ) : 'light';
+		if ( ! in_array( $mode, array( 'light', 'dark' ), true ) ) {
+			$mode = 'light';
+		}
+
 		$overlay = array();
 		$schema  = KDNA_Events_Settings::email_design_schema();
 		foreach ( $schema as $name => $def ) {
@@ -748,7 +815,7 @@ class KDNA_Events_Emails {
 			$overlay[ $name ] = sanitize_textarea_field( (string) $raw );
 		}
 
-		$html = self::render_preview( $template, $overlay );
+		$html = self::render_preview( $template, $overlay, $mode );
 		wp_send_json_success( array( 'html' => $html ) );
 	}
 
@@ -771,8 +838,12 @@ class KDNA_Events_Emails {
 		if ( ! in_array( $template, array( 'booking_confirmation', 'admin_notification' ), true ) ) {
 			$template = 'booking_confirmation';
 		}
+		$mode = isset( $_POST['preview_mode'] ) ? sanitize_key( wp_unslash( $_POST['preview_mode'] ) ) : 'light';
+		if ( ! in_array( $mode, array( 'light', 'dark' ), true ) ) {
+			$mode = 'light';
+		}
 
-		$html    = self::render_preview( $template );
+		$html    = self::render_preview( $template, array(), $mode );
 		$subject = 'admin_notification' === $template
 			? __( '[Test] KDNA Events admin notification', 'kdna-events' )
 			: __( '[Test] KDNA Events booking confirmation', 'kdna-events' );

@@ -148,6 +148,53 @@ Recommended pre-release steps before tagging 1.1.0:
 5. Toggle Apple Mail into dark mode and confirm the dark-mode
    overrides in `email.css` keep the design legible.
 
+## Admin Email Audit (follow-up pass)
+
+Against the corrected spec (seven admin content strings, full branded
+treatment, Booking Summary + Event Details + Attendees blocks, VML-
+safe CSS, plain-text fallback, configurable subject line, linked
+event title, optional footer note, compact header).
+
+| Spec check | Result |
+| --- | --- |
+| send_admin_notification uses the same render flow as send_booking_confirmation | PASS (Emogrifier inline, plain-text via `strip_html_to_text`, multipart/alternative via `phpmailer_init` AltBody, `kdna_events_email_attachments` filter applied). |
+| admin-notification.php uses shared doctype-head + preheader + logo + footer partials | PASS (identical include chain to the customer template, same `load_email_css` stylesheet). |
+| All seven admin content strings exposed on Email Design | FIXED (added Subject line, Booking summary heading, Event section heading, Attendees heading, Footer note; already had Heading + Intro). Grouped under 'Admin Email Content' visually separate from 'Customer Email Content'. |
+| Subject line template-driven with merge tags | FIXED (`kdna_events_email_admin_subject`, default `New booking: {event_title} ({quantity} tickets)`, resolved via `kdna_events_render_merge_tags` in `send_admin_notification` and falls back to the legacy hard-coded string if blank). |
+| Booking summary table with alternating row tints | FIXED (two-column key/value, rows: Order reference, Booked at, Purchaser name/email/phone, Tickets purchased, Total amount, Payment status, Payment reference; tint derived via `kdna_events_mix_hex(divider, 0.35, card_bg)` so it adapts to any palette). |
+| Event Details block | FIXED (new admin template block; title linked to `admin_url('post.php?post=ID&action=edit')` when an event id is present, date + time, location, organiser). |
+| Attendees table with dynamic custom field columns | FIXED (columns: Ticket code, Name, Email, Phone, plus any `custom_fields` keys aggregated across every ticket; primary brand colour header, alternating body rows). |
+| Optional footer note | FIXED (new multiline setting, renders as a tinted panel above the shared footer; hides entirely when blank). |
+| Compact admin header toggle | FIXED (`kdna_events_email_admin_header_compact` checkbox, default on; multiplies vertical padding by 0.75 in the template). |
+| Shared full branded footer (NOT plugin attribution only) | PASS (uses the same `footer.php` partial as the customer email; no changes needed from Brief A). |
+| Live preview has Admin Notification tab | PASS (already shipped). |
+| Test-send can target admin template | PASS (preview panel's current template is what gets sent). |
+
+## Preview enhancements (this pass)
+
+- Light / Dark toggle above the iframe. Light strips the
+  `@media (prefers-color-scheme: dark)` block from the inlined CSS
+  so the preview never inherits the admin's OS dark preference;
+  Dark flips the same media query to unconditional rules so the
+  dark palette renders regardless of OS setting.
+- Desktop / Mobile viewport toggle. Mobile clamps the preview
+  viewport to 400px wide so admins can eyeball the `@media
+  (max-width:480px)` stacking rules without reaching for a phone.
+- Iframe container is wrapped with `color-scheme: light` so the
+  sample iframe never paints a black background from the system
+  scheme when Light is selected.
+- The Light mode is the default on first load so new users don't
+  see the email's dark-mode fallback painted as the headline look.
+
+## Out of scope for this session
+
+- **Invoice generator**. Flagged by the client in-session as a
+  new core feature (PDF invoices, numbering, tax/VAT, storage,
+  email attachment, admin reprint). That is a substantial
+  separate product surface and should be a standalone Brief C
+  with its own scope doc and design references. Not built here;
+  do not attempt it until a dedicated brief lands.
+
 ## Known limitations / follow-ups for Brief B
 
 - Bundle PDF tickets via the new `kdna_events_email_attachments`
