@@ -392,6 +392,62 @@ class KDNA_Events_Settings {
 				'default'           => 10,
 			)
 		);
+
+		// Booking References.
+		register_setting(
+			'kdna_events_general',
+			'kdna_events_reference_prefix',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_reference_token' ),
+				'default'           => '',
+			)
+		);
+		register_setting(
+			'kdna_events_general',
+			'kdna_events_reference_suffix',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_reference_token' ),
+				'default'           => '',
+			)
+		);
+		register_setting(
+			'kdna_events_general',
+			'kdna_events_reference_include_year',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ),
+				'default'           => true,
+			)
+		);
+		register_setting(
+			'kdna_events_general',
+			'kdna_events_reference_pad_width',
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_pad_width' ),
+				'default'           => 6,
+			)
+		);
+		register_setting(
+			'kdna_events_general',
+			'kdna_events_reference_format',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_reference_format' ),
+				'default'           => 'sequential',
+			)
+		);
+		register_setting(
+			'kdna_events_general',
+			'kdna_events_reference_next',
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_reference_next' ),
+				'default'           => 1,
+			)
+		);
 		// Send-related settings moved from the v1.0 General tab to the
 		// Emails tab in v1.1. Option names are unchanged so existing
 		// values carry over; only the form group changes.
@@ -609,6 +665,135 @@ class KDNA_Events_Settings {
 		if ( $int < 1 ) {
 			$int = 1;
 		}
+		return $int;
+	}
+
+	/**
+	 * Sanitise the prefix / suffix tokens for the booking reference.
+	 *
+	 * Allowed characters are ASCII letters, digits, and the safe
+	 * punctuation used in reference strings (dash, underscore, dot,
+	 * slash, hash, space). Anything else is dropped.
+	 *
+	 * @param mixed $value Raw input.
+	 * @return string
+	 */
+	public static function sanitize_reference_token( $value ) {
+		$value = trim( (string) $value );
+		$value = preg_replace( '/[^A-Za-z0-9_\-\.\/# ]/', '', $value );
+		return substr( (string) $value, 0, 24 );
+	}
+
+	/**
+	 * Clamp the padding width to 1..12.
+	 *
+	 * @param mixed $value Raw input.
+	 * @return int
+	 */
+	public static function sanitize_pad_width( $value ) {
+		$int = absint( $value );
+		if ( $int < 1 ) {
+			$int = 1;
+		}
+		if ( $int > 12 ) {
+			$int = 12;
+		}
+		return $int;
+	}
+
+	/**
+	 * Guard the booking reference format selector.
+	 *
+	 * @param mixed $value Raw input.
+	 * @return string
+	 */
+	public static function sanitize_reference_format( $value ) {
+		$value = (string) $value;
+		if ( 'random' === $value ) {
+			return 'random';
+		}
+		return 'sequential';
+	}
+
+	/**
+	 * Sanitise the 'Next reference number' counter with a collision guard.
+	 *
+	 * Admins can jump the counter forwards freely, but jumping backwards
+	 * onto a number that already exists in the orders table would
+	 * produce duplicate references. When that would happen we clamp the
+	 * value to the highest used number + 1 and flash an admin notice.
+	 *
+	 * @param mixed $value Raw input.
+	 * @return int
+	 */
+	public static function sanitize_reference_next( $value ) {
+		global $wpdb;
+
+		$int = absint( $value );
+		if ( $int < 1 ) {
+			$int = 1;
+		}
+
+		if ( ! class_exists( 'KDNA_Events_DB' ) ) {
+			return $int;
+		}
+
+		$table  = KDNA_Events_DB::orders_table();
+		$prefix = (string) get_option( 'kdna_events_reference_prefix', '' );
+		$suffix = (string) get_option( 'kdna_events_reference_suffix', '' );
+		$width  = max( 1, min( 12, (int) get_option( 'kdna_events_reference_pad_width', 6 ) ) );
+		$year   = (int) current_time( 'Y' );
+		$inc_y  = (bool) get_option( 'kdna_events_reference_include_year', true );
+
+		$candidate_body = str_pad( (string) $int, $width, '0', STR_PAD_LEFT );
+		$parts = array();
+		if ( '' !== $prefix ) {
+			$parts[] = $prefix;
+		}
+		if ( $inc_y ) {
+			$parts[] = (string) $year;
+		}
+		$parts[] = $candidate_body;
+		$candidate = implode( '-', $parts ) . $suffix;
+
+		$exists = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$table} WHERE order_reference = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$candidate
+			)
+		);
+
+		if ( $exists > 0 ) {
+			add_settings_error(
+				'kdna_events_reference_next',
+				'kdna_events_reference_collision',
+				__( 'The starting number you chose is already in use. KDNA Events advanced it to the next free number.', 'kdna-events' ),
+				'warning'
+			);
+			// Advance until we find a free slot.
+			$guard = 0;
+			do {
+				$int++;
+				$guard++;
+				$candidate_body = str_pad( (string) $int, $width, '0', STR_PAD_LEFT );
+				$parts          = array();
+				if ( '' !== $prefix ) {
+					$parts[] = $prefix;
+				}
+				if ( $inc_y ) {
+					$parts[] = (string) $year;
+				}
+				$parts[]   = $candidate_body;
+				$candidate = implode( '-', $parts ) . $suffix;
+				$exists    = (int) $wpdb->get_var(
+					$wpdb->prepare(
+						"SELECT COUNT(*) FROM {$table} WHERE order_reference = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+						$candidate
+					)
+				);
+			} while ( $exists > 0 && $guard < 1000 );
+		}
+
 		return $int;
 	}
 
@@ -949,6 +1134,104 @@ class KDNA_Events_Settings {
 				<td>
 					<input type="number" min="1" step="1" id="kdna_events_default_max_per_order" name="kdna_events_default_max_per_order" value="<?php echo esc_attr( (string) $max_per ); ?>" />
 					<p class="description"><?php esc_html_e( 'Fallback cap applied when an event does not set its own maximum per order.', 'kdna-events' ); ?></p>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+
+		<?php self::render_reference_settings(); ?>
+		<?php
+	}
+
+	/**
+	 * Render the Booking References settings block.
+	 *
+	 * Lives on the General tab so admins can set the prefix, suffix,
+	 * padding, starting number and sequential / random mode. A live
+	 * example string shows exactly what the next booking reference
+	 * will look like, which saves a lot of confused back-and-forth.
+	 *
+	 * @return void
+	 */
+	protected static function render_reference_settings() {
+		$prefix       = (string) get_option( 'kdna_events_reference_prefix', '' );
+		$suffix       = (string) get_option( 'kdna_events_reference_suffix', '' );
+		$include_year = (bool) get_option( 'kdna_events_reference_include_year', true );
+		$pad_width    = max( 1, min( 12, (int) get_option( 'kdna_events_reference_pad_width', 6 ) ) );
+		$format       = (string) get_option( 'kdna_events_reference_format', 'sequential' );
+		$next         = max( 1, (int) get_option( 'kdna_events_reference_next', 1 ) );
+
+		$year = (int) current_time( 'Y' );
+		$example_body = 'sequential' === $format
+			? str_pad( (string) $next, $pad_width, '0', STR_PAD_LEFT )
+			: strtoupper( wp_generate_password( 6, false, false ) );
+		$example_parts = array();
+		if ( '' !== $prefix ) {
+			$example_parts[] = $prefix;
+		}
+		if ( $include_year ) {
+			$example_parts[] = (string) $year;
+		}
+		$example_parts[] = $example_body;
+		$example = implode( '-', $example_parts ) . $suffix;
+		?>
+		<h2 class="title" style="margin-top:1.5em;"><?php esc_html_e( 'Booking References', 'kdna-events' ); ?></h2>
+		<p class="description" style="max-width:64em;">
+			<?php esc_html_e( 'Controls the booking reference shown on confirmation emails, Stripe Checkout and every admin screen. Existing references never change, only new bookings follow the new format.', 'kdna-events' ); ?>
+		</p>
+		<table class="form-table" role="presentation">
+			<tbody>
+			<tr>
+				<th scope="row"><label for="kdna_events_reference_prefix"><?php esc_html_e( 'Prefix', 'kdna-events' ); ?></label></th>
+				<td>
+					<input type="text" class="regular-text" id="kdna_events_reference_prefix" name="kdna_events_reference_prefix" value="<?php echo esc_attr( $prefix ); ?>" maxlength="24" />
+					<p class="description"><?php esc_html_e( 'Optional. Letters, digits, dash, underscore, dot, slash, hash, space. Leave blank for none.', 'kdna-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="kdna_events_reference_suffix"><?php esc_html_e( 'Suffix', 'kdna-events' ); ?></label></th>
+				<td>
+					<input type="text" class="regular-text" id="kdna_events_reference_suffix" name="kdna_events_reference_suffix" value="<?php echo esc_attr( $suffix ); ?>" maxlength="24" />
+					<p class="description"><?php esc_html_e( 'Optional. Appended after the number.', 'kdna-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Include year', 'kdna-events' ); ?></th>
+				<td>
+					<label>
+						<input type="checkbox" name="kdna_events_reference_include_year" value="1" <?php checked( $include_year ); ?> />
+						<?php esc_html_e( 'Insert the current 4-digit year between prefix and number.', 'kdna-events' ); ?>
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="kdna_events_reference_pad_width"><?php esc_html_e( 'Number padding width', 'kdna-events' ); ?></label></th>
+				<td>
+					<input type="number" min="1" max="12" step="1" id="kdna_events_reference_pad_width" name="kdna_events_reference_pad_width" value="<?php echo esc_attr( (string) $pad_width ); ?>" />
+					<p class="description"><?php esc_html_e( 'Zero-pads the sequential counter. 6 renders 1 as 000001.', 'kdna-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="kdna_events_reference_format"><?php esc_html_e( 'Format', 'kdna-events' ); ?></label></th>
+				<td>
+					<select id="kdna_events_reference_format" name="kdna_events_reference_format">
+						<option value="sequential" <?php selected( $format, 'sequential' ); ?>><?php esc_html_e( 'Sequential (000001, 000002, ...)', 'kdna-events' ); ?></option>
+						<option value="random" <?php selected( $format, 'random' ); ?>><?php esc_html_e( 'Random (6-char alphanumeric)', 'kdna-events' ); ?></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="kdna_events_reference_next"><?php esc_html_e( 'Next reference number', 'kdna-events' ); ?></label></th>
+				<td>
+					<input type="number" min="1" step="1" id="kdna_events_reference_next" name="kdna_events_reference_next" value="<?php echo esc_attr( (string) $next ); ?>" />
+					<p class="description"><?php esc_html_e( 'Used in Sequential mode. Set to 1000 and the next booking gets that number, then auto-increments from there. Jumping backwards onto an already-used number is auto-corrected forward.', 'kdna-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Example', 'kdna-events' ); ?></th>
+				<td>
+					<code style="font-size:14px;padding:6px 10px;background:#f6f7f7;border:1px solid #dcdcde;border-radius:4px;"><?php echo esc_html( $example ); ?></code>
+					<p class="description"><?php esc_html_e( 'Exact preview of the next generated reference. Save changes to update.', 'kdna-events' ); ?></p>
 				</td>
 			</tr>
 			</tbody>

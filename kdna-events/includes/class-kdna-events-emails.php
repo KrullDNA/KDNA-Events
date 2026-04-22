@@ -639,7 +639,7 @@ class KDNA_Events_Emails {
 			'purchaser_email'      => 'jane@example.com',
 			'attendee_name'        => __( 'Jane Doe', 'kdna-events' ),
 			'ticket_code'          => 'ABCD1234',
-			'order_ref'            => 'KDNA-EV-2026-PREVIEW',
+			'order_ref'            => '2026-000123',
 			'quantity'             => '2',
 			'total'                => kdna_events_format_price( 199, (string) get_option( 'kdna_events_default_currency', 'AUD' ) ),
 			'my_tickets_url'       => home_url( '/my-tickets/' ),
