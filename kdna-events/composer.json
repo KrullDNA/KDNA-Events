@@ -5,12 +5,15 @@
 	"license": "GPL-2.0-or-later",
 	"require": {
 		"php": ">=7.4",
-		"pelago/emogrifier": "^8.2",
+		"pelago/emogrifier": "^7.0",
 		"stripe/stripe-php": "^15.0"
 	},
 	"config": {
 		"optimize-autoloader": true,
 		"preferred-install": "dist",
-		"sort-packages": true
+		"sort-packages": true,
+		"platform": {
+			"php": "7.4.33"
+		}
 	}
 }

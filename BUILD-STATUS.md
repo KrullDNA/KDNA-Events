@@ -41,7 +41,18 @@ design tweaks called out directly on `KDNA Events Email Template.pdf`
 
 ## Deviations from the brief
 
-1. **No 'View My Tickets' CTA in the booking confirmation.** Brief
+1. **Emogrifier pinned to 7.x (not the latest 8.x).** The plugin
+   header declares `Requires PHP: 7.4`. The current Emogrifier 8.x
+   line pulls `thecodingmachine/safe` v3, which requires PHP 8.4,
+   which would break hosts on PHP 7.4 or 8.0-8.3 with
+   'Composer dependencies require a PHP version ">= 8.4.0"'.
+   Composer is therefore pinned to `pelago/emogrifier ^7.0` with
+   `config.platform.php = 7.4.33` so resolution always targets
+   7.4, keeping the vendor tree deployable from 7.4 up. The
+   `CssInliner::fromHtml`/`inlineCss` and `HtmlPruner` APIs the
+   plugin relies on are identical between 7.3 and 8.2.
+
+2. **No 'View My Tickets' CTA in the booking confirmation.** Brief
    Section 5 Block 7 specifies a bulletproof CTA labelled 'View My
    Tickets'. The KDNA Events Email Template.pdf supplied as the
    visual source of truth does not include that button; it only
