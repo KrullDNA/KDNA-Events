@@ -1,6 +1,6 @@
 # KDNA Events developer guide
 
-Version: 1.1.0
+Version: 1.2.0
 
 This guide covers the public surface that third-party add-ons and
 bespoke themes should rely on. Everything not documented here is
@@ -430,3 +430,39 @@ add_filter( 'kdna_events_event_card_template', function ( $path ) {
 * Plugin repository: https://github.com/krulldna/kdna-events
 * Issues and feature requests: open a GitHub issue.
 * Commercial support: hello@krulldna.com
+
+## Tax Invoices (v1.2, Brief C)
+
+### Options
+
+All invoice options are keyed under the `kdna_events_invoice_*` and `kdna_events_invoices_enabled` namespace. The canonical schema lives on `KDNA_Events_Invoices::options_schema()` with types and defaults. Notable entries:
+
+- `kdna_events_invoices_enabled` (bool) — master switch.
+- `kdna_events_invoice_business_legal_name`, `..._trading_name`, `..._tax_id`, `..._business_address`, `..._business_email`, `..._business_phone`, `..._business_website` — seller identity.
+- `kdna_events_invoice_tax_registered` (bool), `..._jurisdiction` (`au|uk|eu|nz|us|other`), `..._tax_label`, `..._tax_rate` (decimal as string), `..._document_heading`, `..._tax_inclusive_statement` — tax configuration.
+- `kdna_events_invoice_number_prefix`, `..._suffix`, `..._start`, `..._padding`, `..._current_sequence` — numbering. `..._start` is locked once `..._current_sequence` exceeds zero.
+- `kdna_events_invoice_line_item_template`, `..._paid_label`, `..._pending_label`, `..._payment_method_label`, `..._payment_terms`, `..._notes`, `..._date_source` — content strings. Template supports `{quantity}`, `{event_title}`, `{event_subtitle}`, `{event_date}` via `kdna_events_render_merge_tags`.
+- `kdna_events_invoice_design_*` — design tokens. Each inheritable token pairs with `kdna_events_invoice_design_inherit_*` (default on) so edits on Email Design cascade into invoices automatically.
+
+### Database table
+
+`wp_kdna_events_invoices` (one row per paid order, `UNIQUE invoice_number / sequence_number / order_id`). Columns: `invoice_id`, `invoice_number`, `sequence_number`, `order_id`, `issued_at`, `tax_rate_applied`, `tax_label_applied`, `subtotal_ex_tax`, `tax_amount`, `total_inc_tax`, `currency`, `business_snapshot` (JSON), `status` (`issued|voided|replaced`), `notes`, `created_at`, `updated_at`. Schema version tracked in the `kdna_events_invoices_db_version` option; migrations run via `KDNA_Events_Invoices_DB::maybe_upgrade()` on `admin_init`.
+
+### Hooks
+
+| Name | Type | Signature |
+| --- | --- | --- |
+| `kdna_events_invoice_payload` | filter | `function ( array $payload, object $invoice, object|null $order )` — mutate the render context (line items, merge tags, snapshot) before templates consume it. |
+| `kdna_events_invoice_html` | filter | `function ( string $html, array $payload, object $invoice )` — post-process the raw HTML before Dompdf ingests it. Useful for add-ons that want to inject a watermark, promotional block, etc. |
+| `kdna_events_invoice_pdf_options` | filter | `function ( \Dompdf\Options $options )` — override Dompdf options (paper, fonts, security, remote loading). |
+
+### REST endpoint
+
+- `GET /wp-json/kdna-events/v1/invoice/{invoice_number}.pdf`
+- Auth: the current user owns the underlying order (user ID or purchaser email match), OR they can `manage_options`, OR the query string carries a valid signed token `?t=...`.
+- Token helpers: `kdna_events_invoice_generate_token( $number )` and `kdna_events_invoice_verify_token( $number, $token )`. Lifetime defaults to 24 hours (`KDNA_Events_Invoices::TOKEN_LIFETIME`).
+- Convenience URL builder: `kdna_events_invoice_download_url( $number, $signed = false )`.
+
+### Idempotency + snapshots
+
+Calling `KDNA_Events_Invoices::generate( $order_id )` multiple times for the same order always returns the same number and the same rendered PDF, because `business_snapshot`, `tax_rate_applied` and `tax_label_applied` are frozen at creation time. Changes to Tax Invoices settings only affect invoices created after the change. This meets ATO immutability requirements for historical invoices.

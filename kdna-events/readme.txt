@@ -4,7 +4,7 @@ Tags: events, ticketing, elementor, stripe, bookings
 Requires at least: 6.0
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -82,6 +82,18 @@ Each event has an optional Opens at and Closes at datetime. If both are blank, r
 
 Build a small add-on plugin that extends `KDNA_Events_CRM_Integration` and registers on the `kdna_events_register_crm_integrations` action. See docs/DEVELOPER.md for a complete HubSpot example. The framework handles settings UI, Test Connection, enable / disable toggles, master switch, the payload build, the sync log and the `kdna_events_after_crm_sync` hook.
 
+= How do tax invoices work? =
+
+When enabled under Events, Settings, Tax Invoices, every paid booking automatically produces a sequentially numbered tax invoice PDF that attaches to the customer's branded booking confirmation email. Free events do not generate invoices because they have no taxable supply. Regenerating an invoice never changes its number and always reads the snapshot of business identity and tax rate taken at time of issue, so historical invoices stay ATO-compliant even after the admin edits settings.
+
+= Can I reset the invoice numbering? =
+
+The starting number locks automatically after the first invoice is issued because duplicate invoice numbers cause serious accounting and legal problems. A Reset numbering button is available for advanced users but it displays a strong warning dialog and should only be used when you fully understand the consequences (typically never on a live site).
+
+= What happens when an invoice is refunded or voided? =
+
+Refunds are out of scope for v1.2 and will ship with a future credit-note flow. Invoices are immutable: refunds never modify the original invoice. Voiding an invoice sets its status to `voided` and regenerates the PDF with a VOID overlay; the invoice number is NOT reused and the sequence continues.
+
 = Can I override the email templates? =
 
 Yes. The booking confirmation and admin notification templates can be replaced via the `kdna_events_email_template_path` filter. See docs/DEVELOPER.md.
@@ -101,6 +113,18 @@ Yes. The shared partial at `templates/partials/event-card.php` is resolved via t
 7. My Tickets page with Upcoming / Past tabs.
 
 == Changelog ==
+
+= 1.2.0 =
+* Core tax invoice generator. Every paid booking now automatically produces an ATO-compliant tax invoice PDF which attaches to the customer booking confirmation email from Brief A. Free bookings generate no invoice.
+* New `Tax Invoices` settings tab with Business Details, Tax Configuration (Australia / UK / EU / NZ / US / Other jurisdiction presets), Invoice Numbering, Invoice Content, Design (with Inherit from Email Design toggles for logo / colours / fonts) and a live preview iframe + Latest invoices panel.
+* Sequential numbering with configurable prefix, suffix, zero-padding, starting number. Starting number locks after the first invoice is issued to protect against accidental duplicates. Atomic SELECT ... FOR UPDATE sequence allocation means concurrent checkouts cannot produce duplicate numbers.
+* Immutable snapshots per invoice: business identity (name, tax ID, address), tax rate and tax label stored at time of issue. Regenerating a PDF always reads the snapshot so historical invoices stay ATO-compliant after settings change.
+* Invoice layout matches docs/pdf-tax-invoice-reference.pdf: logo top-left, Tax Invoice heading top-right, TO block on the left, Date + Invoice # on the right, dark-header line items table, right-aligned totals stack, centred footer with business identity. Optional conditional blocks for PAID stamp overlay, payment details and notes when the corresponding settings have content.
+* New REST endpoint `/wp-json/kdna-events/v1/invoice/{number}.pdf` for authenticated and signed-token downloads. Helpers `kdna_events_invoice_generate_token` and `kdna_events_invoice_verify_token` with 24 hour validity.
+* New `Download invoice` button on the My Tickets widget per paid order, controllable via Elementor switchers. Uses the signed token so guest buyers can download without an account.
+* Composer pulls in `dompdf/dompdf ^2.0` (compatible with PHP 7.4 and up). The PDF Tickets add-on (Brief B) shares the same Dompdf instance when both are installed, via a `class_exists` guard around the autoloader.
+* New DB table `wp_kdna_events_invoices` with UNIQUE constraints on invoice_number, sequence_number and order_id.
+* New hooks for add-ons: `kdna_events_invoice_payload`, `kdna_events_invoice_html`, `kdna_events_invoice_pdf_options`.
 
 = 1.1.0 =
 * Branded HTML email templates matching the KDNA Events design reference PDF, replacing the v1.0 plain-body textarea.
@@ -131,6 +155,9 @@ Yes. The shared partial at `templates/partials/event-card.php` is resolved via t
 * Stage 11: final QA, translations, documentation, packaging.
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Adds ATO-compliant tax invoice generation as a core feature. Paid bookings now automatically attach a sequentially numbered invoice PDF to the booking confirmation email. Configure under Events, Settings, Tax Invoices. Core now ships Dompdf.
 
 = 1.1.0 =
 Adds fully branded HTML email templates, a new Email Design settings tab with live preview and test-send, per-event Email Header Image field, per-event email overrides, and three extension hooks for add-ons.

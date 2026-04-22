@@ -45,6 +45,50 @@ function kdna_events_get_event_meta( $post_id, $key, $default = '' ) {
 }
 
 /**
+ * Public wrapper: generate a signed download token for an invoice.
+ *
+ * @param string $invoice_number Invoice number.
+ * @param int    $lifetime       Optional lifetime in seconds. 0 = default.
+ * @return string
+ */
+function kdna_events_invoice_generate_token( $invoice_number, $lifetime = 0 ) {
+	if ( ! class_exists( 'KDNA_Events_Invoices' ) ) {
+		return '';
+	}
+	return KDNA_Events_Invoices::generate_download_token( $invoice_number, $lifetime );
+}
+
+/**
+ * Public wrapper: verify a signed invoice download token.
+ *
+ * @param string $invoice_number Invoice number.
+ * @param string $token          Token.
+ * @return bool
+ */
+function kdna_events_invoice_verify_token( $invoice_number, $token ) {
+	if ( ! class_exists( 'KDNA_Events_Invoices' ) ) {
+		return false;
+	}
+	return KDNA_Events_Invoices::verify_download_token( $invoice_number, $token );
+}
+
+/**
+ * Build a download URL for an invoice, optionally with a signed token.
+ *
+ * @param string $invoice_number Invoice number.
+ * @param bool   $signed         When true, appends a 24h signed token
+ *                               so guest buyers can reach it.
+ * @return string
+ */
+function kdna_events_invoice_download_url( $invoice_number, $signed = false ) {
+	$base = rest_url( 'kdna-events/v1/invoice/' . rawurlencode( (string) $invoice_number ) . '.pdf' );
+	if ( $signed ) {
+		$base = add_query_arg( 't', kdna_events_invoice_generate_token( $invoice_number ), $base );
+	}
+	return $base;
+}
+
+/**
  * Resolve the URL of the email header image for an event.
  *
  * Implements the fallback cascade from Brief A, Section 3:

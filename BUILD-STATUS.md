@@ -195,6 +195,65 @@ event title, optional footer note, compact header).
   with its own scope doc and design references. Not built here;
   do not attempt it until a dedicated brief lands.
 
+## v1.2 Brief C, Tax Invoices
+
+### Files created
+
+- `kdna-events/includes/class-kdna-events-invoices-db.php`
+- `kdna-events/includes/class-kdna-events-invoices.php`
+- `kdna-events/templates/invoices/invoice.php`
+- `kdna-events/templates/invoices/partials/brand-header.php`
+- `kdna-events/templates/invoices/partials/to-block.php`
+- `kdna-events/templates/invoices/partials/meta-block.php`
+- `kdna-events/templates/invoices/partials/line-items.php`
+- `kdna-events/templates/invoices/partials/totals.php`
+- `kdna-events/templates/invoices/partials/paid-stamp.php`
+- `kdna-events/templates/invoices/partials/payment-details.php`
+- `kdna-events/templates/invoices/partials/notes.php`
+- `kdna-events/templates/invoices/partials/footer.php`
+- `kdna-events/templates/invoices/css/invoice.css`
+- `docs/pdf-tax-invoice-reference.pdf` (copy into plugin's `docs/`)
+
+### Files modified
+
+- `kdna-events/kdna-events.php` (version 1.2.0, autoload with Dompdf guard, invoices module boot, DB migration hook)
+- `kdna-events/composer.json` + vendor (adds `dompdf/dompdf ^2.0`; 2.x chosen over the brief's 3.x because 3.x requires PHP 8.1+ and the plugin is pinned to PHP 7.4)
+- `kdna-events/includes/helpers.php` (new public wrappers `kdna_events_invoice_generate_token`, `kdna_events_invoice_verify_token`, `kdna_events_invoice_download_url`)
+- `kdna-events/includes/class-kdna-events-settings.php` (new Tax Invoices tab with Business Details, Tax Configuration, Numbering, Content, Design sections, live iframe preview + debounced AJAX, Latest invoices panel with per-row Download + Regenerate buttons, jurisdiction auto-fill, starting-number lock)
+- `kdna-events/widgets/class-widget-my-tickets.php` (new Download invoice button + two Elementor controls; ticket query extended to carry `order_id`, `total` and `order_status` so invoice lookup is cheap)
+- `kdna-events/readme.txt` (1.2.0 changelog, FAQ entries, upgrade notice, stable tag)
+- `kdna-events/docs/DEVELOPER.md` (version bump, full Tax Invoices section covering options, table schema, hooks, REST endpoint, idempotency guarantees)
+
+### Deviations from the brief
+
+1. **Dompdf pinned to ^2.0** rather than ^3.0. Dompdf 3.x requires PHP 8.1+; the plugin header still declares `Requires PHP: 7.4` and the Composer platform is locked at 7.4.33 from the Brief A retrofit. Dompdf 2.0.8 exposes an identical API surface for the calls we make (`fromHtml`/`loadHtml`, `setPaper`, `render`, `output`). Document updated in readme FAQ.
+2. **Orders admin list column deferred.** The brief describes adding an `Invoice` column to an `Orders admin list`, but no such list screen exists in v1.0/v1.1. The plugin's orders live in a custom table with no dedicated admin view. Rather than scope-creep a whole `Orders` admin page into this brief, regenerate and download actions ship on the Tax Invoices tab's `Latest invoices` panel (per-row buttons) and on the My Tickets widget for end users. A dedicated Orders admin screen is noted as follow-up work.
+3. **Order edit screen `Regenerate Invoice PDF` button** likewise deferred along with the Orders list. Per-invoice regenerate is exposed on the Latest invoices panel.
+4. **`docs/pdf-tax-invoice-reference.pdf` as design source** — the supplied PDF is a plain template (no PAID stamp, no payment block, no notes block). Rather than drop those features, the templates render them only when the relevant settings have content (`payment_terms`, `notes`, `show_paid_stamp`). Default install with the brief's defaults matches the reference exactly; an admin can layer richer content in by filling settings.
+5. **`kdna_events_cleanup_tmp` daily cron** added in core since the brief mentions it may be shared with the Brief B add-on. The cron sweeps `wp-content/uploads/kdna-events-tmp/` of any files older than 24 hours. Brief B's add-on should share this same hook rather than registering its own.
+6. **Content-Disposition `attachment` vs `inline`** — the REST endpoint streams with `attachment` so clicking the link downloads the file. If an admin needs inline display, future work can respect a `?mode=inline` query argument.
+
+### Test results
+
+Phase 1 checks performed on the dev box:
+
+- `php -l` passes on every touched PHP file, including templates.
+- Dompdf end-to-end smoke test: passing a plain HTML string through `\Dompdf\Dompdf::loadHtml + render + output` returns a buffer whose first bytes are `%PDF`, confirming the vendor install is functional on the pinned PHP.
+- `dbDelta` SQL for `wp_kdna_events_invoices` conforms to `UNIQUE KEY` syntax required by `dbDelta`'s quirky parser (double space before the column list on the `UNIQUE KEY` lines).
+- Atomic sequence allocation: `next_sequence_number()` wraps the options update in `START TRANSACTION` + `SELECT ... FOR UPDATE`, so the only race window is resolved by InnoDB row locking. Stress test deferred to staging because it needs a real DB under concurrent load.
+- Snapshot integrity: every field required by ATO for historical immutability (`tax_rate_applied`, `tax_label_applied`, `business_snapshot`, `subtotal_ex_tax`, `tax_amount`, `total_inc_tax`) is populated from `create_invoice_record` at creation time and re-read at every render, never from live settings.
+- Sample ATO maths verified against the 10% brief example: `$100` total at 10% GST produces `$90.91` subtotal + `$9.09` GST, rounded via `PHP_ROUND_HALF_EVEN` (banker's rounding). `($90.91 + $9.09 = $100.00)` reconciles. Over-threshold case ($1,500) carries `purchaser_name` on the invoice, satisfying buyer-identity.
+
+Phase 3 (full cross-client / live WP) not run here, same caveat as Briefs A and B: no running WP instance + SMTP in this environment. Deploy to staging and walk the Section 8 checklist before declaring the release shippable.
+
+### Known limitations / follow-ups
+
+- Dedicated `Orders` admin list page with the `Invoice` column (deferred above).
+- Credit-note flow for refunds (out of scope per brief, reserved for a later release).
+- Multi-line pricing for ticket tiers (currently one line item per invoice; brief calls this future roadmap).
+- Buyer ABN capture at checkout for over-$1,000 invoices (mentioned as future enhancement).
+- Dompdf 3.x upgrade once the plugin bumps its minimum PHP to 8.1.
+
 ## Known limitations / follow-ups for Brief B
 
 - Bundle PDF tickets via the new `kdna_events_email_attachments`
