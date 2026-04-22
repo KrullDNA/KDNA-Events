@@ -113,3 +113,120 @@
 		justify-content: flex-start;
 	}
 }
+
+/* Email Header Image picker on the event meta box. */
+.kdna-events-email-image-field__preview {
+	display: block;
+	max-width: 320px;
+	margin: 0 0 0.5em;
+}
+
+.kdna-events-email-image-field__preview img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+}
+
+.kdna-events-email-image-field button[hidden] {
+	display: none !important;
+}
+
+/* KDNA Events, Email Design tab. */
+.kdna-events-email-design-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	gap: 24px;
+}
+
+@media screen and (max-width: 1100px) {
+	.kdna-events-email-design-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+.kdna-events-email-design-preview {
+	position: sticky;
+	top: 40px;
+	align-self: start;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	padding: 16px;
+}
+
+.kdna-events-email-design-preview__tabs {
+	display: flex;
+	gap: 4px;
+	margin-bottom: 12px;
+}
+
+.kdna-events-email-design-preview__tab {
+	cursor: pointer;
+	padding: 6px 14px;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 999px;
+	font-size: 13px;
+	color: #1d2327;
+}
+
+.kdna-events-email-design-preview__tab.is-active {
+	background: #1d4ed8;
+	border-color: #1d4ed8;
+	color: #fff;
+}
+
+.kdna-events-email-design-preview__frame {
+	width: 100%;
+	height: 720px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #f4f4f4;
+}
+
+.kdna-events-email-design-preview__send {
+	display: flex;
+	gap: 8px;
+	margin-top: 12px;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.kdna-events-email-design-preview__send input[type="email"] {
+	flex: 1 1 auto;
+	min-width: 220px;
+}
+
+.kdna-events-email-design-section {
+	margin-top: 1.5em;
+	padding: 0 0 1em;
+}
+
+.kdna-events-email-design-section h2 {
+	margin: 1.2em 0 0.2em;
+	font-size: 15px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #1d2327;
+}
+
+.kdna-events-social-repeater {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.kdna-events-social-row {
+	display: grid;
+	grid-template-columns: 140px minmax(0, 1fr) auto;
+	gap: 8px;
+	align-items: center;
+}
+
+@media screen and (max-width: 782px) {
+	.kdna-events-social-row {
+		grid-template-columns: 1fr;
+	}
+}

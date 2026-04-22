@@ -104,6 +104,8 @@ class KDNA_Events_Admin {
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME );
 
 		$subtitle             = (string) get_post_meta( $post->ID, '_kdna_event_subtitle', true );
+		$email_image_id       = (int) get_post_meta( $post->ID, '_kdna_event_image', true );
+		$email_image_url      = $email_image_id ? (string) wp_get_attachment_image_url( $email_image_id, 'medium' ) : '';
 		$start                = (string) get_post_meta( $post->ID, '_kdna_event_start', true );
 		$end                  = (string) get_post_meta( $post->ID, '_kdna_event_end', true );
 		$timezone             = (string) get_post_meta( $post->ID, '_kdna_event_timezone', true );
@@ -182,6 +184,30 @@ class KDNA_Events_Admin {
 							<?php echo wp_timezone_choice( $timezone, get_user_locale() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</select>
 						<p class="description"><?php esc_html_e( 'Defaults to the site timezone.', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_event_image_button"><?php esc_html_e( 'Email Header Image', 'kdna-events' ); ?></label></th>
+					<td>
+						<div class="kdna-events-email-image-field" data-kdna-events-email-image>
+							<input type="hidden" id="kdna_event_image" name="kdna_event_image" value="<?php echo esc_attr( (string) $email_image_id ); ?>" data-kdna-events-email-image-input />
+							<div class="kdna-events-email-image-field__preview" data-kdna-events-email-image-preview>
+								<?php if ( '' !== $email_image_url ) : ?>
+									<img src="<?php echo esc_url( $email_image_url ); ?>" alt="" />
+								<?php endif; ?>
+							</div>
+							<p>
+								<button type="button" class="button" id="kdna_event_image_button" data-kdna-events-email-image-select>
+									<?php echo '' !== $email_image_url ? esc_html__( 'Change image', 'kdna-events' ) : esc_html__( 'Select image', 'kdna-events' ); ?>
+								</button>
+								<button type="button" class="button-link-delete" data-kdna-events-email-image-remove <?php echo '' === $email_image_url ? 'hidden' : ''; ?>>
+									<?php esc_html_e( 'Remove', 'kdna-events' ); ?>
+								</button>
+							</p>
+							<p class="description">
+								<?php esc_html_e( 'Shown at the top of the booking confirmation email. Recommended size 1200x600px (2x for retina), minimum 600x300px. JPG or PNG.', 'kdna-events' ); ?>
+							</p>
+						</div>
 					</td>
 				</tr>
 				</tbody>
@@ -493,6 +519,13 @@ class KDNA_Events_Admin {
 		// Subtitle.
 		$subtitle = isset( $_POST['kdna_event_subtitle'] ) ? sanitize_text_field( wp_unslash( $_POST['kdna_event_subtitle'] ) ) : '';
 		update_post_meta( $post_id, '_kdna_event_subtitle', $subtitle );
+
+		// Email Header Image (attachment ID).
+		$email_image_id = isset( $_POST['kdna_event_image'] ) ? absint( wp_unslash( $_POST['kdna_event_image'] ) ) : 0;
+		if ( $email_image_id && 'attachment' !== get_post_type( $email_image_id ) ) {
+			$email_image_id = 0;
+		}
+		update_post_meta( $post_id, '_kdna_event_image', $email_image_id );
 
 		// Start / End / Registration window, stored as Y-m-d\TH:i.
 		foreach ( array(
@@ -850,6 +883,9 @@ class KDNA_Events_Admin {
 			array(),
 			KDNA_EVENTS_VERSION
 		);
+
+		// The Email Header Image field on the event meta box uses wp.media.
+		wp_enqueue_media();
 
 		wp_enqueue_script(
 			'kdna-events-admin',

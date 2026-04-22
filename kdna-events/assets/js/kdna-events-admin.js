@@ -46,6 +46,11 @@
 		$('[data-kdna-events-attendee-fields]').each(function () {
 			wireAttendeeRepeater($(this));
 		});
+
+		// Every Email Header Image / Email Design media picker on the page.
+		$('[data-kdna-events-email-image]').each(function () {
+			wireEmailImagePicker($(this));
+		});
 	});
 
 	/**
@@ -203,6 +208,81 @@
 			event.preventDefault();
 			$(this).closest('[data-kdna-events-attendee-field]').remove();
 			reindexRows();
+		});
+	}
+
+	/**
+	 * Attach a wp.media picker to an email image field.
+	 *
+	 * Shared between the event Email Header Image field and the
+	 * Email Design, Brand settings (logo + default header image).
+	 * The field contains a hidden input (the attachment ID), a preview
+	 * node and select / remove buttons. Emits a 'kdna:email-image-change'
+	 * DOM event whenever the value changes so the Email Design live
+	 * preview can re-render.
+	 *
+	 * @param {jQuery} $field
+	 */
+	function wireEmailImagePicker($field) {
+		if (!window.wp || !window.wp.media) {
+			return;
+		}
+		var $input = $field.find('[data-kdna-events-email-image-input]');
+		var $preview = $field.find('[data-kdna-events-email-image-preview]');
+		var $select = $field.find('[data-kdna-events-email-image-select]');
+		var $remove = $field.find('[data-kdna-events-email-image-remove]');
+
+		var frame;
+
+		function notify() {
+			if ('function' === typeof window.CustomEvent) {
+				$field[0].dispatchEvent(new window.CustomEvent('kdna:email-image-change', { bubbles: true }));
+			}
+		}
+
+		$select.on('click', function (event) {
+			event.preventDefault();
+
+			if (frame) {
+				frame.open();
+				return;
+			}
+
+			frame = window.wp.media({
+				title: $select.text() || 'Select image',
+				button: { text: 'Use this image' },
+				library: { type: ['image/jpeg', 'image/png'] },
+				multiple: false
+			});
+
+			frame.on('select', function () {
+				var attachment = frame.state().get('selection').first().toJSON();
+				if (!attachment || !attachment.id) {
+					return;
+				}
+				$input.val(attachment.id);
+				var url = attachment.url;
+				if (attachment.sizes) {
+					if (attachment.sizes.medium && attachment.sizes.medium.url) {
+						url = attachment.sizes.medium.url;
+					} else if (attachment.sizes.thumbnail && attachment.sizes.thumbnail.url) {
+						url = attachment.sizes.thumbnail.url;
+					}
+				}
+				$preview.html('<img src="' + url + '" alt="" />');
+				$remove.removeAttr('hidden');
+				notify();
+			});
+
+			frame.open();
+		});
+
+		$remove.on('click', function (event) {
+			event.preventDefault();
+			$input.val('');
+			$preview.empty();
+			$remove.attr('hidden', 'hidden');
+			notify();
 		});
 	}
 })(jQuery);

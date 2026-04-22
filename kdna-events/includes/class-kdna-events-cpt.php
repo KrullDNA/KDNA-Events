@@ -291,6 +291,19 @@ class KDNA_Events_CPT {
 
 		register_post_meta(
 			self::POST_TYPE,
+			'_kdna_event_image',
+			array(
+				'type'              => 'integer',
+				'single'            => true,
+				'show_in_rest'      => true,
+				'default'           => 0,
+				'sanitize_callback' => 'absint',
+				'auth_callback'     => $auth,
+			)
+		);
+
+		register_post_meta(
+			self::POST_TYPE,
 			'_kdna_event_price',
 			array(
 				'type'              => 'number',
