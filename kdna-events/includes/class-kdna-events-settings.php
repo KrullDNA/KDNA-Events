@@ -50,14 +50,131 @@ class KDNA_Events_Settings {
 	 */
 	public static function tabs() {
 		return array(
-			'general'   => __( 'General', 'kdna-events' ),
-			'attendees' => __( 'Attendees', 'kdna-events' ),
-			'stripe'    => __( 'Stripe', 'kdna-events' ),
-			'maps'      => __( 'Google Maps', 'kdna-events' ),
-			'pages'     => __( 'Pages', 'kdna-events' ),
-			'emails'    => __( 'Emails', 'kdna-events' ),
-			'crm'       => __( 'CRM', 'kdna-events' ),
+			'general'      => __( 'General', 'kdna-events' ),
+			'attendees'    => __( 'Attendees', 'kdna-events' ),
+			'stripe'       => __( 'Stripe', 'kdna-events' ),
+			'maps'         => __( 'Google Maps', 'kdna-events' ),
+			'pages'        => __( 'Pages', 'kdna-events' ),
+			'emails'       => __( 'Emails', 'kdna-events' ),
+			'email_design' => __( 'Email Design', 'kdna-events' ),
+			'crm'          => __( 'CRM', 'kdna-events' ),
 		);
+	}
+
+	/**
+	 * Return every Email Design option as $key => $defaults.
+	 *
+	 * Central registry used by register_settings (for Settings API
+	 * registration), get_all (for template rendering), the live preview
+	 * and the sanitiser. Adding a new control here is enough to make
+	 * it flow through the entire stack.
+	 *
+	 * @return array<string,array{type:string,default:mixed,sanitize?:string|array}>
+	 */
+	public static function email_design_schema() {
+		$heading_font_default = "'Inter', Arial, Helvetica, sans-serif";
+		$body_font_default    = "'Inter', Arial, Helvetica, sans-serif";
+		$monospace_default    = "Consolas, 'Courier New', monospace";
+
+		return array(
+			// Brand.
+			'kdna_events_email_logo_id'                => array( 'type' => 'integer', 'default' => 0 ),
+			'kdna_events_email_logo_width'             => array( 'type' => 'integer', 'default' => 160 ),
+			'kdna_events_email_logo_align'             => array( 'type' => 'string',  'default' => 'center' ),
+			'kdna_events_email_default_header_image'   => array( 'type' => 'integer', 'default' => 0 ),
+			'kdna_events_email_header_image_max_h'     => array( 'type' => 'integer', 'default' => 300 ),
+
+			// Colours.
+			'kdna_events_email_color_primary'          => array( 'type' => 'string', 'default' => '#2E75B6' ),
+			'kdna_events_email_color_accent'           => array( 'type' => 'string', 'default' => '#F07759' ),
+			'kdna_events_email_color_page_bg'          => array( 'type' => 'string', 'default' => '#EFEFEF' ),
+			'kdna_events_email_color_content_bg'       => array( 'type' => 'string', 'default' => '#FFFFFF' ),
+			'kdna_events_email_color_heading'          => array( 'type' => 'string', 'default' => '#1A1A1A' ),
+			'kdna_events_email_color_body'             => array( 'type' => 'string', 'default' => '#555555' ),
+			'kdna_events_email_color_muted'            => array( 'type' => 'string', 'default' => '#888888' ),
+			'kdna_events_email_color_divider'          => array( 'type' => 'string', 'default' => '#E5E5E5' ),
+			'kdna_events_email_color_button_bg'        => array( 'type' => 'string', 'default' => '#F07759' ),
+			'kdna_events_email_color_button_text'      => array( 'type' => 'string', 'default' => '#FFFFFF' ),
+
+			// Typography.
+			'kdna_events_email_heading_font'           => array( 'type' => 'string',  'default' => 'google:Inter' ),
+			'kdna_events_email_heading_font_custom'    => array( 'type' => 'string',  'default' => $heading_font_default ),
+			'kdna_events_email_heading_font_size'      => array( 'type' => 'integer', 'default' => 28 ),
+			'kdna_events_email_heading_font_weight'    => array( 'type' => 'integer', 'default' => 700 ),
+			'kdna_events_email_body_font'              => array( 'type' => 'string',  'default' => 'google:Inter' ),
+			'kdna_events_email_body_font_custom'       => array( 'type' => 'string',  'default' => $body_font_default ),
+			'kdna_events_email_body_font_size'         => array( 'type' => 'integer', 'default' => 16 ),
+			'kdna_events_email_body_line_height'       => array( 'type' => 'string',  'default' => '1.55' ),
+			'kdna_events_email_monospace_font'         => array( 'type' => 'string',  'default' => $monospace_default ),
+
+			// Layout.
+			'kdna_events_email_content_max_width'      => array( 'type' => 'integer', 'default' => 600 ),
+			'kdna_events_email_content_padding_y'      => array( 'type' => 'integer', 'default' => 32 ),
+			'kdna_events_email_content_padding_x'      => array( 'type' => 'integer', 'default' => 28 ),
+			'kdna_events_email_card_border_radius'     => array( 'type' => 'integer', 'default' => 8 ),
+			'kdna_events_email_button_border_radius'   => array( 'type' => 'integer', 'default' => 28 ),
+
+			// Virtual Event button.
+			'kdna_events_email_virtual_button_label'   => array( 'type' => 'string',  'default' => 'Virtual Event link' ),
+			'kdna_events_email_virtual_button_bg'      => array( 'type' => 'string',  'default' => '#F07759' ),
+			'kdna_events_email_virtual_button_text'    => array( 'type' => 'string',  'default' => '#FFFFFF' ),
+			'kdna_events_email_virtual_button_radius'  => array( 'type' => 'integer', 'default' => 28 ),
+
+			// Footer.
+			'kdna_events_email_footer_text'            => array(
+				'type'    => 'string',
+				'default' => 'You received this email because you booked a ticket with us. Please do not reply, this inbox is not monitored.',
+			),
+			'kdna_events_email_footer_business_name'   => array( 'type' => 'string', 'default' => '' ),
+
+			// Content strings with merge tag support.
+			'kdna_events_email_subject_default'        => array(
+				'type'    => 'string',
+				'default' => 'Your booking for {event_title} is confirmed',
+			),
+			'kdna_events_email_heading_default'        => array(
+				'type'    => 'string',
+				'default' => "So you're going to the {event_title}, see you there.",
+			),
+			'kdna_events_email_content_1_default'      => array(
+				'type'    => 'string',
+				'default' => "Hi {attendee_name},\n\nThanks for booking {event_title}. Your booking reference is {order_ref}.",
+			),
+			'kdna_events_email_content_2_default'      => array(
+				'type'    => 'string',
+				'default' => "If you have any questions, reply to this email.\n\n{organiser_name}",
+			),
+
+			// Admin notification strings.
+			'kdna_events_email_admin_heading'          => array(
+				'type'    => 'string',
+				'default' => 'New booking received',
+			),
+			'kdna_events_email_admin_intro'            => array(
+				'type'    => 'string',
+				'default' => 'A new booking has been placed for {event_title}.',
+			),
+		);
+	}
+
+	/**
+	 * Return every Email Design option value keyed by setting name.
+	 *
+	 * Applies defaults from email_design_schema() so templates never
+	 * have to guard for missing keys.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public static function get_email_design() {
+		$out = array();
+		foreach ( self::email_design_schema() as $name => $def ) {
+			$value = get_option( $name, $def['default'] );
+			if ( '' === $value || null === $value ) {
+				$value = $def['default'];
+			}
+			$out[ $name ] = $value;
+		}
+		return $out;
 	}
 
 	/**
@@ -251,8 +368,11 @@ class KDNA_Events_Settings {
 				'default'           => 10,
 			)
 		);
+		// Send-related settings moved from the v1.0 General tab to the
+		// Emails tab in v1.1. Option names are unchanged so existing
+		// values carry over; only the form group changes.
 		register_setting(
-			'kdna_events_general',
+			'kdna_events_emails',
 			'kdna_events_admin_notification_email',
 			array(
 				'type'              => 'string',
@@ -261,7 +381,7 @@ class KDNA_Events_Settings {
 			)
 		);
 		register_setting(
-			'kdna_events_general',
+			'kdna_events_emails',
 			'kdna_events_notify_organiser',
 			array(
 				'type'              => 'boolean',
@@ -270,7 +390,7 @@ class KDNA_Events_Settings {
 			)
 		);
 		register_setting(
-			'kdna_events_general',
+			'kdna_events_emails',
 			'kdna_events_email_from_name',
 			array(
 				'type'              => 'string',
@@ -279,7 +399,7 @@ class KDNA_Events_Settings {
 			)
 		);
 		register_setting(
-			'kdna_events_general',
+			'kdna_events_emails',
 			'kdna_events_email_from_address',
 			array(
 				'type'              => 'string',
@@ -288,7 +408,16 @@ class KDNA_Events_Settings {
 			)
 		);
 		register_setting(
-			'kdna_events_general',
+			'kdna_events_emails',
+			'kdna_events_email_reply_to',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_email',
+				'default'           => '',
+			)
+		);
+		register_setting(
+			'kdna_events_emails',
 			'kdna_events_per_attendee_emails',
 			array(
 				'type'              => 'boolean',
@@ -375,16 +504,19 @@ class KDNA_Events_Settings {
 			)
 		);
 
-		// Emails.
-		register_setting(
-			'kdna_events_emails',
-			'kdna_events_booking_email_body',
-			array(
-				'type'              => 'string',
-				'sanitize_callback' => array( __CLASS__, 'sanitize_textarea' ),
-				'default'           => self::default_booking_email_body(),
-			)
-		);
+		// Email Design (branded HTML templates, v1.1 Brief A).
+		foreach ( self::email_design_schema() as $name => $def ) {
+			$sanitize = array( __CLASS__, 'sanitize_email_design_value' );
+			register_setting(
+				'kdna_events_email_design',
+				$name,
+				array(
+					'type'              => 'string' === $def['type'] ? 'string' : $def['type'],
+					'sanitize_callback' => $sanitize,
+					'default'           => $def['default'],
+				)
+			);
+		}
 
 		// Attendees.
 		register_setting(
@@ -657,13 +789,30 @@ class KDNA_Events_Settings {
 			array(),
 			KDNA_EVENTS_VERSION
 		);
+		// Colour pickers + media pickers power the Email Design tab.
+		wp_enqueue_style( 'wp-color-picker' );
+		wp_enqueue_media();
 		wp_enqueue_script(
 			'kdna-events-admin',
 			KDNA_EVENTS_URL . 'assets/js/kdna-events-admin.js',
-			array( 'jquery' ),
+			array( 'jquery', 'wp-color-picker' ),
 			KDNA_EVENTS_VERSION,
 			true
 		);
+
+		$current_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( 'email_design' === $current_tab ) {
+			wp_add_inline_script(
+				'kdna-events-admin',
+				'window.kdnaEventsEmailDesign = ' . wp_json_encode(
+					array(
+						'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
+						'previewNonce' => wp_create_nonce( 'kdna_events_preview_email' ),
+						'testNonce'    => wp_create_nonce( 'kdna_events_preview_test_send' ),
+					)
+				) . ';'
+			);
+		}
 	}
 
 	/**
@@ -728,6 +877,10 @@ class KDNA_Events_Settings {
 						settings_fields( 'kdna_events_emails' );
 						self::render_emails_tab();
 						break;
+					case 'email_design':
+						settings_fields( 'kdna_events_email_design' );
+						self::render_email_design_tab();
+						break;
 					case 'crm':
 						settings_fields( 'kdna_events_crm' );
 						self::render_crm_tab();
@@ -751,14 +904,8 @@ class KDNA_Events_Settings {
 	 * @return void
 	 */
 	protected static function render_general_tab() {
-		$currency     = (string) get_option( 'kdna_events_default_currency', 'AUD' );
-		$max_per      = (int) get_option( 'kdna_events_default_max_per_order', 10 );
-		$admin_email  = (string) get_option( 'kdna_events_admin_notification_email', '' );
-		$notify_org   = (bool) get_option( 'kdna_events_notify_organiser', false );
-		$from_name    = (string) get_option( 'kdna_events_email_from_name', '' );
-		$from_address = (string) get_option( 'kdna_events_email_from_address', '' );
-		$per_attendee = (bool) get_option( 'kdna_events_per_attendee_emails', false );
-		$test_nonce   = wp_create_nonce( 'kdna_events_test_email' );
+		$currency = (string) get_option( 'kdna_events_default_currency', 'AUD' );
+		$max_per  = (int) get_option( 'kdna_events_default_max_per_order', 10 );
 		?>
 		<table class="form-table" role="presentation">
 			<tbody>
@@ -780,93 +927,8 @@ class KDNA_Events_Settings {
 					<p class="description"><?php esc_html_e( 'Fallback cap applied when an event does not set its own maximum per order.', 'kdna-events' ); ?></p>
 				</td>
 			</tr>
-			<tr>
-				<th scope="row"><label for="kdna_events_admin_notification_email"><?php esc_html_e( 'Admin notification email', 'kdna-events' ); ?></label></th>
-				<td>
-					<input type="email" class="regular-text" id="kdna_events_admin_notification_email" name="kdna_events_admin_notification_email" value="<?php echo esc_attr( $admin_email ); ?>" />
-					<button
-						type="button"
-						class="button button-secondary"
-						id="kdna-events-send-test-email"
-						data-nonce="<?php echo esc_attr( $test_nonce ); ?>"
-						data-ajax-url="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
-						style="margin-left:8px;"
-					>
-						<?php esc_html_e( 'Send test email', 'kdna-events' ); ?>
-					</button>
-					<span id="kdna-events-send-test-email-result" role="status" aria-live="polite" style="margin-left:8px;"></span>
-					<p class="description"><?php esc_html_e( 'Booking notifications are sent to this address. Use the button to verify SMTP without completing a booking.', 'kdna-events' ); ?></p>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row"><?php esc_html_e( 'Notify organiser', 'kdna-events' ); ?></th>
-				<td>
-					<label>
-						<input type="checkbox" name="kdna_events_notify_organiser" value="1" <?php checked( $notify_org ); ?> />
-						<?php esc_html_e( 'Also send admin notifications to the event organiser email when one is set.', 'kdna-events' ); ?>
-					</label>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row"><label for="kdna_events_email_from_name"><?php esc_html_e( 'Email from name', 'kdna-events' ); ?></label></th>
-				<td>
-					<input type="text" class="regular-text" id="kdna_events_email_from_name" name="kdna_events_email_from_name" value="<?php echo esc_attr( $from_name ); ?>" />
-				</td>
-			</tr>
-			<tr>
-				<th scope="row"><label for="kdna_events_email_from_address"><?php esc_html_e( 'Email from address', 'kdna-events' ); ?></label></th>
-				<td>
-					<input type="email" class="regular-text" id="kdna_events_email_from_address" name="kdna_events_email_from_address" value="<?php echo esc_attr( $from_address ); ?>" />
-				</td>
-			</tr>
-			<tr>
-				<th scope="row"><?php esc_html_e( 'Per-attendee emails', 'kdna-events' ); ?></th>
-				<td>
-					<label>
-						<input type="checkbox" name="kdna_events_per_attendee_emails" value="1" <?php checked( $per_attendee ); ?> />
-						<?php esc_html_e( 'Also send a personalised ticket email to each attendee when their email address is captured.', 'kdna-events' ); ?>
-					</label>
-				</td>
-			</tr>
 			</tbody>
 		</table>
-		<script>
-		(function () {
-			var btn = document.getElementById('kdna-events-send-test-email');
-			var result = document.getElementById('kdna-events-send-test-email-result');
-			if (!btn || !result) { return; }
-			btn.addEventListener('click', function () {
-				result.textContent = '<?php echo esc_js( __( 'Sending...', 'kdna-events' ) ); ?>';
-				result.style.color = '#4b5563';
-				var body = new URLSearchParams();
-				body.append('action', 'kdna_events_send_test_email');
-				body.append('nonce', btn.getAttribute('data-nonce') || '');
-				fetch(btn.getAttribute('data-ajax-url') || '', {
-					method: 'POST',
-					credentials: 'same-origin',
-					headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-					body: body.toString()
-				}).then(function (r) {
-					return r.json().then(function (json) { return { status: r.status, json: json }; });
-				}).then(function (res) {
-					var message = '';
-					if (res.json && res.json.data && res.json.data.message) {
-						message = res.json.data.message;
-					}
-					if (res.json && res.json.success) {
-						result.style.color = '#059669';
-						result.textContent = message || '<?php echo esc_js( __( 'Sent.', 'kdna-events' ) ); ?>';
-					} else {
-						result.style.color = '#b91c1c';
-						result.textContent = message || '<?php echo esc_js( __( 'Send failed.', 'kdna-events' ) ); ?>';
-					}
-				}).catch(function () {
-					result.style.color = '#b91c1c';
-					result.textContent = '<?php echo esc_js( __( 'Network error.', 'kdna-events' ) ); ?>';
-				});
-			});
-		})();
-		</script>
 		<?php
 	}
 
@@ -1390,37 +1452,751 @@ class KDNA_Events_Settings {
 	 * @return void
 	 */
 	protected static function render_emails_tab() {
-		$body = get_option( 'kdna_events_booking_email_body', self::default_booking_email_body() );
-		if ( '' === $body ) {
-			$body = self::default_booking_email_body();
-		}
-
-		$tags = array(
-			'{order_ref}'       => __( 'Order reference code.', 'kdna-events' ),
-			'{event_title}'     => __( 'Event title.', 'kdna-events' ),
-			'{event_date}'      => __( 'Event start date and time.', 'kdna-events' ),
-			'{attendee_name}'   => __( 'Attendee full name.', 'kdna-events' ),
-			'{ticket_code}'     => __( 'Individual ticket code.', 'kdna-events' ),
-			'{event_location}'  => __( 'Event location, venue or virtual link.', 'kdna-events' ),
-			'{organiser_name}'  => __( 'Event organiser name.', 'kdna-events' ),
-		);
+		$admin_email  = (string) get_option( 'kdna_events_admin_notification_email', '' );
+		$notify_org   = (bool) get_option( 'kdna_events_notify_organiser', false );
+		$from_name    = (string) get_option( 'kdna_events_email_from_name', '' );
+		$from_address = (string) get_option( 'kdna_events_email_from_address', '' );
+		$reply_to     = (string) get_option( 'kdna_events_email_reply_to', '' );
+		$per_attendee = (bool) get_option( 'kdna_events_per_attendee_emails', false );
+		$test_nonce   = wp_create_nonce( 'kdna_events_test_email' );
 		?>
+		<p class="description" style="max-width:64em;">
+			<?php
+			printf(
+				/* translators: %s: tab label */
+				esc_html__( 'Send-related settings for booking and organiser notifications. To change how the email looks, visit the %s tab.', 'kdna-events' ),
+				'<strong>' . esc_html__( 'Email Design', 'kdna-events' ) . '</strong>'
+			);
+			?>
+		</p>
 		<table class="form-table" role="presentation">
 			<tbody>
 			<tr>
-				<th scope="row"><label for="kdna_events_booking_email_body"><?php esc_html_e( 'Booking confirmation body', 'kdna-events' ); ?></label></th>
+				<th scope="row"><label for="kdna_events_admin_notification_email"><?php esc_html_e( 'Admin notification email', 'kdna-events' ); ?></label></th>
 				<td>
-					<textarea id="kdna_events_booking_email_body" name="kdna_events_booking_email_body" rows="12" class="large-text code"><?php echo esc_textarea( (string) $body ); ?></textarea>
-					<p class="description"><?php esc_html_e( 'Available merge tags:', 'kdna-events' ); ?></p>
-					<ul class="kdna-events-merge-tags">
-						<?php foreach ( $tags as $tag => $desc ) : ?>
-							<li><code><?php echo esc_html( $tag ); ?></code> <?php echo esc_html( $desc ); ?></li>
-						<?php endforeach; ?>
-					</ul>
+					<input type="email" class="regular-text" id="kdna_events_admin_notification_email" name="kdna_events_admin_notification_email" value="<?php echo esc_attr( $admin_email ); ?>" />
+					<button
+						type="button"
+						class="button button-secondary"
+						id="kdna-events-send-test-email"
+						data-nonce="<?php echo esc_attr( $test_nonce ); ?>"
+						data-ajax-url="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
+						style="margin-left:8px;"
+					>
+						<?php esc_html_e( 'Send test email', 'kdna-events' ); ?>
+					</button>
+					<span id="kdna-events-send-test-email-result" role="status" aria-live="polite" style="margin-left:8px;"></span>
+					<p class="description"><?php esc_html_e( 'Booking notifications are sent to this address. Use the button to verify SMTP without completing a booking. The test uses the new branded template.', 'kdna-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Notify organiser', 'kdna-events' ); ?></th>
+				<td>
+					<label>
+						<input type="checkbox" name="kdna_events_notify_organiser" value="1" <?php checked( $notify_org ); ?> />
+						<?php esc_html_e( 'Also send admin notifications to the event organiser email when one is set.', 'kdna-events' ); ?>
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="kdna_events_email_from_name"><?php esc_html_e( 'Email from name', 'kdna-events' ); ?></label></th>
+				<td>
+					<input type="text" class="regular-text" id="kdna_events_email_from_name" name="kdna_events_email_from_name" value="<?php echo esc_attr( $from_name ); ?>" />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="kdna_events_email_from_address"><?php esc_html_e( 'Email from address', 'kdna-events' ); ?></label></th>
+				<td>
+					<input type="email" class="regular-text" id="kdna_events_email_from_address" name="kdna_events_email_from_address" value="<?php echo esc_attr( $from_address ); ?>" />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="kdna_events_email_reply_to"><?php esc_html_e( 'Reply-to address', 'kdna-events' ); ?></label></th>
+				<td>
+					<input type="email" class="regular-text" id="kdna_events_email_reply_to" name="kdna_events_email_reply_to" value="<?php echo esc_attr( $reply_to ); ?>" />
+					<p class="description"><?php esc_html_e( 'Optional. If blank, replies go back to the From address.', 'kdna-events' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Per-attendee emails', 'kdna-events' ); ?></th>
+				<td>
+					<label>
+						<input type="checkbox" name="kdna_events_per_attendee_emails" value="1" <?php checked( $per_attendee ); ?> />
+						<?php esc_html_e( 'Also send a personalised ticket email to each attendee when their email address is captured.', 'kdna-events' ); ?>
+					</label>
 				</td>
 			</tr>
 			</tbody>
 		</table>
+		<script>
+		(function () {
+			var btn = document.getElementById('kdna-events-send-test-email');
+			var result = document.getElementById('kdna-events-send-test-email-result');
+			if (!btn || !result) { return; }
+			btn.addEventListener('click', function () {
+				result.textContent = '<?php echo esc_js( __( 'Sending...', 'kdna-events' ) ); ?>';
+				result.style.color = '#4b5563';
+				var body = new URLSearchParams();
+				body.append('action', 'kdna_events_send_test_email');
+				body.append('nonce', btn.getAttribute('data-nonce') || '');
+				fetch(btn.getAttribute('data-ajax-url') || '', {
+					method: 'POST',
+					credentials: 'same-origin',
+					headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+					body: body.toString()
+				}).then(function (r) {
+					return r.json().then(function (json) { return { status: r.status, json: json }; });
+				}).then(function (res) {
+					var message = '';
+					if (res.json && res.json.data && res.json.data.message) {
+						message = res.json.data.message;
+					}
+					if (res.json && res.json.success) {
+						result.style.color = '#059669';
+						result.textContent = message || '<?php echo esc_js( __( 'Sent.', 'kdna-events' ) ); ?>';
+					} else {
+						result.style.color = '#b91c1c';
+						result.textContent = message || '<?php echo esc_js( __( 'Send failed.', 'kdna-events' ) ); ?>';
+					}
+				}).catch(function () {
+					result.style.color = '#b91c1c';
+					result.textContent = '<?php echo esc_js( __( 'Network error.', 'kdna-events' ) ); ?>';
+				});
+			});
+		})();
+		</script>
+		<?php
+	}
+
+	/**
+	 * Render the Email Design tab with every brand / colour /
+	 * typography / layout / footer / content-strings control plus a
+	 * live preview panel and test-send form.
+	 *
+	 * @return void
+	 */
+	protected static function render_email_design_tab() {
+		$d = self::get_email_design();
+
+		$logo_id       = (int) $d['kdna_events_email_logo_id'];
+		$logo_url      = $logo_id ? (string) wp_get_attachment_image_url( $logo_id, 'medium' ) : '';
+		$default_img_id = (int) $d['kdna_events_email_default_header_image'];
+		$default_img_url = $default_img_id ? (string) wp_get_attachment_image_url( $default_img_id, 'medium' ) : '';
+
+		$heading_font_options = self::email_font_options();
+		?>
+		<div class="kdna-events-email-design-grid">
+			<div class="kdna-events-email-design-controls">
+				<?php self::render_email_design_controls( $d, $logo_id, $logo_url, $default_img_id, $default_img_url, $heading_font_options ); ?>
+			</div>
+			<?php self::render_email_design_preview_panel(); ?>
+		</div>
+		<?php self::render_email_design_preview_script(); ?>
+		<?php
+	}
+
+	/**
+	 * Curated font list for the Email Design tab.
+	 *
+	 * @return array<string,string>
+	 */
+	public static function email_font_options() {
+		return array(
+			'google:Inter'            => __( 'Inter (Google, recommended)', 'kdna-events' ),
+			'google:Roboto'           => __( 'Roboto (Google)', 'kdna-events' ),
+			'google:Poppins'          => __( 'Poppins (Google)', 'kdna-events' ),
+			'google:Montserrat'       => __( 'Montserrat (Google)', 'kdna-events' ),
+			'google:Open Sans'        => __( 'Open Sans (Google)', 'kdna-events' ),
+			'google:Lato'             => __( 'Lato (Google)', 'kdna-events' ),
+			'google:Nunito'           => __( 'Nunito (Google)', 'kdna-events' ),
+			'google:Work Sans'        => __( 'Work Sans (Google)', 'kdna-events' ),
+			'google:DM Sans'          => __( 'DM Sans (Google)', 'kdna-events' ),
+			'google:Manrope'          => __( 'Manrope (Google)', 'kdna-events' ),
+			'google:Playfair Display' => __( 'Playfair Display (Google, serif)', 'kdna-events' ),
+			'google:Merriweather'     => __( 'Merriweather (Google, serif)', 'kdna-events' ),
+			'system:arial'            => __( 'Arial (system)', 'kdna-events' ),
+			'system:helvetica'        => __( 'Helvetica (system)', 'kdna-events' ),
+			'system:georgia'          => __( 'Georgia (serif, system)', 'kdna-events' ),
+			'system:verdana'          => __( 'Verdana (system)', 'kdna-events' ),
+			'system:tahoma'           => __( 'Tahoma (system)', 'kdna-events' ),
+			'system:trebuchet'        => __( 'Trebuchet MS (system)', 'kdna-events' ),
+			'system:times'            => __( 'Times New Roman (serif, system)', 'kdna-events' ),
+			'custom'                  => __( 'Custom stack', 'kdna-events' ),
+		);
+	}
+
+	/**
+	 * Resolve a font selector to an Outlook-safe font-family stack.
+	 *
+	 * @param string $value  Selector value.
+	 * @param string $custom Custom stack when $value is 'custom'.
+	 * @return string
+	 */
+	public static function email_resolve_font_stack( $value, $custom = '' ) {
+		$value = (string) $value;
+		if ( 'custom' === $value ) {
+			$stack = trim( (string) $custom );
+			return '' === $stack ? 'Arial, Helvetica, sans-serif' : $stack;
+		}
+		if ( 0 === strpos( $value, 'google:' ) ) {
+			$family = trim( substr( $value, 7 ) );
+			if ( in_array( $family, array( 'Playfair Display', 'Merriweather' ), true ) ) {
+				return "'" . $family . "', Georgia, 'Times New Roman', serif";
+			}
+			return "'" . $family . "', Arial, Helvetica, sans-serif";
+		}
+		switch ( $value ) {
+			case 'system:arial':     return 'Arial, Helvetica, sans-serif';
+			case 'system:helvetica': return 'Helvetica, Arial, sans-serif';
+			case 'system:verdana':   return 'Verdana, Geneva, sans-serif';
+			case 'system:tahoma':    return 'Tahoma, Geneva, sans-serif';
+			case 'system:trebuchet': return "'Trebuchet MS', Tahoma, Arial, sans-serif";
+			case 'system:georgia':   return "Georgia, 'Times New Roman', serif";
+			case 'system:times':     return "'Times New Roman', Times, serif";
+		}
+		return 'Arial, Helvetica, sans-serif';
+	}
+
+	/**
+	 * Return the Google Fonts stylesheet URL for a selector, or ''.
+	 *
+	 * @param string $value   Selector value.
+	 * @param string $weights Weights, default '400;600;700'.
+	 * @return string
+	 */
+	public static function email_resolve_google_font_url( $value, $weights = '400;600;700' ) {
+		if ( 0 !== strpos( (string) $value, 'google:' ) ) {
+			return '';
+		}
+		$family = trim( substr( (string) $value, 7 ) );
+		if ( '' === $family ) {
+			return '';
+		}
+		return 'https://fonts.googleapis.com/css2?family=' . str_replace( ' ', '+', $family ) . ':wght@' . $weights . '&display=swap';
+	}
+
+	/**
+	 * Sanitise a single Email Design option using the schema type.
+	 *
+	 * @param mixed $value Raw value from $_POST.
+	 * @return mixed
+	 */
+	public static function sanitize_email_design_value( $value ) {
+		$option = '';
+		if ( isset( $GLOBALS['wp_current_filter'] ) && is_array( $GLOBALS['wp_current_filter'] ) ) {
+			foreach ( $GLOBALS['wp_current_filter'] as $filter ) {
+				if ( 0 === strpos( (string) $filter, 'sanitize_option_' ) ) {
+					$option = substr( (string) $filter, strlen( 'sanitize_option_' ) );
+					break;
+				}
+			}
+		}
+
+		$schema = self::email_design_schema();
+		if ( '' === $option || ! isset( $schema[ $option ] ) ) {
+			if ( is_scalar( $value ) ) {
+				return sanitize_text_field( (string) $value );
+			}
+			return '';
+		}
+
+		$type = $schema[ $option ]['type'];
+
+		switch ( $type ) {
+			case 'integer':
+				return absint( $value );
+			case 'string':
+			default:
+				$value = (string) $value;
+				if ( false !== strpos( $option, 'content' ) || false !== strpos( $option, 'footer_text' ) || false !== strpos( $option, 'intro' ) ) {
+					return sanitize_textarea_field( $value );
+				}
+				if ( 0 === strpos( $option, 'kdna_events_email_color_' ) || in_array( $option, array( 'kdna_events_email_virtual_button_bg', 'kdna_events_email_virtual_button_text' ), true ) ) {
+					$value = trim( $value );
+					if ( preg_match( '/^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/', $value ) ) {
+						return strtoupper( $value );
+					}
+					return $schema[ $option ]['default'];
+				}
+				return sanitize_text_field( $value );
+		}
+	}
+
+	/**
+	 * Render the sectioned list of Email Design controls.
+	 *
+	 * @param array  $d                Resolved options.
+	 * @param int    $logo_id          Current logo attachment.
+	 * @param string $logo_url         Preview URL.
+	 * @param int    $default_img_id   Current default header image attachment.
+	 * @param string $default_img_url  Preview URL.
+	 * @param array  $fonts            Font selector options.
+	 * @return void
+	 */
+	protected static function render_email_design_controls( $d, $logo_id, $logo_url, $default_img_id, $default_img_url, $fonts ) {
+		$aligns = array(
+			'left'   => __( 'Left', 'kdna-events' ),
+			'center' => __( 'Centre', 'kdna-events' ),
+		);
+		?>
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Brand', 'kdna-events' ); ?></h2>
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Logo', 'kdna-events' ); ?></th>
+					<td>
+						<div class="kdna-events-email-image-field" data-kdna-events-email-image>
+							<input type="hidden" name="kdna_events_email_logo_id" value="<?php echo esc_attr( (string) $logo_id ); ?>" data-kdna-events-email-image-input data-kdna-preview-key="logo_id" />
+							<div class="kdna-events-email-image-field__preview" data-kdna-events-email-image-preview>
+								<?php if ( $logo_url ) : ?><img src="<?php echo esc_url( $logo_url ); ?>" alt="" /><?php endif; ?>
+							</div>
+							<p>
+								<button type="button" class="button" data-kdna-events-email-image-select><?php echo $logo_url ? esc_html__( 'Change logo', 'kdna-events' ) : esc_html__( 'Select logo', 'kdna-events' ); ?></button>
+								<button type="button" class="button-link-delete" data-kdna-events-email-image-remove <?php echo $logo_url ? '' : 'hidden'; ?>><?php esc_html_e( 'Remove', 'kdna-events' ); ?></button>
+							</p>
+							<p class="description"><?php esc_html_e( 'PNG or JPG, up to 400px wide works best. Sits above the white content card in every email.', 'kdna-events' ); ?></p>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_logo_width"><?php esc_html_e( 'Logo display width', 'kdna-events' ); ?></label></th>
+					<td>
+						<input type="number" min="40" max="400" step="1" id="kdna_events_email_logo_width" name="kdna_events_email_logo_width" value="<?php echo esc_attr( (string) $d['kdna_events_email_logo_width'] ); ?>" data-kdna-preview-key="logo_width" /> <?php esc_html_e( 'px', 'kdna-events' ); ?>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_logo_align"><?php esc_html_e( 'Logo alignment', 'kdna-events' ); ?></label></th>
+					<td>
+						<select id="kdna_events_email_logo_align" name="kdna_events_email_logo_align" data-kdna-preview-key="logo_align">
+							<?php foreach ( $aligns as $k => $label ) : ?>
+								<option value="<?php echo esc_attr( $k ); ?>" <?php selected( $d['kdna_events_email_logo_align'], $k ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Default event header image', 'kdna-events' ); ?></th>
+					<td>
+						<div class="kdna-events-email-image-field" data-kdna-events-email-image>
+							<input type="hidden" name="kdna_events_email_default_header_image" value="<?php echo esc_attr( (string) $default_img_id ); ?>" data-kdna-events-email-image-input data-kdna-preview-key="default_header_image" />
+							<div class="kdna-events-email-image-field__preview" data-kdna-events-email-image-preview>
+								<?php if ( $default_img_url ) : ?><img src="<?php echo esc_url( $default_img_url ); ?>" alt="" /><?php endif; ?>
+							</div>
+							<p>
+								<button type="button" class="button" data-kdna-events-email-image-select><?php echo $default_img_url ? esc_html__( 'Change image', 'kdna-events' ) : esc_html__( 'Select image', 'kdna-events' ); ?></button>
+								<button type="button" class="button-link-delete" data-kdna-events-email-image-remove <?php echo $default_img_url ? '' : 'hidden'; ?>><?php esc_html_e( 'Remove', 'kdna-events' ); ?></button>
+							</p>
+							<p class="description"><?php esc_html_e( 'Used when an event has no Email Header Image set.', 'kdna-events' ); ?></p>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_header_image_max_h"><?php esc_html_e( 'Header image max height', 'kdna-events' ); ?></label></th>
+					<td>
+						<input type="number" min="80" max="600" step="1" id="kdna_events_email_header_image_max_h" name="kdna_events_email_header_image_max_h" value="<?php echo esc_attr( (string) $d['kdna_events_email_header_image_max_h'] ); ?>" data-kdna-preview-key="header_image_max_h" /> <?php esc_html_e( 'px', 'kdna-events' ); ?>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<?php self::render_email_design_controls_colours( $d ); ?>
+		<?php self::render_email_design_controls_typography( $d, $fonts ); ?>
+		<?php self::render_email_design_controls_layout( $d ); ?>
+		<?php self::render_email_design_controls_virtual_button( $d ); ?>
+		<?php self::render_email_design_controls_content( $d ); ?>
+		<?php
+	}
+
+	/**
+	 * Render the Colours section of the Email Design tab.
+	 *
+	 * @param array $d Resolved options.
+	 * @return void
+	 */
+	protected static function render_email_design_controls_colours( $d ) {
+		$rows = array(
+			'kdna_events_email_color_primary'    => __( 'Primary brand colour', 'kdna-events' ),
+			'kdna_events_email_color_accent'     => __( 'Accent colour', 'kdna-events' ),
+			'kdna_events_email_color_page_bg'    => __( 'Page background', 'kdna-events' ),
+			'kdna_events_email_color_content_bg' => __( 'Content card background', 'kdna-events' ),
+			'kdna_events_email_color_heading'    => __( 'Heading text', 'kdna-events' ),
+			'kdna_events_email_color_body'       => __( 'Body text', 'kdna-events' ),
+			'kdna_events_email_color_muted'      => __( 'Muted text (labels, footer)', 'kdna-events' ),
+			'kdna_events_email_color_divider'    => __( 'Divider', 'kdna-events' ),
+			'kdna_events_email_color_button_bg'  => __( 'Button background', 'kdna-events' ),
+			'kdna_events_email_color_button_text' => __( 'Button text', 'kdna-events' ),
+		);
+		?>
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Colours', 'kdna-events' ); ?></h2>
+			<table class="form-table" role="presentation">
+				<tbody>
+					<?php foreach ( $rows as $key => $label ) :
+						$preview_key = substr( $key, strlen( 'kdna_events_email_color_' ) );
+						$current     = (string) $d[ $key ];
+						?>
+						<tr>
+							<th scope="row"><label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $label ); ?></label></th>
+							<td>
+								<input type="text" class="kdna-events-color-picker" id="<?php echo esc_attr( $key ); ?>" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $current ); ?>" data-kdna-preview-key="color_<?php echo esc_attr( $preview_key ); ?>" data-default-color="<?php echo esc_attr( $current ); ?>" />
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render the Typography section of the Email Design tab.
+	 *
+	 * @param array $d     Resolved options.
+	 * @param array $fonts Font selector options.
+	 * @return void
+	 */
+	protected static function render_email_design_controls_typography( $d, $fonts ) {
+		?>
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Typography', 'kdna-events' ); ?></h2>
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_heading_font"><?php esc_html_e( 'Heading font', 'kdna-events' ); ?></label></th>
+					<td>
+						<select id="kdna_events_email_heading_font" name="kdna_events_email_heading_font" data-kdna-preview-key="heading_font">
+							<?php foreach ( $fonts as $value => $label ) : ?>
+								<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $d['kdna_events_email_heading_font'], $value ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<input type="text" class="regular-text" id="kdna_events_email_heading_font_custom" name="kdna_events_email_heading_font_custom" value="<?php echo esc_attr( (string) $d['kdna_events_email_heading_font_custom'] ); ?>" placeholder="'MyBrand', Helvetica, Arial, sans-serif" data-kdna-preview-key="heading_font_custom" style="margin-top:4px;" />
+						<p class="description"><?php esc_html_e( 'Google fonts load in web clients; Outlook Desktop safely falls back to Arial or Helvetica. Custom stack kicks in when the selector is set to Custom.', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_heading_font_size"><?php esc_html_e( 'Heading size', 'kdna-events' ); ?></label></th>
+					<td><input type="number" min="14" max="48" step="1" id="kdna_events_email_heading_font_size" name="kdna_events_email_heading_font_size" value="<?php echo esc_attr( (string) $d['kdna_events_email_heading_font_size'] ); ?>" data-kdna-preview-key="heading_font_size" /> <?php esc_html_e( 'px', 'kdna-events' ); ?></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_heading_font_weight"><?php esc_html_e( 'Heading weight', 'kdna-events' ); ?></label></th>
+					<td>
+						<select id="kdna_events_email_heading_font_weight" name="kdna_events_email_heading_font_weight" data-kdna-preview-key="heading_font_weight">
+							<?php foreach ( array( 400, 600, 700 ) as $w ) : ?>
+								<option value="<?php echo esc_attr( (string) $w ); ?>" <?php selected( (int) $d['kdna_events_email_heading_font_weight'], $w ); ?>><?php echo esc_html( (string) $w ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_body_font"><?php esc_html_e( 'Body font', 'kdna-events' ); ?></label></th>
+					<td>
+						<select id="kdna_events_email_body_font" name="kdna_events_email_body_font" data-kdna-preview-key="body_font">
+							<?php foreach ( $fonts as $value => $label ) : ?>
+								<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $d['kdna_events_email_body_font'], $value ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<input type="text" class="regular-text" name="kdna_events_email_body_font_custom" value="<?php echo esc_attr( (string) $d['kdna_events_email_body_font_custom'] ); ?>" placeholder="'MyBrand', Helvetica, Arial, sans-serif" data-kdna-preview-key="body_font_custom" style="margin-top:4px;" />
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_body_font_size"><?php esc_html_e( 'Body size', 'kdna-events' ); ?></label></th>
+					<td><input type="number" min="12" max="22" step="1" id="kdna_events_email_body_font_size" name="kdna_events_email_body_font_size" value="<?php echo esc_attr( (string) $d['kdna_events_email_body_font_size'] ); ?>" data-kdna-preview-key="body_font_size" /> <?php esc_html_e( 'px', 'kdna-events' ); ?></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_body_line_height"><?php esc_html_e( 'Body line height', 'kdna-events' ); ?></label></th>
+					<td><input type="text" id="kdna_events_email_body_line_height" name="kdna_events_email_body_line_height" value="<?php echo esc_attr( (string) $d['kdna_events_email_body_line_height'] ); ?>" data-kdna-preview-key="body_line_height" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_monospace_font"><?php esc_html_e( 'Monospace / ticket code stack', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="regular-text" id="kdna_events_email_monospace_font" name="kdna_events_email_monospace_font" value="<?php echo esc_attr( (string) $d['kdna_events_email_monospace_font'] ); ?>" data-kdna-preview-key="monospace_font" /></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render the Layout section of the Email Design tab.
+	 *
+	 * @param array $d Resolved options.
+	 * @return void
+	 */
+	protected static function render_email_design_controls_layout( $d ) {
+		?>
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Layout', 'kdna-events' ); ?></h2>
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_content_max_width"><?php esc_html_e( 'Content max width', 'kdna-events' ); ?></label></th>
+					<td><input type="number" min="480" max="720" step="10" id="kdna_events_email_content_max_width" name="kdna_events_email_content_max_width" value="<?php echo esc_attr( (string) $d['kdna_events_email_content_max_width'] ); ?>" data-kdna-preview-key="content_max_width" /> <?php esc_html_e( 'px', 'kdna-events' ); ?></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_content_padding_y"><?php esc_html_e( 'Content padding, top / bottom', 'kdna-events' ); ?></label></th>
+					<td><input type="number" min="0" max="80" step="1" id="kdna_events_email_content_padding_y" name="kdna_events_email_content_padding_y" value="<?php echo esc_attr( (string) $d['kdna_events_email_content_padding_y'] ); ?>" data-kdna-preview-key="content_padding_y" /> <?php esc_html_e( 'px', 'kdna-events' ); ?></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_content_padding_x"><?php esc_html_e( 'Content padding, sides', 'kdna-events' ); ?></label></th>
+					<td><input type="number" min="0" max="60" step="1" id="kdna_events_email_content_padding_x" name="kdna_events_email_content_padding_x" value="<?php echo esc_attr( (string) $d['kdna_events_email_content_padding_x'] ); ?>" data-kdna-preview-key="content_padding_x" /> <?php esc_html_e( 'px', 'kdna-events' ); ?></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_card_border_radius"><?php esc_html_e( 'Content card radius', 'kdna-events' ); ?></label></th>
+					<td><input type="number" min="0" max="40" step="1" id="kdna_events_email_card_border_radius" name="kdna_events_email_card_border_radius" value="<?php echo esc_attr( (string) $d['kdna_events_email_card_border_radius'] ); ?>" data-kdna-preview-key="card_border_radius" /> <?php esc_html_e( 'px', 'kdna-events' ); ?></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_button_border_radius"><?php esc_html_e( 'Button radius', 'kdna-events' ); ?></label></th>
+					<td><input type="number" min="0" max="40" step="1" id="kdna_events_email_button_border_radius" name="kdna_events_email_button_border_radius" value="<?php echo esc_attr( (string) $d['kdna_events_email_button_border_radius'] ); ?>" data-kdna-preview-key="button_border_radius" /> <?php esc_html_e( 'px', 'kdna-events' ); ?></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render the Virtual Event Button section of the Email Design tab.
+	 *
+	 * @param array $d Resolved options.
+	 * @return void
+	 */
+	protected static function render_email_design_controls_virtual_button( $d ) {
+		?>
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Virtual Event Button', 'kdna-events' ); ?></h2>
+			<p class="description" style="max-width:64em;">
+				<?php esc_html_e( 'Shown in the booking confirmation email only when the event type is Virtual or Hybrid and a Virtual URL is set on the event. The button links to that URL.', 'kdna-events' ); ?>
+			</p>
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_virtual_button_label"><?php esc_html_e( 'Button label', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="regular-text" id="kdna_events_email_virtual_button_label" name="kdna_events_email_virtual_button_label" value="<?php echo esc_attr( (string) $d['kdna_events_email_virtual_button_label'] ); ?>" data-kdna-preview-key="virtual_button_label" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_virtual_button_bg"><?php esc_html_e( 'Background colour', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="kdna-events-color-picker" id="kdna_events_email_virtual_button_bg" name="kdna_events_email_virtual_button_bg" value="<?php echo esc_attr( (string) $d['kdna_events_email_virtual_button_bg'] ); ?>" data-kdna-preview-key="virtual_button_bg" data-default-color="<?php echo esc_attr( (string) $d['kdna_events_email_virtual_button_bg'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_virtual_button_text"><?php esc_html_e( 'Text colour', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="kdna-events-color-picker" id="kdna_events_email_virtual_button_text" name="kdna_events_email_virtual_button_text" value="<?php echo esc_attr( (string) $d['kdna_events_email_virtual_button_text'] ); ?>" data-kdna-preview-key="virtual_button_text" data-default-color="<?php echo esc_attr( (string) $d['kdna_events_email_virtual_button_text'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_virtual_button_radius"><?php esc_html_e( 'Border radius', 'kdna-events' ); ?></label></th>
+					<td><input type="number" min="0" max="40" step="1" id="kdna_events_email_virtual_button_radius" name="kdna_events_email_virtual_button_radius" value="<?php echo esc_attr( (string) $d['kdna_events_email_virtual_button_radius'] ); ?>" data-kdna-preview-key="virtual_button_radius" /> <?php esc_html_e( 'px', 'kdna-events' ); ?></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render the Content Strings and Footer sections of the Email Design tab.
+	 *
+	 * @param array $d Resolved options.
+	 * @return void
+	 */
+	protected static function render_email_design_controls_content( $d ) {
+		?>
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Content', 'kdna-events' ); ?></h2>
+			<p class="description" style="max-width:64em;">
+				<?php esc_html_e( 'Defaults used when an event does not set its own override. Supports merge tags: {event_title}, {attendee_name}, {order_ref}, {event_date}, {event_time}, {event_type}, {event_location}, {organiser_name}, {purchaser_name}, {ticket_code}.', 'kdna-events' ); ?>
+			</p>
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_subject_default"><?php esc_html_e( 'Email subject', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="large-text" id="kdna_events_email_subject_default" name="kdna_events_email_subject_default" value="<?php echo esc_attr( (string) $d['kdna_events_email_subject_default'] ); ?>" data-kdna-preview-key="subject_default" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_heading_default"><?php esc_html_e( 'Email heading', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="large-text" id="kdna_events_email_heading_default" name="kdna_events_email_heading_default" value="<?php echo esc_attr( (string) $d['kdna_events_email_heading_default'] ); ?>" data-kdna-preview-key="heading_default" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_content_1_default"><?php esc_html_e( 'Email content 1', 'kdna-events' ); ?></label></th>
+					<td><textarea class="large-text" rows="3" id="kdna_events_email_content_1_default" name="kdna_events_email_content_1_default" data-kdna-preview-key="content_1_default"><?php echo esc_textarea( (string) $d['kdna_events_email_content_1_default'] ); ?></textarea></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_content_2_default"><?php esc_html_e( 'Email content 2', 'kdna-events' ); ?></label></th>
+					<td><textarea class="large-text" rows="3" id="kdna_events_email_content_2_default" name="kdna_events_email_content_2_default" data-kdna-preview-key="content_2_default"><?php echo esc_textarea( (string) $d['kdna_events_email_content_2_default'] ); ?></textarea></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_admin_heading"><?php esc_html_e( 'Admin notification heading', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="large-text" id="kdna_events_email_admin_heading" name="kdna_events_email_admin_heading" value="<?php echo esc_attr( (string) $d['kdna_events_email_admin_heading'] ); ?>" data-kdna-preview-key="admin_heading" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_admin_intro"><?php esc_html_e( 'Admin notification intro', 'kdna-events' ); ?></label></th>
+					<td><textarea class="large-text" rows="2" id="kdna_events_email_admin_intro" name="kdna_events_email_admin_intro" data-kdna-preview-key="admin_intro"><?php echo esc_textarea( (string) $d['kdna_events_email_admin_intro'] ); ?></textarea></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="kdna-events-email-design-section">
+			<h2><?php esc_html_e( 'Footer', 'kdna-events' ); ?></h2>
+			<table class="form-table" role="presentation">
+				<tbody>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_footer_business_name"><?php esc_html_e( 'Business name', 'kdna-events' ); ?></label></th>
+					<td><input type="text" class="regular-text" id="kdna_events_email_footer_business_name" name="kdna_events_email_footer_business_name" value="<?php echo esc_attr( (string) $d['kdna_events_email_footer_business_name'] ); ?>" placeholder="<?php echo esc_attr( (string) get_bloginfo( 'name' ) ); ?>" data-kdna-preview-key="footer_business_name" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kdna_events_email_footer_text"><?php esc_html_e( 'Footer text', 'kdna-events' ); ?></label></th>
+					<td><textarea class="large-text" rows="3" id="kdna_events_email_footer_text" name="kdna_events_email_footer_text" data-kdna-preview-key="footer_text"><?php echo esc_textarea( (string) $d['kdna_events_email_footer_text'] ); ?></textarea>
+						<p class="description"><?php esc_html_e( 'Shown below the white content card. Individual events can override this under the event meta box.', 'kdna-events' ); ?></p>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render the live preview panel and test-send area.
+	 *
+	 * @return void
+	 */
+	protected static function render_email_design_preview_panel() {
+		?>
+		<div class="kdna-events-email-design-preview" data-kdna-events-email-preview>
+			<div class="kdna-events-email-design-preview__tabs">
+				<button type="button" class="kdna-events-email-design-preview__tab is-active" data-target="booking_confirmation"><?php esc_html_e( 'Booking Confirmation', 'kdna-events' ); ?></button>
+				<button type="button" class="kdna-events-email-design-preview__tab" data-target="admin_notification"><?php esc_html_e( 'Admin Notification', 'kdna-events' ); ?></button>
+				<button type="button" class="button button-secondary" style="margin-left:auto;" data-kdna-events-email-preview-refresh><?php esc_html_e( 'Refresh preview', 'kdna-events' ); ?></button>
+			</div>
+			<iframe class="kdna-events-email-design-preview__frame" data-kdna-events-email-preview-frame title="<?php esc_attr_e( 'Email preview', 'kdna-events' ); ?>" srcdoc="&lt;p style=&quot;font:14px sans-serif;color:#555;padding:2em;&quot;&gt;<?php echo esc_attr__( 'Loading preview...', 'kdna-events' ); ?>&lt;/p&gt;"></iframe>
+			<div class="kdna-events-email-design-preview__send">
+				<label for="kdna-events-email-preview-test-to" class="screen-reader-text"><?php esc_html_e( 'Send test to email address', 'kdna-events' ); ?></label>
+				<input type="email" id="kdna-events-email-preview-test-to" placeholder="<?php esc_attr_e( 'you@example.com', 'kdna-events' ); ?>" />
+				<button type="button" class="button button-primary" data-kdna-events-email-preview-send><?php esc_html_e( 'Send test to inbox', 'kdna-events' ); ?></button>
+				<span class="kdna-events-email-design-preview__status" role="status" aria-live="polite"></span>
+			</div>
+			<p class="description" style="margin-top:8px;">
+				<?php esc_html_e( 'Preview uses dummy event and attendee data. Save your settings before sending a real test so the sent copy matches what you see.', 'kdna-events' ); ?>
+			</p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Emit the client-side JS that drives the live preview + test send.
+	 *
+	 * @return void
+	 */
+	protected static function render_email_design_preview_script() {
+		?>
+		<script>
+		(function () {
+			var cfg = window.kdnaEventsEmailDesign || {};
+			if (!cfg.ajaxUrl) { return; }
+
+			var root = document.querySelector('[data-kdna-events-email-preview]');
+			if (!root) { return; }
+
+			var frame = root.querySelector('[data-kdna-events-email-preview-frame]');
+			var status = root.querySelector('.kdna-events-email-design-preview__status');
+			var refresh = root.querySelector('[data-kdna-events-email-preview-refresh]');
+			var sendBtn = root.querySelector('[data-kdna-events-email-preview-send]');
+			var toInput = root.querySelector('#kdna-events-email-preview-test-to');
+			var tabs = root.querySelectorAll('.kdna-events-email-design-preview__tab');
+			var form = root.closest('form');
+
+			var currentTemplate = 'booking_confirmation';
+			var debounceTimer = null;
+
+			function collectPayload() {
+				var fd = new FormData();
+				fd.append('action', 'kdna_events_preview_email');
+				fd.append('nonce', cfg.previewNonce);
+				fd.append('template', currentTemplate);
+				if (form) {
+					var controls = form.querySelectorAll('[name^="kdna_events_email_"], [name="kdna_events_email_logo_id"], [name="kdna_events_email_default_header_image"]');
+					controls.forEach(function (el) {
+						if (el.type === 'checkbox') {
+							if (el.checked) { fd.append(el.name, el.value || '1'); }
+						} else {
+							fd.append(el.name, el.value);
+						}
+					});
+				}
+				return fd;
+			}
+
+			function setStatus(text, isError) {
+				if (!status) { return; }
+				status.textContent = text || '';
+				status.style.color = isError ? '#b91c1c' : '#059669';
+			}
+
+			function renderPreview() {
+				setStatus('');
+				fetch(cfg.ajaxUrl, { method: 'POST', credentials: 'same-origin', body: collectPayload() })
+					.then(function (r) { return r.json(); })
+					.then(function (res) {
+						if (res && res.success && res.data && res.data.html) {
+							frame.setAttribute('srcdoc', res.data.html);
+						} else {
+							setStatus(res && res.data && res.data.message ? res.data.message : 'Preview failed.', true);
+						}
+					})
+					.catch(function () { setStatus('Network error rendering preview.', true); });
+			}
+
+			function scheduleRender() {
+				if (debounceTimer) { clearTimeout(debounceTimer); }
+				debounceTimer = setTimeout(renderPreview, 300);
+			}
+
+			// React to any control change inside the form, including wp.media picks.
+			if (form) {
+				form.addEventListener('input', scheduleRender);
+				form.addEventListener('change', scheduleRender);
+				form.addEventListener('kdna:email-image-change', scheduleRender);
+			}
+			if (refresh) { refresh.addEventListener('click', renderPreview); }
+
+			tabs.forEach(function (tab) {
+				tab.addEventListener('click', function () {
+					tabs.forEach(function (t) { t.classList.remove('is-active'); });
+					tab.classList.add('is-active');
+					currentTemplate = tab.getAttribute('data-target') || 'booking_confirmation';
+					renderPreview();
+				});
+			});
+
+			// Initial render.
+			renderPreview();
+
+			if (sendBtn) {
+				sendBtn.addEventListener('click', function () {
+					var to = (toInput && toInput.value || '').trim();
+					if (!to) { setStatus('Enter an email address first.', true); return; }
+					setStatus('Sending...', false);
+					status.style.color = '#4b5563';
+					var body = new FormData();
+					body.append('action', 'kdna_events_preview_test_send');
+					body.append('nonce', cfg.testNonce);
+					body.append('to', to);
+					body.append('template', currentTemplate);
+					fetch(cfg.ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body })
+						.then(function (r) { return r.json(); })
+						.then(function (res) {
+							if (res && res.success) {
+								setStatus(res.data && res.data.message ? res.data.message : 'Sent.', false);
+							} else {
+								setStatus(res && res.data && res.data.message ? res.data.message : 'Send failed.', true);
+							}
+						})
+						.catch(function () { setStatus('Network error sending test.', true); });
+				});
+			}
+		})();
+		</script>
 		<?php
 	}
 }

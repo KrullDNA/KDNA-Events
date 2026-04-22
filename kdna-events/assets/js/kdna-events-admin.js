@@ -51,6 +51,18 @@
 		$('[data-kdna-events-email-image]').each(function () {
 			wireEmailImagePicker($(this));
 		});
+
+		// Email Design tab colour pickers.
+		if ($.fn && $.fn.wpColorPicker) {
+			$('.kdna-events-color-picker').wpColorPicker({
+				change: function () {
+					var form = this.closest ? this.closest('form') : $(this).closest('form').get(0);
+					if (form && 'function' === typeof window.Event) {
+						form.dispatchEvent(new window.Event('change', { bubbles: true }));
+					}
+				}
+			});
+		}
 	});
 
 	/**

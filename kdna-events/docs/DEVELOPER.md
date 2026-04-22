@@ -1,6 +1,6 @@
 # KDNA Events developer guide
 
-Version: 1.0.0
+Version: 1.1.0
 
 This guide covers the public surface that third-party add-ons and
 bespoke themes should rely on. Everything not documented here is
@@ -87,6 +87,35 @@ without wrapping the bridge itself.
 Signature: `function ( string $integration_id, array $payload, $result, int $ticket_id )`.
 `$result` is `true` on success or a `WP_Error`.
 
+### `kdna_events_after_success_ticket` (v1.1)
+
+Fires after each ticket's body has rendered inside the Success Tickets
+widget's per-ticket loop. Add-ons can inject per-ticket UI (download
+buttons, wallet passes, calendar links) without forking core.
+
+Signature: `function ( object $ticket, object $order, array $settings )`.
+
+```php
+add_action( 'kdna_events_after_success_ticket', function ( $ticket, $order, $settings ) {
+	echo '<a href="' . esc_url( my_addon_pdf_url( $ticket ) ) . '">Download PDF</a>';
+}, 10, 3 );
+```
+
+### `kdna_events_after_my_ticket` (v1.1)
+
+Fires inside the per-ticket loop of the My Tickets widget. Same shape
+as `kdna_events_after_success_ticket` so add-ons can share handlers.
+
+Signature: `function ( object $ticket, null $order, array $settings )`.
+`$order` is null because the My Tickets list joins orders on user /
+email across many orders; all order context lives on `$ticket`.
+
+```php
+add_action( 'kdna_events_after_my_ticket', function ( $ticket, $order, $settings ) {
+	echo '<button type="button">Add to calendar</button>';
+}, 10, 3 );
+```
+
 ### `kdna_events_pending_order_created`
 
 Fires after a pending order row is inserted but before Stripe or the
@@ -109,6 +138,33 @@ add_filter( 'kdna_events_crm_sync_data', function ( $payload, $ticket_id, $order
 	return $payload;
 }, 10, 3 );
 ```
+
+### `kdna_events_email_attachments` (v1.1)
+
+Applied to the `$attachments` array passed to `wp_mail` for every KDNA
+Events booking confirmation and admin notification send. Lets add-ons
+inject additional files (PDF tickets from the upcoming
+`kdna-events-pdf-tickets` add-on, CSV rosters, etc.) into outgoing
+emails without modifying core.
+
+```php
+add_filter( 'kdna_events_email_attachments', function ( $attachments, $order_id, $email_type ) {
+	if ( 'booking_confirmation' !== $email_type ) {
+		return $attachments;
+	}
+	$path = my_addon_build_pdf_for_order( $order_id );
+	if ( $path && file_exists( $path ) ) {
+		$attachments[] = $path;
+	}
+	return $attachments;
+}, 10, 3 );
+```
+
+Parameters:
+
+- `array $attachments` Array of absolute file paths. Empty by default.
+- `int $order_id` The order being emailed.
+- `string $email_type` `'booking_confirmation'` or `'admin_notification'`.
 
 ### `kdna_events_crm_integrations`
 
@@ -262,6 +318,70 @@ array(
   'total'     => 199.00,
 )
 ```
+
+## Email Design (v1.1)
+
+v1.1 Brief A replaces the v1.0 plain body textarea with a full branded
+HTML email system under Events, Settings, Email Design. Every visual
+property (logo, colours, typography, layout, button styling, footer,
+content strings) is controllable from that tab, with a live preview
+panel and a 'Send test to ...' field for real-world SMTP testing.
+
+Per-event overrides live on the Event Details meta box under the
+'Email Overrides' heading:
+
+- Email subject line
+- Email heading
+- Email content 1
+- Email content 2
+- Email footer text
+
+Any override is merge-tag enabled and falls back to the matching
+global default when left blank.
+
+### Merge tags
+
+Use these in subject lines, headings, content 1 / 2, footer text and
+the admin notification intro. Unknown tags render as empty strings.
+
+| Tag | Value |
+| --- | --- |
+| `{event_title}` | Event post title |
+| `{event_subtitle}` | Event subtitle |
+| `{event_date}` | Formatted start date (no time) |
+| `{event_time}` | Formatted start time |
+| `{event_end_date}` / `{event_end_time}` | End date/time |
+| `{event_type}` | Human label, In-person / Virtual / Hybrid |
+| `{event_location}` | Name + address, joined |
+| `{event_location_name}` / `{event_address}` | Individual parts |
+| `{event_url}` | Permalink |
+| `{virtual_url}` | Event's virtual URL (empty on in-person events) |
+| `{organiser_name}` / `{organiser_email}` | Organiser details |
+| `{purchaser_name}` / `{purchaser_first_name}` / `{purchaser_email}` | Buyer |
+| `{attendee_name}` | Per-ticket recipient (falls back to purchaser) |
+| `{ticket_code}` | Single ticket code, or all codes joined |
+| `{order_ref}` / `{quantity}` / `{total}` | Order meta |
+| `{my_tickets_url}` | URL of the assigned My Tickets page |
+| `{business_name}` / `{support_email}` | From Email Design + Emails settings |
+
+### Header image field
+
+Each event has an Email Header Image meta field (`_kdna_event_image`,
+WordPress attachment ID) on the Event Details, Basics section. The
+plugin registers a custom image size `kdna-events-email-header` at
+1200x600 centre-cropped, rendered at 600x300 in the email for retina
+sharpness.
+
+Resolve the URL in your own code via:
+
+```php
+$url = kdna_events_get_email_header_image_url( $event_id );
+// Falls back through: event image, plugin default, empty string.
+```
+
+Uploads made before the plugin was active get their cropped size
+auto-regenerated on activation and on demand via a scheduled
+`kdna_events_regenerate_email_image_crops` task.
 
 ## Overriding email templates
 

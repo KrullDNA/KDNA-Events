@@ -398,6 +398,20 @@ class KDNA_Events_Widget_Success_Tickets extends KDNA_Events_Widget_Base {
 										<?php esc_html_e( 'Download PDF (coming soon)', 'kdna-events' ); ?>
 									</button>
 								<?php endif; ?>
+								<?php
+								/**
+								 * Fires after each ticket's body has rendered on the Success page.
+								 *
+								 * Add-ons (v1.1 Brief B's kdna-events-pdf-tickets, wallet passes,
+								 * calendar buttons) hook here to inject per-ticket UI without
+								 * touching core.
+								 *
+								 * @param object $ticket   The ticket object.
+								 * @param object $order    The parent order object.
+								 * @param array  $settings Elementor widget settings.
+								 */
+								do_action( 'kdna_events_after_success_ticket', $ticket, $order, $settings );
+								?>
 							</div>
 							<?php if ( $show_qr ) : ?>
 								<div class="kdna-events-success-ticket__qr">

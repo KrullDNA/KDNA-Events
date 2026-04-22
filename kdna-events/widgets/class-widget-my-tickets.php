@@ -823,6 +823,23 @@ class KDNA_Events_Widget_My_Tickets extends KDNA_Events_Widget_Base {
 										<?php esc_html_e( 'Download PDF (coming soon)', 'kdna-events' ); ?>
 									</button>
 								<?php endif; ?>
+								<?php
+								/**
+								 * Fires after each ticket's body has rendered on the My Tickets
+								 * dashboard. Mirrors kdna_events_after_success_ticket so add-ons
+								 * can inject per-ticket UI in both places.
+								 *
+								 * Note: there is no single $order context on the My Tickets list
+								 * because rows join orders on user / email. We pass the joined
+								 * row via $ticket (which carries order_reference and similar
+								 * fields) and null for $order to keep the signature shape.
+								 *
+								 * @param object     $ticket   Ticket + order fields joined together.
+								 * @param null       $order    Reserved for consistency.
+								 * @param array      $settings Elementor widget settings.
+								 */
+								do_action( 'kdna_events_after_my_ticket', $ticket, null, $settings );
+								?>
 							</div>
 							<?php if ( $show_qr ) : ?>
 								<div class="kdna-events-my-ticket__qr">

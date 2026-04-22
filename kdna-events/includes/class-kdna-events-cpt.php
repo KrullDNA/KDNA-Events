@@ -273,6 +273,8 @@ class KDNA_Events_CPT {
 			'_kdna_event_virtual_url',
 			'_kdna_event_organiser_name',
 			'_kdna_event_organiser_email',
+			'_kdna_event_email_heading',
+			'_kdna_event_email_subject',
 		);
 
 		foreach ( $string_fields as $key ) {
@@ -301,6 +303,28 @@ class KDNA_Events_CPT {
 				'auth_callback'     => $auth,
 			)
 		);
+
+		// Per-event email body overrides. Each value defaults to empty, in
+		// which case the global Email Design setting with the matching key
+		// is used at render time.
+		$textarea_fields = array(
+			'_kdna_event_email_content_1',
+			'_kdna_event_email_content_2',
+			'_kdna_event_email_footer_text',
+		);
+		foreach ( $textarea_fields as $key ) {
+			register_post_meta(
+				self::POST_TYPE,
+				$key,
+				array(
+					'type'              => 'string',
+					'single'            => true,
+					'show_in_rest'      => true,
+					'sanitize_callback' => 'sanitize_textarea_field',
+					'auth_callback'     => $auth,
+				)
+			);
+		}
 
 		register_post_meta(
 			self::POST_TYPE,

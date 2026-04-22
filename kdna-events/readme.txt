@@ -4,7 +4,7 @@ Tags: events, ticketing, elementor, stripe, bookings
 Requires at least: 6.0
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,20 @@ Yes. The shared partial at `templates/partials/event-card.php` is resolved via t
 
 == Changelog ==
 
+= 1.1.0 =
+* Branded HTML email templates matching the KDNA Events design reference PDF, replacing the v1.0 plain-body textarea.
+* New Email Design settings tab with controls for brand (logo, default event image), colours, typography (with Google Font picker and Outlook-safe fallbacks), layout, Virtual Event Button style, content strings and footer.
+* Live preview panel with tabs for Booking Confirmation and Admin Notification, re-renders on any change, plus a 'Send test to inbox' field.
+* New `_kdna_event_image` meta field per event with a wp.media picker and automatic 1200x600 centre-cropped image size.
+* New per-event email overrides on the Event Details meta box: subject line, heading, content 1, content 2, footer text.
+* New merge tags: `{event_time}`, `{event_type}`, `{event_end_date}`, `{event_end_time}`, `{event_location_name}`, `{event_address}`, `{virtual_url}`, `{purchaser_first_name}`, `{my_tickets_url}`, `{business_name}`, `{support_email}`.
+* Virtual Event link button renders only for virtual and hybrid events with a URL set; bulletproof VML + CSS button pattern.
+* CSS inlining via `pelago/emogrifier` for reliable rendering across Gmail, Apple Mail, Outlook 365 and Outlook Desktop for Windows.
+* Plain-text fallback auto-derived and sent as a multipart/alternative part.
+* Reply-to address added to the Emails settings tab.
+* Three new extension hooks for add-ons: filter `kdna_events_email_attachments`, actions `kdna_events_after_success_ticket` and `kdna_events_after_my_ticket`.
+* v1.0 booking confirmation body textarea removed; any stored value is ignored by the new template system.
+
 = 1.0.0 =
 * Initial release.
 * Stage 1: plugin foundation, custom post type, meta fields, admin Event Details meta box, custom list columns, custom tables for orders and tickets, helper library, uninstall cleanup.
@@ -117,6 +131,9 @@ Yes. The shared partial at `templates/partials/event-card.php` is resolved via t
 * Stage 11: final QA, translations, documentation, packaging.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Adds fully branded HTML email templates, a new Email Design settings tab with live preview and test-send, per-event Email Header Image field, per-event email overrides, and three extension hooks for add-ons.
 
 = 1.0.0 =
 Initial release.
