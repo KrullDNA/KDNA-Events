@@ -833,6 +833,8 @@ class KDNA_Events_PDF_Settings {
 						.then(function (res) {
 							if (res && res.success && res.data && res.data.html) {
 								debugOut.innerHTML = res.data.html;
+							} else if (res === 0 || res === '0') {
+								debugOut.innerHTML = '<p style="color:#b91c1c;"><strong>Server returned 0.</strong> The debug AJAX handler is not registered. The latest add-on version is not installed on this site yet. Deactivate the plugin, re-upload the latest zip (v1.0.0 build bbe2c03 or newer), reactivate, then hard-reload this settings page (Ctrl+Shift+R / Cmd+Shift+R) before clicking Debug again.</p>';
 							} else {
 								debugOut.textContent = 'Debug failed: ' + JSON.stringify(res);
 							}
