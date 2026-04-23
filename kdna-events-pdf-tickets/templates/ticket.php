@@ -41,15 +41,30 @@ $css    = '@page { margin: ' . $margin . 'mm ' . $margin . 'mm ' . ( $margin + 6
 $heading_face = trim( (string) ( $design['heading_font_url'] ?? '' ) );
 $body_face    = trim( (string) ( $design['body_font_url'] ?? '' ) );
 $face_css     = '';
-$body_targets = "body, .tkt-event-name, .tkt-meta__label, .tkt-meta__value, .tkt-location__label, .tkt-location__value, .tkt-terms, .tkt-top__title, .tkt-footer, .tkt-footer p, .tkt-footer strong";
+$body_targets = "body, td, .tkt-event-name, .tkt-meta, .tkt-meta td, .tkt-meta__label, .tkt-meta__value, .tkt-location, .tkt-location__label, .tkt-location__value, .tkt-terms, .tkt-top__title, .tkt-footer, .tkt-footer p, .tkt-footer strong, .tkt-card__body, .tkt-bottom, .tkt-bottom td";
 $heading_targets = ".tkt-event-name, .tkt-meta__label, .tkt-meta__value, .tkt-location__label, .tkt-location__value, .tkt-top__title";
-if ( '' !== $body_face ) {
-	$face_css .= "@font-face { font-family: 'KdnaPdfBody'; src: url('" . esc_url_raw( $body_face ) . "') format('truetype'); font-weight: normal; font-style: normal; }\n";
-	$face_css .= $body_targets . " { font-family: 'KdnaPdfBody', " . ( $design['body_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
-}
-if ( '' !== $heading_face ) {
-	$face_css .= "@font-face { font-family: 'KdnaPdfHeading'; src: url('" . esc_url_raw( $heading_face ) . "') format('truetype'); font-weight: normal; font-style: normal; }\n";
-	$face_css .= $heading_targets . " { font-family: 'KdnaPdfHeading', " . ( $design['heading_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
+// Emit @font-face + font-family rules. Dompdf de-duplicates @font-
+// face entries by src URL: if we register two different family
+// names pointing at the same TTF, only the first family sticks and
+// the second silently fails to render. Dedupe: when both slots use
+// the same URL, emit the TTF once and have both rules reference
+// the same family.
+$heading_family = 'KdnaPdfHeading';
+$body_family    = 'KdnaPdfBody';
+if ( '' !== $body_face && '' !== $heading_face && $body_face === $heading_face ) {
+	$heading_family = $body_family;
+	$face_css      .= "@font-face { font-family: '" . $body_family . "'; src: url('" . esc_url_raw( $body_face ) . "') format('truetype'); font-weight: normal; font-style: normal; }\n";
+	$face_css      .= $body_targets . " { font-family: '" . $body_family . "', " . ( $design['body_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
+	$face_css      .= $heading_targets . " { font-family: '" . $heading_family . "', " . ( $design['heading_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
+} else {
+	if ( '' !== $body_face ) {
+		$face_css .= "@font-face { font-family: '" . $body_family . "'; src: url('" . esc_url_raw( $body_face ) . "') format('truetype'); font-weight: normal; font-style: normal; }\n";
+		$face_css .= $body_targets . " { font-family: '" . $body_family . "', " . ( $design['body_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
+	}
+	if ( '' !== $heading_face ) {
+		$face_css .= "@font-face { font-family: '" . $heading_family . "'; src: url('" . esc_url_raw( $heading_face ) . "') format('truetype'); font-weight: normal; font-style: normal; }\n";
+		$face_css .= $heading_targets . " { font-family: '" . $heading_family . "', " . ( $design['heading_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
+	}
 }
 $css .= "\n" . $face_css;
 
