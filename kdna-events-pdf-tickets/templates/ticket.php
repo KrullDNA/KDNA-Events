@@ -144,9 +144,9 @@ $address  = trim( (string) get_option( 'kdna_events_invoice_business_address', '
 							</tr>
 						</table>
 					</td>
-					<td class="tkt-card__image">
-						<?php if ( '' !== $header_image_url ) : ?>
-							<img src="<?php echo esc_url( $header_image_url ); ?>" alt="<?php echo esc_attr( $event_name ); ?>" />
+					<td class="tkt-card__image" style="<?php echo '' !== $header_image_url ? 'background-image:url(' . esc_url( $header_image_url ) . ');' : ''; ?>">
+						<?php if ( '' === $header_image_url ) : ?>
+							&nbsp;
 						<?php endif; ?>
 					</td>
 				</tr>
