@@ -24,7 +24,7 @@
 body {
 	margin: 0;
 	padding: 0;
-	font-family: helvetica, Arial, sans-serif;
+	font-family: {{FONT_BODY}};
 	font-size: 10pt;
 	line-height: 1.45;
 	color: #1A1A1A;
@@ -49,7 +49,7 @@ body {
 
 .tkt-top__title {
 	text-align: right;
-	font-family: helvetica, Arial, sans-serif;
+	font-family: {{FONT_HEADING}};
 	font-size: 18pt;
 	font-weight: 300;
 	color: #1A1A1A;
@@ -120,7 +120,7 @@ body {
 /* Body content. */
 .tkt-event-name {
 	text-align: center;
-	font-family: helvetica, Arial, sans-serif;
+	font-family: {{FONT_HEADING}};
 	font-size: 22pt;
 	font-weight: 700;
 	color: #1A1A1A;
@@ -144,7 +144,7 @@ body {
 
 .tkt-meta__label {
 	display: block;
-	font-family: helvetica, Arial, sans-serif;
+	font-family: {{FONT_HEADING}};
 	font-size: 9pt;
 	font-weight: 400;
 	color: #555555;
@@ -154,7 +154,7 @@ body {
 
 .tkt-meta__value {
 	display: block;
-	font-family: helvetica, Arial, sans-serif;
+	font-family: {{FONT_HEADING}};
 	font-size: 11pt;
 	font-weight: 700;
 	color: #1A1A1A;
@@ -167,7 +167,7 @@ body {
 
 .tkt-location__label {
 	display: block;
-	font-family: helvetica, Arial, sans-serif;
+	font-family: {{FONT_HEADING}};
 	font-size: 9pt;
 	color: #555555;
 	margin: 0;
@@ -176,7 +176,7 @@ body {
 
 .tkt-location__value {
 	display: block;
-	font-family: helvetica, Arial, sans-serif;
+	font-family: {{FONT_HEADING}};
 	font-size: 11pt;
 	font-weight: 700;
 	color: #1A1A1A;

@@ -3,7 +3,7 @@
  * Plugin Name:       KDNA Events PDF Tickets
  * Plugin URI:        https://krulldna.com/
  * Description:       Adds branded PDF ticket attachments with Code 128 barcodes to the KDNA Events plugin.
- * Version:           1.0.0d
+ * Version:           1.0.0e
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            KDNA
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'KDNA_EVENTS_PDF_VERSION', '1.0.0d' );
+define( 'KDNA_EVENTS_PDF_VERSION', '1.0.0e' );
 define( 'KDNA_EVENTS_PDF_PLUGIN_FILE', __FILE__ );
 define( 'KDNA_EVENTS_PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'KDNA_EVENTS_PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
