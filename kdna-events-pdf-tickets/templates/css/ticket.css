@@ -55,14 +55,18 @@ body {
 	letter-spacing: 0.02em;
 }
 
-/* The horizontal ticket card. 3 table columns: side label | body | image. */
+/* The horizontal ticket card. 3 table columns: side label | body | image.
+   table-layout:fixed forces Dompdf to honour the per-cell widths below
+   instead of auto-sizing each column by its content, which otherwise
+   shoves the body column down to 40mm and wraps every second word. */
 .tkt-card {
 	width: 100%;
 	border-collapse: collapse;
+	table-layout: fixed;
 }
 
 .tkt-card__side {
-	width: 14mm;
+	width: 9mm;
 	background: #000000;
 	color: #ffffff;
 	vertical-align: middle;
@@ -75,10 +79,10 @@ body {
 	transform: rotate(-90deg);
 	-webkit-transform: rotate(-90deg);
 	white-space: nowrap;
-	font-size: 12pt;
+	font-size: 10pt;
 	font-weight: 400;
-	letter-spacing: 0.1em;
-	line-height: 14mm;
+	letter-spacing: 0.08em;
+	line-height: 9mm;
 }
 
 .tkt-card__body {
@@ -115,10 +119,12 @@ body {
 	width: 100%;
 	border-collapse: collapse;
 	margin: 0 0 3mm;
+	table-layout: fixed;
 }
 
 .tkt-meta td {
-	padding: 0 4mm;
+	width: 33%;
+	padding: 0 3mm;
 	text-align: center;
 	vertical-align: top;
 }
@@ -161,6 +167,7 @@ body {
 .tkt-bottom {
 	width: 100%;
 	border-collapse: collapse;
+	table-layout: fixed;
 }
 
 .tkt-bottom td {
@@ -168,16 +175,18 @@ body {
 }
 
 .tkt-terms {
-	width: 60%;
+	width: 55%;
 	padding-right: 6mm;
 	font-size: 8.5pt;
 	color: #555555;
 	line-height: 1.45;
+	vertical-align: middle;
 }
 
 .tkt-barcode {
-	width: 40%;
-	text-align: right;
+	width: 45%;
+	text-align: center;
+	vertical-align: middle;
 }
 
 .tkt-barcode img {
