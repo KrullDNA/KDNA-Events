@@ -141,6 +141,7 @@ function kdna_events_pdf_bootstrap() {
 	require_once KDNA_EVENTS_PDF_PLUGIN_DIR . 'includes/class-barcode.php';
 	require_once KDNA_EVENTS_PDF_PLUGIN_DIR . 'includes/class-pdf-generator.php';
 	require_once KDNA_EVENTS_PDF_PLUGIN_DIR . 'includes/class-settings.php';
+	require_once KDNA_EVENTS_PDF_PLUGIN_DIR . 'includes/class-event-meta.php';
 	require_once KDNA_EVENTS_PDF_PLUGIN_DIR . 'includes/class-email-integration.php';
 	require_once KDNA_EVENTS_PDF_PLUGIN_DIR . 'includes/class-widget-integration.php';
 	require_once KDNA_EVENTS_PDF_PLUGIN_DIR . 'includes/class-rest-endpoint.php';

@@ -1,13 +1,20 @@
 /**
- * KDNA Events ticket PDF stylesheet.
+ * KDNA Events ticket PDF stylesheet, matched to
+ * docs/pdf-ticket-reference.pdf.
  *
- * Dompdf 2.x supports most of CSS 2.1 plus parts of CSS 3. No flex,
- * no grid, no clip-path. Tables, padding, borders, backgrounds and
- * absolute-positioned bars are the building blocks.
+ * Layout: logo top-left, 'Ticket' heading top-right, one horizontal
+ * card consisting of a black side strip with 'Single Ticket' rotated
+ * text, a light-grey content area (event name, 3-column date/time/
+ * type row, centred location, terms + barcode), and a full-height
+ * event image on the right. Centred footer with business identity.
+ *
+ * Dompdf 2.x supports `transform: rotate()`, CSS 2.1 tables, basic
+ * block positioning and the `@page` rule. This sheet stays within
+ * that subset.
  */
 
 @page {
-	margin: 15mm;
+	margin: 20mm 18mm;
 }
 
 * {
@@ -18,162 +25,187 @@ body {
 	margin: 0;
 	padding: 0;
 	font-family: helvetica, Arial, sans-serif;
-	font-size: 11pt;
-	line-height: 1.5;
-	color: #333333;
+	font-size: 10pt;
+	line-height: 1.45;
+	color: #1A1A1A;
+	background: #ffffff;
 }
 
-.tkt-page {
-	page-break-after: always;
+/* Top row: logo left, 'Ticket' label right. */
+.tkt-top {
+	width: 100%;
+	margin: 0 0 8mm;
 }
 
-.tkt-page:last-child {
-	page-break-after: auto;
+.tkt-top td {
+	vertical-align: middle;
 }
 
-.tkt-header {
+.tkt-top__logo img {
 	display: block;
-	background: #2E75B6;
-	padding: 10mm 12mm;
-	text-align: center;
-	margin: -15mm -15mm 8mm;
-}
-
-.tkt-header img {
-	display: inline-block;
-	max-width: 160px;
+	max-width: 140px;
 	height: auto;
 }
 
-.tkt-hero {
-	margin: 0 0 8mm;
-	text-align: center;
-}
-
-.tkt-hero img {
-	display: block;
-	width: 100%;
-	max-height: 70mm;
-	object-fit: cover;
-}
-
-.tkt-details {
-	margin: 0 0 8mm;
-}
-
-.tkt-details__title {
-	font-size: 20pt;
-	font-weight: 700;
+.tkt-top__title {
+	text-align: right;
+	font-size: 18pt;
+	font-weight: 300;
 	color: #1A1A1A;
-	margin: 0 0 2mm;
-	line-height: 1.2;
+	letter-spacing: 0.02em;
 }
 
-.tkt-details__subtitle {
-	font-size: 13pt;
-	color: #555555;
-	margin: 0 0 4mm;
-}
-
-.tkt-details__meta {
+/* The horizontal ticket card. 3 table columns: side label | body | image. */
+.tkt-card {
 	width: 100%;
 	border-collapse: collapse;
 }
 
-.tkt-details__meta td {
-	padding: 2mm 0;
-	font-size: 10.5pt;
+.tkt-card__side {
+	width: 14mm;
+	background: #000000;
+	color: #ffffff;
+	vertical-align: middle;
+	text-align: center;
+	padding: 0;
+}
+
+.tkt-card__side span {
+	display: inline-block;
+	transform: rotate(-90deg);
+	-webkit-transform: rotate(-90deg);
+	white-space: nowrap;
+	font-size: 12pt;
+	font-weight: 400;
+	letter-spacing: 0.1em;
+	line-height: 14mm;
+}
+
+.tkt-card__body {
+	background: #F2F2F2;
+	padding: 10mm 8mm;
+	vertical-align: middle;
+}
+
+.tkt-card__image {
+	width: 62mm;
+	padding: 0;
 	vertical-align: top;
 }
 
-.tkt-details__meta td.label {
-	color: #888888;
-	width: 30mm;
+.tkt-card__image img {
+	display: block;
+	width: 62mm;
+	height: 65mm;
+	object-fit: cover;
+	object-position: center center;
 }
 
-.tkt-details__meta td.value {
-	color: #1A1A1A;
-	font-weight: 600;
-}
-
-.tkt-attendee {
-	margin: 6mm 0 8mm;
-	padding: 6mm 8mm;
-	background: #FBFBFB;
-	border: 1px solid #E5E5E5;
+/* Body content. */
+.tkt-event-name {
 	text-align: center;
-}
-
-.tkt-attendee__name {
-	font-size: 14pt;
+	font-size: 22pt;
 	font-weight: 700;
 	color: #1A1A1A;
-	margin: 0 0 2mm;
+	margin: 0 0 4mm;
+	line-height: 1.15;
 }
 
-.tkt-attendee__code {
-	display: inline-block;
-	padding: 4mm 6mm;
-	background: #FCEAE3;
-	color: #1A1A1A;
-	font-family: courier, monospace;
-	font-size: 36pt;
+.tkt-meta {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 0 0 3mm;
+}
+
+.tkt-meta td {
+	padding: 0 4mm;
+	text-align: center;
+	vertical-align: top;
+}
+
+.tkt-meta__label {
+	display: block;
+	font-size: 9pt;
+	font-weight: 400;
+	color: #555555;
+	margin: 0 0 1mm;
+}
+
+.tkt-meta__value {
+	display: block;
+	font-size: 11pt;
 	font-weight: 700;
-	letter-spacing: 0.1em;
-	line-height: 1;
-	margin: 2mm 0;
+	color: #1A1A1A;
 }
 
-.tkt-attendee__order-ref {
-	margin: 2mm 0 0;
-	font-size: 9.5pt;
-	color: #888888;
+.tkt-location {
+	text-align: center;
+	margin: 0 0 6mm;
 }
 
-.tkt-attendee__custom {
-	margin: 3mm 0 0;
-	font-size: 9.5pt;
-	color: #888888;
+.tkt-location__label {
+	display: block;
+	font-size: 9pt;
+	color: #555555;
+	margin: 0 0 1mm;
+}
+
+.tkt-location__value {
+	display: block;
+	font-size: 11pt;
+	font-weight: 700;
+	color: #1A1A1A;
+}
+
+/* Bottom row of the card: terms on the left, barcode on the right. */
+.tkt-bottom {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.tkt-bottom td {
+	vertical-align: middle;
+}
+
+.tkt-terms {
+	width: 60%;
+	padding-right: 6mm;
+	font-size: 8.5pt;
+	color: #555555;
+	line-height: 1.45;
 }
 
 .tkt-barcode {
-	text-align: center;
-	margin: 8mm 0;
+	width: 40%;
+	text-align: right;
 }
 
 .tkt-barcode img {
 	display: inline-block;
-	max-width: 80mm;
-	height: 20mm;
+	max-width: 55mm;
+	height: 16mm;
 }
 
 .tkt-barcode__code {
+	display: block;
+	text-align: center;
 	font-family: courier, monospace;
-	font-size: 11pt;
-	letter-spacing: 0.1em;
-	margin: 2mm 0 0;
-	color: #1A1A1A;
+	font-size: 8pt;
+	color: #555555;
+	margin-top: 1mm;
+	letter-spacing: 0.05em;
 }
 
-.tkt-terms {
-	margin: 8mm 0;
-	padding: 4mm 5mm;
-	border-top: 1px solid #E5E5E5;
-	border-bottom: 1px solid #E5E5E5;
-	font-size: 9pt;
-	color: #666666;
-	line-height: 1.5;
-}
-
+/* Centred footer at the bottom of every page. */
 .tkt-footer {
 	position: fixed;
-	bottom: 0;
 	left: 0;
 	right: 0;
+	bottom: 0;
 	text-align: center;
 	font-size: 9pt;
-	color: #888888;
-	padding: 0 15mm;
+	color: #555555;
+	padding: 0 18mm;
 }
 
 .tkt-footer p {
@@ -182,4 +214,5 @@ body {
 
 .tkt-footer strong {
 	color: #1A1A1A;
+	font-weight: 700;
 }

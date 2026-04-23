@@ -92,7 +92,8 @@ class KDNA_Events_PDF_Generator {
 			),
 		);
 		$context = $this->build_context_for_order( $order, $tickets );
-		$context['is_sample'] = true;
+		$context['is_sample']   = true;
+		$context['event_terms'] = __( 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tortor nibh, dignissim ut luctus ac, ultricies ac ex. Vestibulum et malesuada diam, ut finibus nunc. Vivamus neque odio, dictum sit amet eros nec.', 'kdna-events-pdf-tickets' );
 		$html    = $this->render_html( $context );
 		return $this->render_pdf( $html );
 	}
@@ -222,7 +223,12 @@ class KDNA_Events_PDF_Generator {
 			? kdna_events_get_email_header_image_url( $event_id )
 			: '';
 
+		$event_terms = $event_id
+			? (string) get_post_meta( $event_id, '_kdna_events_pdf_ticket_terms', true )
+			: '';
+
 		return array(
+			'event_terms'      => $event_terms,
 			'order'            => $order,
 			'tickets'          => $tickets,
 			'event_id'         => $event_id,

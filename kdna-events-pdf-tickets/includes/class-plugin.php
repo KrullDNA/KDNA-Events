@@ -51,6 +51,7 @@ class KDNA_Events_PDF_Plugin {
 		$this->booted = true;
 
 		KDNA_Events_PDF_Settings::instance()->init();
+		KDNA_Events_PDF_Event_Meta::instance()->init();
 		KDNA_Events_PDF_Email_Integration::instance()->init();
 		KDNA_Events_PDF_Widget_Integration::instance()->init();
 		KDNA_Events_PDF_REST::instance()->init();
