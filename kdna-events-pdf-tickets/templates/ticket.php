@@ -29,6 +29,22 @@ $css     = file_exists( KDNA_EVENTS_PDF_PLUGIN_DIR . 'templates/css/ticket.css' 
 $margin = max( 5, min( 40, (int) ( $design['page_margin'] ?? 18 ) ) );
 $css    = '@page { margin: ' . $margin . 'mm ' . $margin . 'mm ' . ( $margin + 6 ) . 'mm; }' . "\n" . $css;
 
+// Inject @font-face rules + override font-family declarations when
+// the admin has supplied a TTF URL. Dompdf will fetch the TTF on
+// first render (isRemoteEnabled is on in the generator) and cache it.
+$heading_face = trim( (string) ( $design['heading_font_url'] ?? '' ) );
+$body_face    = trim( (string) ( $design['body_font_url'] ?? '' ) );
+$face_css     = '';
+if ( '' !== $heading_face ) {
+	$face_css .= "@font-face { font-family: 'KdnaPdfHeading'; src: url('" . esc_url_raw( $heading_face ) . "') format('truetype'); font-weight: normal; font-style: normal; }\n";
+	$face_css .= ".tkt-event-name, .tkt-meta__label, .tkt-meta__value, .tkt-location__label, .tkt-location__value { font-family: 'KdnaPdfHeading', " . ( $design['heading_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
+}
+if ( '' !== $body_face ) {
+	$face_css .= "@font-face { font-family: 'KdnaPdfBody'; src: url('" . esc_url_raw( $body_face ) . "') format('truetype'); font-weight: normal; font-style: normal; }\n";
+	$face_css .= "body, .tkt-terms, .tkt-top__title, .tkt-footer { font-family: 'KdnaPdfBody', " . ( $design['body_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
+}
+$css .= "\n" . $face_css;
+
 // Pull variables up once so each ticket block can reference them.
 $logo_id  = (int) ( $design['logo_id'] ?? 0 );
 $logo_url = $logo_id ? (string) wp_get_attachment_image_url( $logo_id, 'medium' ) : '';
