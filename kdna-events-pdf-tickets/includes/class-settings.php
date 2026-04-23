@@ -52,6 +52,21 @@ class KDNA_Events_PDF_Settings {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'wp_ajax_' . self::PREVIEW_AJAX, array( $this, 'ajax_preview' ) );
 		add_action( 'wp_ajax_' . self::SAMPLE_AJAX, array( $this, 'ajax_sample' ) );
+		add_filter( 'upload_mimes', array( $this, 'allow_font_uploads' ) );
+	}
+
+	/**
+	 * Allow TTF / OTF font uploads in the WordPress Media Library so
+	 * admins can drop a Google Fonts family in and paste the URL
+	 * into the PDF settings page.
+	 *
+	 * @param array $mimes
+	 * @return array
+	 */
+	public function allow_font_uploads( $mimes ) {
+		$mimes['ttf'] = 'font/ttf';
+		$mimes['otf'] = 'font/otf';
+		return $mimes;
 	}
 
 	/**
@@ -68,6 +83,73 @@ class KDNA_Events_PDF_Settings {
 			self::PAGE_SLUG,
 			array( $this, 'render_page' )
 		);
+	}
+
+	/**
+	 * Curated font dropdown, mirrors the core Email Design options.
+	 *
+	 * The labels are identical to the core email font picker so the
+	 * two settings tabs feel like one connected experience.
+	 *
+	 * @return array<string,string>
+	 */
+	public static function font_options() {
+		if ( class_exists( 'KDNA_Events_Settings' ) && method_exists( 'KDNA_Events_Settings', 'email_font_options' ) ) {
+			$core = KDNA_Events_Settings::email_font_options();
+			if ( is_array( $core ) && ! empty( $core ) ) {
+				return $core;
+			}
+		}
+		// Fallback list if core Brief A is not on this install.
+		return array(
+			'google:Inter'            => __( 'Inter (Google, recommended)', 'kdna-events-pdf-tickets' ),
+			'google:Roboto'           => __( 'Roboto (Google)', 'kdna-events-pdf-tickets' ),
+			'google:Poppins'          => __( 'Poppins (Google)', 'kdna-events-pdf-tickets' ),
+			'google:Montserrat'       => __( 'Montserrat (Google)', 'kdna-events-pdf-tickets' ),
+			'google:Open Sans'        => __( 'Open Sans (Google)', 'kdna-events-pdf-tickets' ),
+			'google:Lato'             => __( 'Lato (Google)', 'kdna-events-pdf-tickets' ),
+			'google:Nunito'           => __( 'Nunito (Google)', 'kdna-events-pdf-tickets' ),
+			'google:Work Sans'        => __( 'Work Sans (Google)', 'kdna-events-pdf-tickets' ),
+			'google:DM Sans'          => __( 'DM Sans (Google)', 'kdna-events-pdf-tickets' ),
+			'google:Manrope'          => __( 'Manrope (Google)', 'kdna-events-pdf-tickets' ),
+			'google:Playfair Display' => __( 'Playfair Display (Google, serif)', 'kdna-events-pdf-tickets' ),
+			'google:Merriweather'     => __( 'Merriweather (Google, serif)', 'kdna-events-pdf-tickets' ),
+			'system:arial'            => __( 'Arial (system)', 'kdna-events-pdf-tickets' ),
+			'system:helvetica'        => __( 'Helvetica (system)', 'kdna-events-pdf-tickets' ),
+			'system:georgia'          => __( 'Georgia (serif, system)', 'kdna-events-pdf-tickets' ),
+			'system:verdana'          => __( 'Verdana (system)', 'kdna-events-pdf-tickets' ),
+			'system:tahoma'           => __( 'Tahoma (system)', 'kdna-events-pdf-tickets' ),
+			'system:trebuchet'        => __( 'Trebuchet MS (system)', 'kdna-events-pdf-tickets' ),
+			'system:times'            => __( 'Times New Roman (serif, system)', 'kdna-events-pdf-tickets' ),
+		);
+	}
+
+	/**
+	 * Resolve a font dropdown value to a Dompdf-safe font name.
+	 *
+	 * Dompdf only renders fonts registered in its font cache. The
+	 * defaults that ship are Helvetica, Times and Courier. Google
+	 * fonts and most system fonts are not available unless the TTF
+	 * is pre-registered. We therefore collapse every choice to one
+	 * of those three built-ins so the PDF always renders, and call
+	 * out the fallback behaviour in the field help text.
+	 *
+	 * @param string $value Dropdown value (e.g. 'google:Inter').
+	 * @return string
+	 */
+	public static function resolve_pdf_font( $value ) {
+		$value = (string) $value;
+		// Serif Google / system fonts collapse to Times.
+		$serif_tokens = array( 'google:Playfair Display', 'google:Merriweather', 'system:georgia', 'system:times', 'times' );
+		if ( in_array( $value, $serif_tokens, true ) ) {
+			return 'times';
+		}
+		// Monospace.
+		if ( 'courier' === $value ) {
+			return 'courier';
+		}
+		// Everything else is sans-serif and falls back to Helvetica.
+		return 'helvetica';
 	}
 
 	/**
@@ -105,9 +187,11 @@ class KDNA_Events_PDF_Settings {
 			'kdna_events_pdf_divider_color'        => array( 'type' => 'string',  'default' => '#E5E5E5' ),
 
 			// Typography.
-			'kdna_events_pdf_heading_font'         => array( 'type' => 'string',  'default' => 'helvetica' ),
+			'kdna_events_pdf_heading_font'         => array( 'type' => 'string',  'default' => 'google:Inter' ),
+			'kdna_events_pdf_heading_font_url'     => array( 'type' => 'string',  'default' => '' ),
+			'kdna_events_pdf_body_font_url'        => array( 'type' => 'string',  'default' => '' ),
 			'kdna_events_pdf_heading_size'         => array( 'type' => 'integer', 'default' => 20 ),
-			'kdna_events_pdf_body_font'            => array( 'type' => 'string',  'default' => 'helvetica' ),
+			'kdna_events_pdf_body_font'            => array( 'type' => 'string',  'default' => 'google:Inter' ),
 			'kdna_events_pdf_body_size'            => array( 'type' => 'integer', 'default' => 11 ),
 			'kdna_events_pdf_code_font'            => array( 'type' => 'string',  'default' => 'courier' ),
 			'kdna_events_pdf_code_size'            => array( 'type' => 'integer', 'default' => 36 ),
@@ -368,18 +452,29 @@ class KDNA_Events_PDF_Settings {
 			$o
 		);
 
+		$font_options = self::font_options();
 		$this->render_section(
 			__( 'Typography', 'kdna-events-pdf-tickets' ),
 			array(
-				array( 'label' => __( 'Heading font', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_heading_font', 'type' => 'select', 'options' => array( 'helvetica' => 'Helvetica', 'times' => 'Times', 'courier' => 'Courier' ) ),
+				array( 'label' => __( 'Heading font', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_heading_font', 'type' => 'select', 'options' => $font_options ),
 				array( 'label' => __( 'Heading size (pt)', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_heading_size', 'type' => 'number' ),
-				array( 'label' => __( 'Body font', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_body_font', 'type' => 'select', 'options' => array( 'helvetica' => 'Helvetica', 'times' => 'Times', 'courier' => 'Courier' ) ),
+				array( 'label' => __( 'Body font', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_body_font', 'type' => 'select', 'options' => $font_options ),
 				array( 'label' => __( 'Body size (pt)', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_body_size', 'type' => 'number' ),
 				array( 'label' => __( 'Ticket code font', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_code_font', 'type' => 'select', 'options' => array( 'courier' => 'Courier', 'helvetica' => 'Helvetica' ) ),
 				array( 'label' => __( 'Ticket code size (pt)', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_code_size', 'type' => 'number' ),
 			),
 			$o
 		);
+		echo '<p class="description" style="max-width:64em;">' . esc_html__( 'Font selections share the same list as the core Email Design tab for consistency. Dompdf cannot load Google Fonts directly, but you can paste a TTF URL below per font slot and the PDF will download the file and render with it. TTF / OTF uploads are enabled in your Media Library.', 'kdna-events-pdf-tickets' ) . '</p>';
+		$this->render_section(
+			__( 'Custom PDF fonts', 'kdna-events-pdf-tickets' ),
+			array(
+				array( 'label' => __( 'Heading font TTF URL', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_heading_font_url', 'type' => 'url' ),
+				array( 'label' => __( 'Body font TTF URL', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_body_font_url', 'type' => 'url' ),
+			),
+			$o
+		);
+		echo '<p class="description" style="max-width:64em;">' . esc_html__( 'Upload your TTF to Media Library (or paste any public HTTPS URL) and paste the file URL here. Leave blank to use the Dompdf-safe fallback from the dropdown above. First PDF render after a change will cache the font in Dompdf, subsequent renders are instant.', 'kdna-events-pdf-tickets' ) . '</p>';
 
 		$this->render_section(
 			__( 'Barcode', 'kdna-events-pdf-tickets' ),

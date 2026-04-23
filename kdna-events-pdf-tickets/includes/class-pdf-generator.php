@@ -270,9 +270,17 @@ class KDNA_Events_PDF_Generator {
 			'body_color'      => (string) get_option( 'kdna_events_pdf_body_color', '#333333' ),
 			'muted_color'     => (string) get_option( 'kdna_events_pdf_muted_color', '#888888' ),
 			'divider_color'   => (string) get_option( 'kdna_events_pdf_divider_color', '#E5E5E5' ),
-			'heading_font'    => (string) get_option( 'kdna_events_pdf_heading_font', 'helvetica' ),
+			'heading_font'    => class_exists( 'KDNA_Events_PDF_Settings' )
+				? KDNA_Events_PDF_Settings::resolve_pdf_font( (string) get_option( 'kdna_events_pdf_heading_font', 'google:Inter' ) )
+				: 'helvetica',
+			'heading_font_raw' => (string) get_option( 'kdna_events_pdf_heading_font', 'google:Inter' ),
+			'heading_font_url' => (string) get_option( 'kdna_events_pdf_heading_font_url', '' ),
 			'heading_size'    => (int) get_option( 'kdna_events_pdf_heading_size', 20 ),
-			'body_font'       => (string) get_option( 'kdna_events_pdf_body_font', 'helvetica' ),
+			'body_font'       => class_exists( 'KDNA_Events_PDF_Settings' )
+				? KDNA_Events_PDF_Settings::resolve_pdf_font( (string) get_option( 'kdna_events_pdf_body_font', 'google:Inter' ) )
+				: 'helvetica',
+			'body_font_raw'   => (string) get_option( 'kdna_events_pdf_body_font', 'google:Inter' ),
+			'body_font_url'   => (string) get_option( 'kdna_events_pdf_body_font_url', '' ),
 			'body_size'       => (int) get_option( 'kdna_events_pdf_body_size', 11 ),
 			'code_font'       => (string) get_option( 'kdna_events_pdf_code_font', 'courier' ),
 			'code_size'       => (int) get_option( 'kdna_events_pdf_code_size', 36 ),
