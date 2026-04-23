@@ -370,6 +370,24 @@ class KDNA_Events_PDF_Generator {
 		$options->set( 'isHtml5ParserEnabled', true );
 		$options->set( 'defaultFont', 'helvetica' );
 
+		// Point Dompdf at a writable font cache. Its default is inside
+		// its own vendor directory which is often read-only on shared
+		// hosts, causing @font-face TTF loads to silently fail and the
+		// render to fall back to Helvetica. wp_upload_dir is guaranteed
+		// writable by WordPress activation.
+		$upload = wp_upload_dir();
+		if ( empty( $upload['error'] ) ) {
+			$font_dir = trailingslashit( $upload['basedir'] ) . 'kdna-events-pdf-fonts';
+			if ( ! file_exists( $font_dir ) ) {
+				wp_mkdir_p( $font_dir );
+				@file_put_contents( $font_dir . '/.htaccess', "Order deny,allow\nDeny from all\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents,Generic.PHP.NoSilencedErrors.Discouraged
+				@file_put_contents( $font_dir . '/index.php', "<?php // Silence is golden.\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents,Generic.PHP.NoSilencedErrors.Discouraged
+			}
+			$options->set( 'fontDir', $font_dir );
+			$options->set( 'fontCache', $font_dir );
+			$options->set( 'tempDir', $font_dir );
+		}
+
 		$dompdf = new \Dompdf\Dompdf( $options );
 		$dompdf->setPaper( $page_size, $orientation );
 		$dompdf->loadHtml( $html, 'UTF-8' );
