@@ -99,7 +99,17 @@ body {
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-size: cover;
-	height: 85mm;
+}
+
+/* Invisible spacer inside the image cell. Guarantees the cell has
+   non-zero content so Dompdf honours the row-height normalisation,
+   and its min-height nudges the card to a sensible minimum when the
+   body content is short. */
+.tkt-card__image-spacer {
+	display: block;
+	width: 1px;
+	height: 70mm;
+	visibility: hidden;
 }
 
 .tkt-card__image img {
