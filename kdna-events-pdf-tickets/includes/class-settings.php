@@ -408,6 +408,217 @@ class KDNA_Events_PDF_Settings {
 	}
 
 	/**
+	protected function render_sections( $o ) {
+		$this->render_inheritable_pair( 'logo_id', __( 'Logo image', 'kdna-events-pdf-tickets' ), $o, 'media' );
+		$this->render_inheritable_pair( 'header_bg', __( 'Brand header background', 'kdna-events-pdf-tickets' ), $o, 'color' );
+		$this->render_inheritable_pair( 'default_event_image', __( 'Default event image', 'kdna-events-pdf-tickets' ), $o, 'media' );
+
+		$this->render_section(
+			__( 'Brand + Layout', 'kdna-events-pdf-tickets' ),
+			array(
+				array( 'label' => __( 'Logo width (px)', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_logo_width', 'type' => 'number' ),
+				array( 'label' => __( 'Logo alignment', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_logo_align', 'type' => 'select', 'options' => array( 'left' => __( 'Left', 'kdna-events-pdf-tickets' ), 'center' => __( 'Centre', 'kdna-events-pdf-tickets' ) ) ),
+				array( 'label' => __( 'Brand header height (px)', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_header_height', 'type' => 'number' ),
+				array( 'label' => __( 'Page size', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_page_size', 'type' => 'select', 'options' => array( 'A4' => 'A4', 'Letter' => 'Letter' ) ),
+				array( 'label' => __( 'Orientation', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_page_orientation', 'type' => 'select', 'options' => array( 'portrait' => __( 'Portrait', 'kdna-events-pdf-tickets' ), 'landscape' => __( 'Landscape', 'kdna-events-pdf-tickets' ) ) ),
+				array( 'label' => __( 'Page margin (mm)', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_page_margin', 'type' => 'number' ),
+				array( 'label' => __( 'Tickets per order', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_tickets_per_order', 'type' => 'select', 'options' => array( 'combined' => __( 'Combined (one PDF, page per ticket)', 'kdna-events-pdf-tickets' ), 'separate' => __( 'Separate (one PDF per ticket)', 'kdna-events-pdf-tickets' ) ) ),
+			),
+			$o
+		);
+
+		$this->render_inheritable_pair( 'color_primary', __( 'Primary brand colour', 'kdna-events-pdf-tickets' ), $o, 'color' );
+		$this->render_inheritable_pair( 'color_accent', __( 'Accent colour', 'kdna-events-pdf-tickets' ), $o, 'color' );
+
+		$this->render_section(
+			__( 'Colours', 'kdna-events-pdf-tickets' ),
+			array(
+				array( 'label' => __( 'Page background', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_page_bg', 'type' => 'color' ),
+				array( 'label' => __( 'Heading text', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_heading_color', 'type' => 'color' ),
+				array( 'label' => __( 'Body text', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_body_color', 'type' => 'color' ),
+				array( 'label' => __( 'Muted text', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_muted_color', 'type' => 'color' ),
+				array( 'label' => __( 'Divider', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_divider_color', 'type' => 'color' ),
+			),
+			$o
+		);
+
+		$font_options = self::font_options();
+		$this->render_section(
+			__( 'Typography', 'kdna-events-pdf-tickets' ),
+			array(
+				array( 'label' => __( 'Heading font', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_heading_font', 'type' => 'select', 'options' => $font_options ),
+				array( 'label' => __( 'Heading size (pt)', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_heading_size', 'type' => 'number' ),
+				array( 'label' => __( 'Body font', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_body_font', 'type' => 'select', 'options' => $font_options ),
+				array( 'label' => __( 'Body size (pt)', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_body_size', 'type' => 'number' ),
+				array( 'label' => __( 'Ticket code font', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_code_font', 'type' => 'select', 'options' => array( 'courier' => 'Courier', 'helvetica' => 'Helvetica' ) ),
+				array( 'label' => __( 'Ticket code size (pt)', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_code_size', 'type' => 'number' ),
+			),
+			$o
+		);
+		echo '<p class="description" style="max-width:64em;">' . esc_html__( 'Font selections share the same list as the core Email Design tab for consistency. Dompdf cannot load Google Fonts directly, but you can paste a TTF URL below per font slot and the PDF will download the file and render with it. TTF / OTF uploads are enabled in your Media Library.', 'kdna-events-pdf-tickets' ) . '</p>';
+		$this->render_section(
+			__( 'Custom PDF fonts', 'kdna-events-pdf-tickets' ),
+			array(
+				array( 'label' => __( 'Heading font TTF URL', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_heading_font_url', 'type' => 'url' ),
+				array( 'label' => __( 'Body font TTF URL', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_body_font_url', 'type' => 'url' ),
+			),
+			$o
+		);
+		echo '<p class="description" style="max-width:64em;">' . esc_html__( 'Upload your TTF to Media Library (or paste any public HTTPS URL) and paste the file URL here. Leave blank to use the Dompdf-safe fallback from the dropdown above. First PDF render after a change will cache the font in Dompdf, subsequent renders are instant.', 'kdna-events-pdf-tickets' ) . '</p>';
+
+		$this->render_section(
+			__( 'Barcode', 'kdna-events-pdf-tickets' ),
+			array(
+				array( 'label' => __( 'Barcode type', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_barcode_type', 'type' => 'select', 'options' => array( 'code128' => 'Code 128' ) ),
+				array( 'label' => __( 'Barcode width (mm)', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_barcode_width', 'type' => 'number' ),
+				array( 'label' => __( 'Barcode height (mm)', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_barcode_height', 'type' => 'number' ),
+				array( 'label' => __( 'Show ticket code below barcode', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_barcode_show_text', 'type' => 'checkbox' ),
+			),
+			$o
+		);
+
+		$this->render_inheritable_pair( 'business_name', __( 'Business name', 'kdna-events-pdf-tickets' ), $o, 'text' );
+		$this->render_inheritable_pair( 'support_email', __( 'Support email', 'kdna-events-pdf-tickets' ), $o, 'email' );
+		$this->render_inheritable_pair( 'support_phone', __( 'Support phone', 'kdna-events-pdf-tickets' ), $o, 'text' );
+
+		$this->render_section(
+			__( 'Footer + Terms', 'kdna-events-pdf-tickets' ),
+			array(
+				array( 'label' => __( 'Show footer', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_show_footer', 'type' => 'checkbox' ),
+				array( 'label' => __( 'Website URL', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_website_url', 'type' => 'url' ),
+				array( 'label' => __( 'Show generation timestamp', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_show_timestamp', 'type' => 'checkbox' ),
+				array( 'label' => __( 'Terms / fine print', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_terms_text', 'type' => 'textarea' ),
+				array( 'label' => __( 'Download button label', 'kdna-events-pdf-tickets' ), 'name' => 'kdna_events_pdf_button_label', 'type' => 'text' ),
+			),
+			$o
+		);
+	}
+
+	/**
+	 * Render a single labelled section with a list of fields.
+	 *
+	 * @param string $title
+	 * @param array  $fields
+	 * @param array  $o
+	 * @return void
+	 */
+	protected function render_section( $title, $fields, $o ) {
+		echo '<h2 style="margin-top:1.5em;">' . esc_html( $title ) . '</h2>';
+		echo '<table class="form-table" role="presentation"><tbody>';
+		foreach ( $fields as $f ) {
+			$this->render_field_row( $f, $o );
+		}
+		echo '</tbody></table>';
+	}
+
+	/**
+	 * Render a field row (label + control).
+	 *
+	 * @param array $f Field definition.
+	 * @param array $o Resolved options.
+	 * @return void
+	 */
+	protected function render_field_row( $f, $o ) {
+		$name  = (string) $f['name'];
+		$label = (string) $f['label'];
+		$type  = (string) ( $f['type'] ?? 'text' );
+		$value = array_key_exists( $name, $o ) ? $o[ $name ] : '';
+		echo '<tr><th scope="row"><label for="' . esc_attr( $name ) . '">' . esc_html( $label ) . '</label></th><td>';
+		switch ( $type ) {
+			case 'checkbox':
+				echo '<label><input type="checkbox" id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" value="1" ' . checked( (bool) $value, true, false ) . ' data-pdf-preview-key="' . esc_attr( $name ) . '" /> ' . esc_html__( 'Enable', 'kdna-events-pdf-tickets' ) . '</label>';
+				break;
+			case 'color':
+				echo '<input type="text" class="kdna-events-pdf-color" id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( (string) $value ) . '" data-default-color="' . esc_attr( (string) $value ) . '" data-pdf-preview-key="' . esc_attr( $name ) . '" />';
+				break;
+			case 'number':
+				echo '<input type="number" id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( (string) $value ) . '" data-pdf-preview-key="' . esc_attr( $name ) . '" />';
+				break;
+			case 'select':
+				echo '<select id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" data-pdf-preview-key="' . esc_attr( $name ) . '">';
+				foreach ( (array) ( $f['options'] ?? array() ) as $k => $v ) {
+					echo '<option value="' . esc_attr( $k ) . '" ' . selected( $value, $k, false ) . '>' . esc_html( $v ) . '</option>';
+				}
+				echo '</select>';
+				break;
+			case 'textarea':
+				echo '<textarea class="large-text" rows="3" id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" data-pdf-preview-key="' . esc_attr( $name ) . '">' . esc_textarea( (string) $value ) . '</textarea>';
+				break;
+			case 'email':
+				echo '<input type="email" class="regular-text" id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( (string) $value ) . '" data-pdf-preview-key="' . esc_attr( $name ) . '" />';
+				break;
+			case 'url':
+				echo '<input type="url" class="regular-text" id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( (string) $value ) . '" data-pdf-preview-key="' . esc_attr( $name ) . '" />';
+				break;
+			default:
+				echo '<input type="text" class="regular-text" id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( (string) $value ) . '" data-pdf-preview-key="' . esc_attr( $name ) . '" />';
+		}
+		echo '</td></tr>';
+	}
+
+	/**
+	 * Render an inheritable field pair: the toggle + override field.
+	 *
+	 * @param string $key   Option key suffix (without the prefix).
+	 * @param string $label Field label.
+	 * @param array  $o     Options.
+	 * @param string $type  'media' | 'color' | 'text' | 'email'.
+	 * @return void
+	 */
+	protected function render_inheritable_pair( $key, $label, $o, $type ) {
+		$inherit_name = 'kdna_events_pdf_inherit_' . $key;
+		$override_name = 'kdna_events_pdf_' . $key;
+		$inherit_on    = ! empty( $o[ $inherit_name ] );
+		echo '<h2 style="margin-top:1.5em;">' . esc_html( $label ) . '</h2>';
+		echo '<p class="description"><label><input type="checkbox" name="' . esc_attr( $inherit_name ) . '" value="1" ' . checked( $inherit_on, true, false ) . ' /> ' . esc_html__( 'Inherit from core Email Design', 'kdna-events-pdf-tickets' ) . '</label></p>';
+		echo '<table class="form-table" role="presentation"><tbody><tr><th scope="row"><label for="' . esc_attr( $override_name ) . '">' . esc_html__( 'Override', 'kdna-events-pdf-tickets' ) . '</label></th><td>';
+		switch ( $type ) {
+			case 'media':
+				$id  = (int) ( $o[ $override_name ] ?? 0 );
+				$url = $id ? (string) wp_get_attachment_image_url( $id, 'medium' ) : '';
+				echo '<div class="kdna-events-pdf-media" data-pdf-media>';
+				echo '<input type="hidden" name="' . esc_attr( $override_name ) . '" value="' . esc_attr( (string) $id ) . '" data-pdf-media-input data-pdf-preview-key="' . esc_attr( $override_name ) . '" />';
+				echo '<div class="kdna-events-pdf-media__preview" data-pdf-media-preview>' . ( $url ? '<img src="' . esc_url( $url ) . '" alt="" style="max-width:180px;" />' : '' ) . '</div>';
+				echo '<button type="button" class="button" data-pdf-media-select>' . ( $url ? esc_html__( 'Change image', 'kdna-events-pdf-tickets' ) : esc_html__( 'Select image', 'kdna-events-pdf-tickets' ) ) . '</button> ';
+				echo '<button type="button" class="button-link-delete" data-pdf-media-remove ' . ( $url ? '' : 'hidden' ) . '>' . esc_html__( 'Remove', 'kdna-events-pdf-tickets' ) . '</button>';
+				echo '</div>';
+				break;
+			case 'color':
+				$value = (string) ( $o[ $override_name ] ?? '' );
+				echo '<input type="text" class="kdna-events-pdf-color" name="' . esc_attr( $override_name ) . '" value="' . esc_attr( $value ) . '" data-default-color="' . esc_attr( $value ) . '" data-pdf-preview-key="' . esc_attr( $override_name ) . '" />';
+				break;
+			case 'email':
+				echo '<input type="email" class="regular-text" name="' . esc_attr( $override_name ) . '" value="' . esc_attr( (string) ( $o[ $override_name ] ?? '' ) ) . '" data-pdf-preview-key="' . esc_attr( $override_name ) . '" />';
+				break;
+			default:
+				echo '<input type="text" class="regular-text" name="' . esc_attr( $override_name ) . '" value="' . esc_attr( (string) ( $o[ $override_name ] ?? '' ) ) . '" data-pdf-preview-key="' . esc_attr( $override_name ) . '" />';
+		}
+		echo '<p class="description">' . esc_html__( 'Only used when Inherit is off.', 'kdna-events-pdf-tickets' ) . '</p>';
+		echo '</td></tr></tbody></table>';
+	}
+
+	/**
+	 * Render the preview iframe panel.
+	 *
+	 * @return void
+	 */
+	protected function render_preview_panel() {
+		?>
+		<div class="kdna-events-pdf-preview-panel" data-pdf-preview>
+			<div class="kdna-events-pdf-preview-panel__bar">
+				<strong><?php esc_html_e( 'Live preview', 'kdna-events-pdf-tickets' ); ?></strong>
+				<button type="button" class="button button-secondary" data-pdf-preview-refresh><?php esc_html_e( 'Refresh', 'kdna-events-pdf-tickets' ); ?></button>
+				<button type="button" class="button button-primary" data-pdf-sample-download><?php esc_html_e( 'Download sample', 'kdna-events-pdf-tickets' ); ?></button>
+				<button type="button" class="button button-link" data-pdf-font-debug><?php esc_html_e( 'Debug fonts', 'kdna-events-pdf-tickets' ); ?></button>
+			</div>
+			<div class="kdna-events-pdf-debug" data-pdf-debug-output hidden style="margin:10px 0;border:1px solid #dcdcde;background:#f6f7f7;padding:10px;max-height:360px;overflow:auto;"></div>
+			<iframe class="kdna-events-pdf-preview-panel__frame" data-pdf-preview-frame title="<?php esc_attr_e( 'Ticket PDF preview', 'kdna-events-pdf-tickets' ); ?>" src="about:blank"></iframe>
+			<p class="description"><?php esc_html_e( 'Preview uses dummy sample data. Save settings before going live.', 'kdna-events-pdf-tickets' ); ?></p>
+		</div>
+		<?php
+	}
+
+	/**
 	 * Inline JS for the preview panel + media picker + colour picker.
 	 *
 	 * @return void
