@@ -430,6 +430,11 @@ class KDNA_Events_PDF_Settings {
 	}
 
 	/**
+	 * Render every control section. Kept compact for brevity.
+	 *
+	 * @param array $o Resolved option values.
+	 * @return void
+	 */
 	protected function render_sections( $o ) {
 		$this->render_inheritable_pair( 'logo_id', __( 'Logo image', 'kdna-events-pdf-tickets' ), $o, 'media' );
 		$this->render_inheritable_pair( 'header_bg', __( 'Brand header background', 'kdna-events-pdf-tickets' ), $o, 'color' );
