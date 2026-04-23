@@ -32,16 +32,24 @@ $css    = '@page { margin: ' . $margin . 'mm ' . $margin . 'mm ' . ( $margin + 6
 // Inject @font-face rules + override font-family declarations when
 // the admin has supplied a TTF URL. Dompdf will fetch the TTF on
 // first render (isRemoteEnabled is on in the generator) and cache it.
+//
+// Dompdf inherits font-family unreliably through descendants, so
+// the body URL is broadcast to every text selector explicitly. The
+// heading URL then overrides headings + meta on top, so any of the
+// three combinations (only body, only heading, both) produces the
+// expected visual result.
 $heading_face = trim( (string) ( $design['heading_font_url'] ?? '' ) );
 $body_face    = trim( (string) ( $design['body_font_url'] ?? '' ) );
 $face_css     = '';
-if ( '' !== $heading_face ) {
-	$face_css .= "@font-face { font-family: 'KdnaPdfHeading'; src: url('" . esc_url_raw( $heading_face ) . "') format('truetype'); font-weight: normal; font-style: normal; }\n";
-	$face_css .= ".tkt-event-name, .tkt-meta__label, .tkt-meta__value, .tkt-location__label, .tkt-location__value { font-family: 'KdnaPdfHeading', " . ( $design['heading_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
-}
+$body_targets = "body, .tkt-event-name, .tkt-meta__label, .tkt-meta__value, .tkt-location__label, .tkt-location__value, .tkt-terms, .tkt-top__title, .tkt-footer, .tkt-footer p, .tkt-footer strong";
+$heading_targets = ".tkt-event-name, .tkt-meta__label, .tkt-meta__value, .tkt-location__label, .tkt-location__value, .tkt-top__title";
 if ( '' !== $body_face ) {
 	$face_css .= "@font-face { font-family: 'KdnaPdfBody'; src: url('" . esc_url_raw( $body_face ) . "') format('truetype'); font-weight: normal; font-style: normal; }\n";
-	$face_css .= "body, .tkt-terms, .tkt-top__title, .tkt-footer { font-family: 'KdnaPdfBody', " . ( $design['body_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
+	$face_css .= $body_targets . " { font-family: 'KdnaPdfBody', " . ( $design['body_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
+}
+if ( '' !== $heading_face ) {
+	$face_css .= "@font-face { font-family: 'KdnaPdfHeading'; src: url('" . esc_url_raw( $heading_face ) . "') format('truetype'); font-weight: normal; font-style: normal; }\n";
+	$face_css .= $heading_targets . " { font-family: 'KdnaPdfHeading', " . ( $design['heading_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
 }
 $css .= "\n" . $face_css;
 
