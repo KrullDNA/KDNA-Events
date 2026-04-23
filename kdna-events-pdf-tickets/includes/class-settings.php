@@ -414,7 +414,7 @@ class KDNA_Events_PDF_Settings {
 		}
 		?>
 		<div class="wrap kdna-events-pdf-settings">
-			<h1><?php esc_html_e( 'PDF Tickets', 'kdna-events-pdf-tickets' ); ?></h1>
+			<h1><?php esc_html_e( 'PDF Tickets', 'kdna-events-pdf-tickets' ); ?> <span style="font-size:13px;color:#888;vertical-align:middle;"><?php echo esc_html( 'v' . KDNA_EVENTS_PDF_VERSION ); ?></span></h1>
 			<?php settings_errors(); ?>
 			<div class="kdna-events-pdf-grid">
 				<form method="post" action="options.php" class="kdna-events-pdf-form">
