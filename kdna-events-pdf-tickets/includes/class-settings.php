@@ -23,6 +23,7 @@ class KDNA_Events_PDF_Settings {
 	const PARENT_SLUG   = 'kdna-events';
 	const PREVIEW_AJAX  = 'kdna_events_pdf_preview';
 	const SAMPLE_AJAX   = 'kdna_events_pdf_sample_download';
+	const DEBUG_AJAX    = 'kdna_events_pdf_font_debug';
 
 	/**
 	 * @var self|null
@@ -52,6 +53,7 @@ class KDNA_Events_PDF_Settings {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'wp_ajax_' . self::PREVIEW_AJAX, array( $this, 'ajax_preview' ) );
 		add_action( 'wp_ajax_' . self::SAMPLE_AJAX, array( $this, 'ajax_sample' ) );
+		add_action( 'wp_ajax_' . self::DEBUG_AJAX, array( $this, 'ajax_font_debug' ) );
 		add_filter( 'upload_mimes', array( $this, 'allow_font_uploads' ) );
 	}
 
@@ -379,6 +381,117 @@ class KDNA_Events_PDF_Settings {
 	}
 
 	/**
+	 * AJAX: run a full diagnostic on the font rendering path and
+	 * return a human-readable HTML report. Used by the 'Debug fonts'
+	 * button on the settings page.
+	 *
+	 * @return void
+	 */
+	public function ajax_font_debug() {
+		check_ajax_referer( self::DEBUG_AJAX, 'nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'kdna-events-pdf-tickets' ) ), 403 );
+		}
+
+		$heading_url = (string) get_option( 'kdna_events_pdf_heading_font_url', '' );
+		$body_url    = (string) get_option( 'kdna_events_pdf_body_font_url', '' );
+		$upload      = wp_upload_dir();
+		$font_dir    = empty( $upload['error'] ) ? trailingslashit( $upload['basedir'] ) . 'kdna-events-pdf-fonts' : '';
+
+		$generator = new KDNA_Events_PDF_Generator();
+		$order     = (object) array(
+			'order_id' => 0, 'order_reference' => 'DBG-0001', 'event_id' => 0,
+			'purchaser_name' => 'Debug', 'purchaser_email' => 'debug@example.com',
+			'quantity' => 1, 'total' => 1, 'currency' => 'AUD', 'status' => 'paid', 'created_at' => current_time( 'mysql' ),
+		);
+		$tickets   = array( (object) array( 'ticket_id' => 0, 'ticket_code' => 'DBG12345', 'attendee_name' => 'Debug', 'attendee_email' => '', 'event_id' => 0 ) );
+		$context   = $generator->build_context_for_order( $order, $tickets );
+		$html      = $generator->render_html( $context );
+
+		// Render, capturing any error logged by Dompdf into an output buffer.
+		$err_before = error_get_last();
+		$pdf        = $generator->render_pdf( $html );
+		$err_after  = error_get_last();
+		$changed    = $err_after !== $err_before ? $err_after : null;
+
+		// Check HEAD on each TTF URL.
+		$probe = static function ( $url ) {
+			if ( '' === $url ) {
+				return null;
+			}
+			$r = wp_remote_head( $url, array( 'timeout' => 10, 'redirection' => 5, 'sslverify' => false ) );
+			if ( is_wp_error( $r ) ) {
+				return array( 'ok' => false, 'error' => $r->get_error_message() );
+			}
+			return array(
+				'ok'           => true,
+				'status'       => (int) wp_remote_retrieve_response_code( $r ),
+				'content_type' => (string) wp_remote_retrieve_header( $r, 'content-type' ),
+				'length'       => (string) wp_remote_retrieve_header( $r, 'content-length' ),
+			);
+		};
+		$body_probe    = $probe( $body_url );
+		$heading_probe = $probe( $heading_url );
+
+		// List font cache dir contents.
+		$cache_files = array();
+		if ( '' !== $font_dir && is_dir( $font_dir ) ) {
+			foreach ( scandir( $font_dir ) as $f ) {
+				if ( '.' === $f || '..' === $f ) {
+					continue;
+				}
+				$p = $font_dir . '/' . $f;
+				if ( is_file( $p ) ) {
+					$cache_files[] = array( 'name' => $f, 'size' => filesize( $p ) );
+				}
+			}
+		}
+
+		// Extract the @font-face block from the rendered HTML so we
+		// can confirm the CSS is actually being emitted.
+		$face_block = '';
+		if ( preg_match_all( '/@font-face\s*\{[^}]*\}/i', $html, $m ) ) {
+			$face_block = implode( "\n", $m[0] );
+		}
+
+		ob_start();
+		?>
+		<div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.5;">
+			<p><strong>Dompdf class loaded:</strong> <?php echo class_exists( '\\Dompdf\\Dompdf' ) ? 'YES' : 'NO'; ?></p>
+			<p><strong>Font cache dir:</strong> <?php echo esc_html( $font_dir ); ?> &nbsp; <strong>writable:</strong> <?php echo ( $font_dir && is_writable( $font_dir ) ) ? 'YES' : 'NO'; ?></p>
+			<p><strong>Body font URL:</strong> <?php echo esc_html( '' === $body_url ? '(not set)' : $body_url ); ?></p>
+			<p><strong>Heading font URL:</strong> <?php echo esc_html( '' === $heading_url ? '(not set)' : $heading_url ); ?></p>
+			<p><strong>PDF generated:</strong> <?php echo ( '' !== $pdf && substr( $pdf, 0, 4 ) === '%PDF' ) ? 'YES, ' . strlen( $pdf ) . ' bytes' : 'FAIL'; ?></p>
+			<?php if ( $changed ) : ?>
+				<p style="color:#b91c1c;"><strong>PHP error during render:</strong> <?php echo esc_html( (string) $changed['message'] ); ?> @ <?php echo esc_html( (string) $changed['file'] ); ?>:<?php echo esc_html( (string) $changed['line'] ); ?></p>
+			<?php endif; ?>
+
+			<p><strong>Body URL HEAD probe:</strong></p>
+			<pre style="white-space:pre-wrap;background:#fff;padding:6px;border:1px solid #dcdcde;"><?php echo esc_html( wp_json_encode( $body_probe, JSON_PRETTY_PRINT ) ); ?></pre>
+
+			<p><strong>Heading URL HEAD probe:</strong></p>
+			<pre style="white-space:pre-wrap;background:#fff;padding:6px;border:1px solid #dcdcde;"><?php echo esc_html( wp_json_encode( $heading_probe, JSON_PRETTY_PRINT ) ); ?></pre>
+
+			<p><strong>@font-face rules emitted in the rendered HTML:</strong></p>
+			<pre style="white-space:pre-wrap;background:#fff;padding:6px;border:1px solid #dcdcde;"><?php echo '' === $face_block ? '(none, the template did not emit an @font-face rule, URL fields may not have saved)' : esc_html( $face_block ); ?></pre>
+
+			<p><strong>Font cache contents (<?php echo count( $cache_files ); ?> files):</strong></p>
+			<pre style="white-space:pre-wrap;background:#fff;padding:6px;border:1px solid #dcdcde;"><?php
+			if ( empty( $cache_files ) ) {
+				echo '(empty, Dompdf has not cached any fonts yet)';
+			} else {
+				foreach ( $cache_files as $f ) {
+					echo esc_html( $f['name'] ) . '  ' . esc_html( (string) $f['size'] ) . " bytes\n";
+				}
+			}
+			?></pre>
+		</div>
+		<?php
+		$report = (string) ob_get_clean();
+		wp_send_json_success( array( 'html' => $report ) );
+	}
+
+	/**
 	 * Render the settings page.
 	 *
 	 * @return void
@@ -619,7 +732,9 @@ class KDNA_Events_PDF_Settings {
 				<strong><?php esc_html_e( 'Live preview', 'kdna-events-pdf-tickets' ); ?></strong>
 				<button type="button" class="button button-secondary" data-pdf-preview-refresh><?php esc_html_e( 'Refresh', 'kdna-events-pdf-tickets' ); ?></button>
 				<button type="button" class="button button-primary" data-pdf-sample-download><?php esc_html_e( 'Download sample', 'kdna-events-pdf-tickets' ); ?></button>
+				<button type="button" class="button button-link" data-pdf-font-debug><?php esc_html_e( 'Debug fonts', 'kdna-events-pdf-tickets' ); ?></button>
 			</div>
+			<div class="kdna-events-pdf-debug" data-pdf-debug-output hidden style="margin:10px 0;border:1px solid #dcdcde;background:#f6f7f7;padding:10px;max-height:360px;overflow:auto;"></div>
 			<iframe class="kdna-events-pdf-preview-panel__frame" data-pdf-preview-frame title="<?php esc_attr_e( 'Ticket PDF preview', 'kdna-events-pdf-tickets' ); ?>" src="about:blank"></iframe>
 			<p class="description"><?php esc_html_e( 'Preview uses dummy sample data. Save settings before going live.', 'kdna-events-pdf-tickets' ); ?></p>
 		</div>
@@ -636,8 +751,10 @@ class KDNA_Events_PDF_Settings {
 			'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
 			'previewNonce'  => wp_create_nonce( self::PREVIEW_AJAX ),
 			'sampleNonce'   => wp_create_nonce( self::SAMPLE_AJAX ),
+			'debugNonce'    => wp_create_nonce( self::DEBUG_AJAX ),
 			'previewAction' => self::PREVIEW_AJAX,
 			'sampleAction'  => self::SAMPLE_AJAX,
+			'debugAction'   => self::DEBUG_AJAX,
 		);
 		?>
 		<style>
@@ -699,6 +816,28 @@ class KDNA_Events_PDF_Settings {
 				sample.addEventListener('click', function () {
 					var url = cfg.ajaxUrl + '?action=' + encodeURIComponent(cfg.sampleAction) + '&nonce=' + encodeURIComponent(cfg.sampleNonce);
 					window.open(url, '_blank');
+				});
+			}
+
+			var debugBtn = panel.querySelector('[data-pdf-font-debug]');
+			var debugOut = panel.querySelector('[data-pdf-debug-output]');
+			if (debugBtn && debugOut) {
+				debugBtn.addEventListener('click', function () {
+					debugOut.removeAttribute('hidden');
+					debugOut.innerHTML = '<em>Running diagnostic...</em>';
+					var fd = new FormData();
+					fd.append('action', cfg.debugAction);
+					fd.append('nonce', cfg.debugNonce);
+					fetch(cfg.ajaxUrl, { method: 'POST', credentials: 'same-origin', body: fd })
+						.then(function (r) { return r.json(); })
+						.then(function (res) {
+							if (res && res.success && res.data && res.data.html) {
+								debugOut.innerHTML = res.data.html;
+							} else {
+								debugOut.textContent = 'Debug failed: ' + JSON.stringify(res);
+							}
+						})
+						.catch(function (err) { debugOut.textContent = 'Debug request failed: ' + err; });
 				});
 			}
 
