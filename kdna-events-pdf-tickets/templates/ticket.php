@@ -51,18 +51,30 @@ $heading_targets = ".tkt-event-name, .tkt-meta__label, .tkt-meta__value, .tkt-lo
 // the same family.
 $heading_family = 'KdnaPdfHeading';
 $body_family    = 'KdnaPdfBody';
+// Register each TTF at BOTH font-weights (normal + bold). Dompdf's
+// font matcher is strict: if the CSS asks for font-weight:700 but the
+// @font-face only declares font-weight:normal, it falls through to
+// the next family in the stack (Helvetica) - which is exactly why
+// body text worked (uses weight:normal) and heading / meta values
+// (weight:700) did not. Registering at both weights lets Dompdf
+// satisfy whichever weight the stylesheet specifies.
+$face_for = static function ( $family, $url ) {
+	$url_safe = esc_url_raw( $url );
+	return "@font-face { font-family: '" . $family . "'; src: url('" . $url_safe . "') format('truetype'); font-weight: normal; font-style: normal; }\n"
+		. "@font-face { font-family: '" . $family . "'; src: url('" . $url_safe . "') format('truetype'); font-weight: bold; font-style: normal; }\n";
+};
 if ( '' !== $body_face && '' !== $heading_face && $body_face === $heading_face ) {
 	$heading_family = $body_family;
-	$face_css      .= "@font-face { font-family: '" . $body_family . "'; src: url('" . esc_url_raw( $body_face ) . "') format('truetype'); font-weight: normal; font-style: normal; }\n";
+	$face_css      .= $face_for( $body_family, $body_face );
 	$face_css      .= $body_targets . " { font-family: '" . $body_family . "', " . ( $design['body_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
 	$face_css      .= $heading_targets . " { font-family: '" . $heading_family . "', " . ( $design['heading_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
 } else {
 	if ( '' !== $body_face ) {
-		$face_css .= "@font-face { font-family: '" . $body_family . "'; src: url('" . esc_url_raw( $body_face ) . "') format('truetype'); font-weight: normal; font-style: normal; }\n";
+		$face_css .= $face_for( $body_family, $body_face );
 		$face_css .= $body_targets . " { font-family: '" . $body_family . "', " . ( $design['body_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
 	}
 	if ( '' !== $heading_face ) {
-		$face_css .= "@font-face { font-family: '" . $heading_family . "'; src: url('" . esc_url_raw( $heading_face ) . "') format('truetype'); font-weight: normal; font-style: normal; }\n";
+		$face_css .= $face_for( $heading_family, $heading_face );
 		$face_css .= $heading_targets . " { font-family: '" . $heading_family . "', " . ( $design['heading_font'] ?? 'helvetica' ) . ", sans-serif !important; }\n";
 	}
 }
