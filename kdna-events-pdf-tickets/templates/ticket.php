@@ -41,7 +41,7 @@ $css    = '@page { margin: ' . $margin . 'mm ' . $margin . 'mm ' . ( $margin + 6
 $heading_face = trim( (string) ( $design['heading_font_url'] ?? '' ) );
 $body_face    = trim( (string) ( $design['body_font_url'] ?? '' ) );
 $face_css     = '';
-$body_targets = "body, td, .tkt-event-name, .tkt-meta, .tkt-meta td, .tkt-meta__label, .tkt-meta__value, .tkt-location, .tkt-location__label, .tkt-location__value, .tkt-terms, .tkt-top__title, .tkt-footer, .tkt-footer p, .tkt-footer strong, .tkt-card__body, .tkt-bottom, .tkt-bottom td";
+$body_targets = "body, td, .tkt-meta, .tkt-meta td, .tkt-location, .tkt-terms, .tkt-footer, .tkt-footer p, .tkt-footer strong, .tkt-card__body, .tkt-bottom, .tkt-bottom td";
 $heading_targets = ".tkt-event-name, .tkt-meta__label, .tkt-meta__value, .tkt-location__label, .tkt-location__value, .tkt-top__title";
 // Emit @font-face + font-family rules. Dompdf de-duplicates @font-
 // face entries by src URL: if we register two different family
