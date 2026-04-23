@@ -382,6 +382,28 @@ class KDNA_Events_PDF_Settings {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'kdna-events-pdf-tickets' ) );
 		}
+
+		// Capture any fatal thrown during render + show it inline on
+		// the page rather than relying on WordPress' generic critical
+		// error screen. Makes debugging without a debug.log possible.
+		try {
+			$this->render_page_body();
+		} catch ( \Throwable $e ) {
+			echo '<div class="wrap"><h1>' . esc_html__( 'PDF Tickets', 'kdna-events-pdf-tickets' ) . '</h1>';
+			echo '<div class="notice notice-error"><p><strong>' . esc_html__( 'PDF Tickets could not render the settings page.', 'kdna-events-pdf-tickets' ) . '</strong></p>';
+			echo '<p><code>' . esc_html( $e->getMessage() ) . '</code></p>';
+			echo '<p>' . esc_html__( 'File:', 'kdna-events-pdf-tickets' ) . ' <code>' . esc_html( $e->getFile() ) . ':' . (int) $e->getLine() . '</code></p>';
+			echo '<pre style="white-space:pre-wrap;background:#f6f7f7;padding:10px;border:1px solid #dcdcde;max-height:360px;overflow:auto;">' . esc_html( $e->getTraceAsString() ) . '</pre></div></div>';
+		}
+	}
+
+	/**
+	 * The actual settings-page markup, separated out so render_page
+	 * can wrap it in a try/catch for friendlier error output.
+	 *
+	 * @return void
+	 */
+	protected function render_page_body() {
 		$o = array();
 		foreach ( self::schema() as $name => $def ) {
 			$value = get_option( $name, $def['default'] );
