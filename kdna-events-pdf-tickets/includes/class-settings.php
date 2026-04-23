@@ -521,7 +521,95 @@ class KDNA_Events_PDF_Settings {
 				<?php $this->render_preview_panel(); ?>
 			</div>
 			<?php $this->render_preview_script(); ?>
+			<?php $this->render_inline_diagnostic(); ?>
 		</div>
+		<?php
+	}
+
+	/**
+	 * Emit a collapsible diagnostic block at the bottom of the
+	 * settings page. Runs every page load, no AJAX involved, so it
+	 * bypasses any nonce / opcache / security-plugin weirdness that
+	 * may be blocking the admin-ajax.php debug endpoint.
+	 *
+	 * @return void
+	 */
+	protected function render_inline_diagnostic() {
+		$heading_url = (string) get_option( 'kdna_events_pdf_heading_font_url', '' );
+		$body_url    = (string) get_option( 'kdna_events_pdf_body_font_url', '' );
+		$upload      = wp_upload_dir();
+		$font_dir    = empty( $upload['error'] ) ? trailingslashit( $upload['basedir'] ) . 'kdna-events-pdf-fonts' : '';
+		$dompdf_ok   = class_exists( '\\Dompdf\\Dompdf' );
+
+		$generator = class_exists( 'KDNA_Events_PDF_Generator' ) ? new KDNA_Events_PDF_Generator() : null;
+		$html      = '';
+		$pdf       = '';
+		$err_after = null;
+		if ( $generator ) {
+			$order   = (object) array(
+				'order_id' => 0, 'order_reference' => 'DBG-0001', 'event_id' => 0,
+				'purchaser_name' => 'Debug', 'purchaser_email' => 'debug@example.com',
+				'quantity' => 1, 'total' => 1, 'currency' => 'AUD', 'status' => 'paid', 'created_at' => current_time( 'mysql' ),
+			);
+			$tickets = array( (object) array( 'ticket_id' => 0, 'ticket_code' => 'DBG12345', 'attendee_name' => 'Debug', 'attendee_email' => '', 'event_id' => 0 ) );
+			$context = $generator->build_context_for_order( $order, $tickets );
+			$html    = $generator->render_html( $context );
+			$before  = error_get_last();
+			$pdf     = $generator->render_pdf( $html );
+			$after   = error_get_last();
+			$err_after = ( $after !== $before ) ? $after : null;
+		}
+
+		$probe = static function ( $url ) {
+			if ( '' === $url ) {
+				return '(not set)';
+			}
+			$r = wp_remote_head( $url, array( 'timeout' => 10, 'redirection' => 5, 'sslverify' => false ) );
+			if ( is_wp_error( $r ) ) {
+				return 'WP_Error: ' . $r->get_error_message();
+			}
+			return 'HTTP ' . (int) wp_remote_retrieve_response_code( $r ) . ', Content-Type: ' . (string) wp_remote_retrieve_header( $r, 'content-type' ) . ', Length: ' . (string) wp_remote_retrieve_header( $r, 'content-length' );
+		};
+
+		$cache_files = array();
+		if ( '' !== $font_dir && is_dir( $font_dir ) ) {
+			foreach ( (array) scandir( $font_dir ) as $f ) {
+				if ( '.' === $f || '..' === $f ) {
+					continue;
+				}
+				$p = $font_dir . '/' . $f;
+				if ( is_file( $p ) ) {
+					$cache_files[] = $f . '  (' . (int) filesize( $p ) . ' bytes)';
+				}
+			}
+		}
+
+		$face_block = '';
+		if ( '' !== $html && preg_match_all( '/@font-face\s*\{[^}]*\}/i', $html, $m ) ) {
+			$face_block = implode( "\n\n", $m[0] );
+		}
+		?>
+		<details style="margin:2em 0;padding:12px 16px;border:1px solid #dcdcde;background:#fff;">
+			<summary style="cursor:pointer;font-weight:600;font-size:14px;"><?php esc_html_e( 'Font diagnostic (click to expand)', 'kdna-events-pdf-tickets' ); ?></summary>
+			<div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.5;margin-top:10px;">
+				<p><strong>Dompdf class loaded:</strong> <?php echo $dompdf_ok ? 'YES' : 'NO'; ?></p>
+				<p><strong>Font cache dir:</strong> <?php echo esc_html( $font_dir ); ?></p>
+				<p><strong>Font cache dir writable:</strong> <?php echo ( '' !== $font_dir && is_writable( $font_dir ) ) ? 'YES' : 'NO'; ?></p>
+				<p><strong>Saved body font URL:</strong> <?php echo esc_html( '' === $body_url ? '(not set)' : $body_url ); ?></p>
+				<p><strong>Saved heading font URL:</strong> <?php echo esc_html( '' === $heading_url ? '(not set)' : $heading_url ); ?></p>
+				<p><strong>Body URL probe:</strong> <?php echo esc_html( $probe( $body_url ) ); ?></p>
+				<p><strong>Heading URL probe:</strong> <?php echo esc_html( $probe( $heading_url ) ); ?></p>
+				<p><strong>PDF render:</strong> <?php echo ( '' !== $pdf && substr( $pdf, 0, 4 ) === '%PDF' ) ? ( 'OK, ' . strlen( $pdf ) . ' bytes' ) : 'FAILED'; ?></p>
+				<?php if ( $err_after ) : ?>
+					<p style="color:#b91c1c;"><strong>PHP error during render:</strong> <?php echo esc_html( (string) ( $err_after['message'] ?? '' ) ); ?> @ <?php echo esc_html( (string) ( $err_after['file'] ?? '' ) ); ?>:<?php echo esc_html( (string) ( $err_after['line'] ?? '' ) ); ?></p>
+				<?php endif; ?>
+				<p><strong>@font-face rules in rendered HTML:</strong></p>
+				<pre style="white-space:pre-wrap;background:#f6f7f7;padding:8px;border:1px solid #dcdcde;"><?php echo '' === $face_block ? '(none emitted)' : esc_html( $face_block ); ?></pre>
+				<p><strong>Files currently in the font cache dir (<?php echo count( $cache_files ); ?>):</strong></p>
+				<pre style="white-space:pre-wrap;background:#f6f7f7;padding:8px;border:1px solid #dcdcde;"><?php echo empty( $cache_files ) ? '(empty)' : esc_html( implode( "\n", $cache_files ) ); ?></pre>
+				<p style="color:#555;">Copy this block and paste it back to support if custom fonts are not applying.</p>
+			</div>
+		</details>
 		<?php
 	}
 
