@@ -58,12 +58,18 @@ All three are the canonical hooks added in core v1.1 Brief A.
    `TYPE_CODE_128`) are identical across the two lines, so the
    upgrade path to 3.x when core eventually drops PHP 7.4 is a
    single-line composer bump.
-3. **Dompdf instance sharing with core v1.2 Brief C.** The add-on's
-   autoloader checks `class_exists( '\Dompdf\Dompdf' )` before
-   requiring its own `vendor/autoload.php`. Core v1.2 ships Dompdf
-   and loads it first (its bootstrap has the same guard), so both
-   plugins share the already-resolved classes at runtime. If the
-   core version is below 1.2, the add-on loads Dompdf itself.
+3. **Dompdf is not vendored.** Core KDNA Events 1.2.0 ships Dompdf
+   2.x for the tax invoice feature. Rather than duplicating ~4 MB
+   of vendor code, this add-on declares core 1.2.0 as its minimum
+   (see the `plugins_loaded` priority 5 check and the
+   `KDNA_EVENTS_PDF_MIN_CORE` constant), omits Dompdf from its own
+   composer require, and relies on core having loaded Dompdf by
+   the time any template renders. A defensive admin notice fires
+   when core is present but Dompdf somehow is not (for example
+   someone deleted core's `vendor/` directory). Composer marks
+   Dompdf as `suggest` so anyone building the add-on from source
+   outside WordPress gets a clear hint. Net result: the packaged
+   add-on drops from ~4.3 MB to under 1 MB.
 4. **Design reference PDF `docs/pdf-ticket-reference.pdf` was not in
    the repo** at build time. Templates follow the brief's 7-block
    structural description (brand header, event image, event details,
