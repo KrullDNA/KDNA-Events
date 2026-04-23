@@ -42,7 +42,7 @@ $heading_face = trim( (string) ( $design['heading_font_url'] ?? '' ) );
 $body_face    = trim( (string) ( $design['body_font_url'] ?? '' ) );
 $face_css     = '';
 $body_targets = "body, td, .tkt-meta, .tkt-meta td, .tkt-location, .tkt-terms, .tkt-footer, .tkt-footer p, .tkt-footer strong, .tkt-card__body, .tkt-bottom, .tkt-bottom td";
-$heading_targets = ".tkt-event-name, .tkt-meta__label, .tkt-meta__value, .tkt-location__label, .tkt-location__value, .tkt-top__title";
+$heading_targets = ".tkt-event-name, .tkt-meta__label, .tkt-meta__value, .tkt-location__label, .tkt-location__value, td.tkt-top__title";
 // Emit @font-face + font-family rules. Dompdf de-duplicates @font-
 // face entries by src URL: if we register two different family
 // names pointing at the same TTF, only the first family sticks and
@@ -144,7 +144,7 @@ $address  = trim( (string) get_option( 'kdna_events_invoice_business_address', '
 							<img src="<?php echo esc_url( $logo_url ); ?>" alt="<?php echo esc_attr( (string) get_bloginfo( 'name' ) ); ?>" style="max-width:<?php echo esc_attr( (string) (int) $design['logo_width'] ); ?>px;" />
 						<?php endif; ?>
 					</td>
-					<td class="tkt-top__title" style="width:50%;"><?php esc_html_e( 'Ticket', 'kdna-events-pdf-tickets' ); ?></td>
+					<td class="tkt-top__title" style="width:50%;<?php if ( '' !== $heading_face ) : ?>font-family:'<?php echo esc_attr( $heading_family ); ?>', <?php echo esc_attr( $design['heading_font'] ?? 'helvetica' ); ?>, sans-serif;<?php elseif ( '' !== $body_face ) : ?>font-family:'<?php echo esc_attr( $body_family ); ?>', <?php echo esc_attr( $design['body_font'] ?? 'helvetica' ); ?>, sans-serif;<?php endif; ?>"><?php esc_html_e( 'Ticket', 'kdna-events-pdf-tickets' ); ?></td>
 				</tr>
 			</table>
 
