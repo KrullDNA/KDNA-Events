@@ -537,6 +537,13 @@ class KDNA_Events_PDF_Settings {
 	 * @return void
 	 */
 	protected function render_preview_script() {
+		$cfg = array(
+			'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+			'previewNonce'  => wp_create_nonce( self::PREVIEW_AJAX ),
+			'sampleNonce'   => wp_create_nonce( self::SAMPLE_AJAX ),
+			'previewAction' => self::PREVIEW_AJAX,
+			'sampleAction'  => self::SAMPLE_AJAX,
+		);
 		?>
 		<style>
 			.kdna-events-pdf-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 20px; align-items: flex-start; }
@@ -547,9 +554,10 @@ class KDNA_Events_PDF_Settings {
 			.kdna-events-pdf-preview-panel__frame { width: 100%; height: 760px; border: 1px solid #dcdcde; border-radius: 4px; background: #f4f4f4; }
 		</style>
 		<script>
-		(function () {
-			if (!window.kdnaEventsPdf) { return; }
+		window.kdnaEventsPdf = <?php echo wp_json_encode( $cfg ); ?>;
+		function kdnaEventsPdfBoot() {
 			var cfg = window.kdnaEventsPdf;
+			if (!cfg || !cfg.ajaxUrl) { return; }
 			var $ = window.jQuery;
 			if ($ && $.fn && $.fn.wpColorPicker) {
 				$('.kdna-events-pdf-color').wpColorPicker({ change: schedule });
@@ -631,7 +639,12 @@ class KDNA_Events_PDF_Settings {
 			});
 
 			render();
-		})();
+		}
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', kdnaEventsPdfBoot);
+		} else {
+			kdnaEventsPdfBoot();
+		}
 		</script>
 		<?php
 	}
